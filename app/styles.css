@@ -1,0 +1,550 @@
+:root {
+  --bg: #f4efe7;
+  --panel: rgba(255, 250, 245, 0.9);
+  --sheet: #cfc081;
+  --sheet-ink: #173761;
+  --ink: #1e1a17;
+  --muted: #6b625b;
+  --line: #d8cbc0;
+  --accent: #fff0b0;
+  --accent-soft: rgba(255, 244, 197, 0.2);
+  --shadow: 0 18px 55px rgba(76, 49, 31, 0.14);
+  --radius: 22px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(176, 87, 54, 0.12), transparent 28%),
+    linear-gradient(160deg, #f7f1e8 0%, #efe7dc 100%);
+}
+
+body {
+  min-height: 100vh;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 420px minmax(0, 1fr);
+  gap: 24px;
+  padding: 24px;
+}
+
+.panel,
+.print-sheet {
+  background: var(--panel);
+  border: 1px solid rgba(143, 62, 46, 0.08);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.controls {
+  padding: 24px;
+  position: sticky;
+  top: 24px;
+  height: calc(100vh - 48px);
+  overflow: auto;
+  backdrop-filter: blur(14px);
+}
+
+.panel-header h1,
+.preview-toolbar h2,
+.quote-header h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.panel-header p,
+.preview-toolbar p,
+.quote-meta p,
+.sheet-section p {
+  margin: 0;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.muted {
+  color: var(--muted);
+  line-height: 1.5;
+  margin-top: 8px;
+}
+
+.field-group {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.field-group h2,
+.sheet-section h3 {
+  margin: 0 0 14px;
+  font-size: 1rem;
+}
+
+.conditional-section {
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(242, 221, 215, 0.32);
+  border: 1px solid rgba(143, 62, 46, 0.12);
+}
+
+.is-hidden {
+  display: none;
+}
+
+.inline-help {
+  margin: 8px 0 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.section-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggle-row input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.toggle-row span {
+  margin: 0;
+  color: var(--ink);
+}
+
+label {
+  display: block;
+  margin-top: 12px;
+}
+
+label span {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--ink);
+}
+
+textarea {
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.grid.two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.actions {
+  margin-top: 28px;
+}
+
+.primary-button,
+.secondary-button,
+.ghost-button {
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 120ms ease, opacity 120ms ease;
+}
+
+.primary-button {
+  width: 100%;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #a14834 0%, #7e3426 100%);
+  color: #fff;
+  font-weight: 700;
+}
+
+.secondary-button,
+.ghost-button {
+  padding: 10px 14px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+.preview-wrap {
+  min-width: 0;
+}
+
+.preview-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.total-badge {
+  min-width: 190px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 248, 243, 0.9);
+  border: 1px solid rgba(143, 62, 46, 0.12);
+  text-align: right;
+}
+
+.total-badge span {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.print-sheet {
+  width: min(100%, 920px);
+  margin: 0 auto 60px;
+  padding: 0;
+  background: transparent;
+  color: var(--sheet-ink);
+  border: 0;
+  box-shadow: none;
+}
+
+.pdf-page {
+  position: relative;
+  min-height: 1120px;
+  margin-bottom: 26px;
+  padding: 56px 48px 34px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  background:
+    radial-gradient(circle at bottom right, rgba(255, 242, 170, 0.72), transparent 32%),
+    linear-gradient(140deg, #b9ab73 0%, #cbbc7b 50%, #d7c783 100%);
+  overflow: hidden;
+}
+
+.page-cover {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  padding-top: 120px;
+  padding-bottom: 46px;
+}
+
+.cover-topline {
+  max-width: 520px;
+  color: var(--accent);
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.cover-patient {
+  margin: auto 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-size: 4rem;
+  font-weight: 500;
+  color: var(--sheet-ink);
+}
+
+.page-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.page-copy,
+.copy-block {
+  max-width: 760px;
+}
+
+.lead-copy,
+.copy-paragraph,
+.bullet-copy,
+.meta-copy {
+  font-size: 1.22rem;
+  line-height: 1.55;
+}
+
+.page-copy p,
+.copy-block p {
+  margin: 0 0 22px;
+}
+
+.page-section-title {
+  margin: 0 0 18px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--sheet-ink);
+  text-transform: uppercase;
+}
+
+.bullet-copy p::before {
+  content: "• ";
+  font-weight: 800;
+}
+
+.bullet-copy p {
+  margin: 0 0 14px;
+}
+
+.meta-copy {
+  margin-top: auto;
+}
+
+.meta-copy p {
+  margin: 0 0 12px;
+}
+
+.quote-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 10px;
+  border-bottom: 0;
+}
+
+.quote-meta {
+  min-width: 270px;
+  display: grid;
+  gap: 8px;
+  font-size: 0.95rem;
+}
+
+.sheet-section {
+  padding-top: 22px;
+}
+
+.sheet-section + .sheet-section {
+  border-top: 0;
+  margin-top: 22px;
+}
+
+.pricing-blocks {
+  display: grid;
+  gap: 26px;
+}
+
+.pricing-block {
+  display: grid;
+  gap: 6px;
+}
+
+.pricing-title {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.pricing-main {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.pricing-note {
+  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1.45;
+}
+
+.pricing-subtitle {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.grand-total-row {
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: baseline;
+  padding-top: 12px;
+  border-top: 2px solid rgba(23, 55, 97, 0.18);
+}
+
+.grand-total-row span {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.grand-total-row strong {
+  font-size: 2rem;
+}
+
+.rich-text {
+  color: var(--sheet-ink);
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+.extra-items {
+  display: grid;
+  gap: 10px;
+}
+
+.extra-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px 42px;
+  gap: 10px;
+}
+
+.preview-empty {
+  color: rgba(23, 55, 97, 0.72);
+}
+
+.sheet-footer {
+  margin-top: auto;
+  padding-top: 56px;
+  text-align: center;
+}
+
+.brand-signature {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.8rem;
+  letter-spacing: 0.04em;
+}
+
+.brand-subtitle {
+  margin-top: 6px;
+  font-size: 0.72rem;
+  letter-spacing: 0.45em;
+}
+
+.implant-pricing {
+  margin-top: 22px;
+}
+
+.implant-pricing .pricing-block {
+  gap: 10px;
+}
+
+@media (max-width: 1100px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .controls {
+    position: static;
+    height: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-shell {
+    padding: 16px;
+  }
+
+  .grid.two,
+  .extra-item,
+  .quote-header,
+  .preview-toolbar {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .print-sheet {
+    margin-bottom: 24px;
+  }
+
+  .pdf-page {
+    min-height: auto;
+    padding: 30px 24px;
+  }
+
+  .cover-patient {
+    font-size: 2.8rem;
+  }
+
+  .quote-meta,
+  .total-badge {
+    min-width: 0;
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .controls,
+  .preview-toolbar {
+    display: none;
+  }
+
+  .app-shell {
+    display: block;
+    padding: 0;
+  }
+
+  .print-sheet {
+    width: 100%;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .pdf-page {
+    min-height: 0;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    page-break-after: always;
+    break-after: page;
+  }
+
+  .pdf-page:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+}

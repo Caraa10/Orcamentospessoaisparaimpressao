@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Orçamentos Cirúrgicos</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="panel controls">
+        <div class="panel-header">
+          <p class="eyebrow">Uso interno</p>
+          <h1>Gerador de orçamentos</h1>
+          <p class="muted">
+            Selecione o procedimento, ajuste os valores necessários e gere um PDF no navegador.
+          </p>
+        </div>
+
+        <section class="field-group">
+          <h2>Dados da paciente</h2>
+          <label>
+            <span>Nome da paciente</span>
+            <input id="patientName" type="text" placeholder="Nome completo">
+          </label>
+          <div class="grid two">
+            <label>
+              <span>Data do orçamento</span>
+              <input id="quoteDate" type="date">
+            </label>
+            <label>
+              <span>Validade</span>
+              <input id="validUntil" type="date">
+            </label>
+          </div>
+        </section>
+
+        <section class="field-group">
+          <h2>Procedimento</h2>
+          <label>
+            <span>Procedimento principal</span>
+            <select id="procedureSelect"></select>
+          </label>
+          <label>
+            <span>Componente adicional</span>
+            <select id="variantSelect"></select>
+          </label>
+          <div class="grid two">
+            <label>
+              <span>Complexidade</span>
+              <select id="complexitySelect">
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+              </select>
+            </label>
+            <label>
+              <span>Título exibido no PDF</span>
+              <input id="procedureLabel" type="text" placeholder="Texto livre para o orçamento">
+            </label>
+          </div>
+        </section>
+
+        <section class="field-group">
+          <h2>Valores</h2>
+          <div class="grid two">
+            <label>
+              <span>Honorários cirúrgicos</span>
+              <input id="surgeryFee" type="number" min="0" step="0.01">
+            </label>
+            <label>
+              <span>Anestesista</span>
+              <input id="anesthesiaFee" type="number" min="0" step="0.01">
+            </label>
+          </div>
+          <div id="implantSection" class="conditional-section is-hidden">
+            <label class="toggle-row">
+              <input id="implantToggle" type="checkbox">
+              <span>Incluir próteses / implantes mamários neste orçamento</span>
+            </label>
+            <div class="grid two">
+              <label>
+                <span>Descrição das próteses / implantes</span>
+                <input id="implantDescription" type="text" placeholder="Ex.: par de próteses mamárias de silicone">
+              </label>
+              <label>
+                <span>Valor das próteses / implantes</span>
+                <input id="implantFee" type="number" min="0" step="0.01" placeholder="0,00">
+              </label>
+            </div>
+            <p class="inline-help">
+              Esse item ficará discriminado separadamente no PDF.
+            </p>
+          </div>
+          <div class="grid two">
+            <label>
+              <span>Hospital</span>
+              <input id="hospitalName" type="text" placeholder="Ex.: Hospital Accurate">
+            </label>
+            <label>
+              <span>Hospital</span>
+              <input id="hospitalFee" type="number" min="0" step="0.01" placeholder="0,00">
+            </label>
+          </div>
+          <label>
+            <span>Outros custos fixos</span>
+            <input id="fixedExtras" type="number" min="0" step="0.01" placeholder="0,00">
+          </label>
+          <label>
+            <span>Observação financeira</span>
+            <input id="paymentTerms" type="text" placeholder="Ex.: pagamento à vista / parcelado conforme combinado">
+          </label>
+        </section>
+
+        <section class="field-group">
+          <div class="section-row">
+            <h2>Itens adicionais</h2>
+            <button id="addItemButton" type="button" class="secondary-button">Adicionar item</button>
+          </div>
+          <div id="extraItems" class="extra-items"></div>
+        </section>
+
+        <section class="field-group">
+          <h2>Texto do orçamento</h2>
+          <label>
+            <span>Incluso no orçamento</span>
+            <textarea id="includedText" rows="5" placeholder="Liste o que está incluso neste orçamento."></textarea>
+          </label>
+          <label>
+            <span>Orientações / observações</span>
+            <textarea id="notesText" rows="6" placeholder="Informações complementares, preparação, observações clínicas, etc."></textarea>
+          </label>
+        </section>
+
+        <div class="actions">
+          <button id="printButton" type="button" class="primary-button">Imprimir / salvar em PDF</button>
+        </div>
+      </aside>
+
+      <main class="preview-wrap">
+        <div class="preview-toolbar">
+          <div>
+            <p class="eyebrow">Pré-visualização</p>
+            <h2>Modelo de orçamento</h2>
+          </div>
+          <div class="total-badge">
+            <span>Total</span>
+            <strong id="grandTotal">R$ 0,00</strong>
+          </div>
+        </div>
+
+        <article id="printSheet" class="print-sheet">
+          <section class="pdf-page page-cover">
+            <div class="cover-topline">PLANEJAMENTO CIRÚRGICO PERSONALIZADO</div>
+            <h1 id="previewPatientCover" class="cover-patient">Nome Paciente</h1>
+            <footer class="sheet-footer">
+              <div class="brand-signature">THIAGO FERRI</div>
+              <div class="brand-subtitle">CIRURGIA PLÁSTICA</div>
+            </footer>
+          </section>
+
+          <section class="pdf-page page-content">
+            <div class="page-copy">
+              <p class="lead-copy">
+                Este orçamento foi preparado com cuidado para dar clareza ao seu planejamento cirúrgico.
+              </p>
+              <p>
+                O objetivo é apresentar o procedimento proposto, os itens incluídos e a estrutura do investimento de forma simples e organizada.
+              </p>
+            </div>
+
+            <div class="copy-block">
+              <h3 class="page-section-title">Procedimento proposto</h3>
+              <p id="previewProcedureText" class="copy-paragraph">-</p>
+            </div>
+
+            <div class="copy-block">
+              <h3 class="page-section-title">Incluso no planejamento</h3>
+              <div id="previewIncludedPage" class="bullet-copy"></div>
+            </div>
+
+            <footer class="sheet-footer">
+              <div class="brand-signature">THIAGO FERRI</div>
+              <div class="brand-subtitle">CIRURGIA PLÁSTICA</div>
+            </footer>
+          </section>
+
+          <section class="pdf-page page-content">
+            <div class="copy-block">
+              <h3 class="page-section-title">Acompanhamento e observações</h3>
+              <div id="previewNotesPage" class="bullet-copy"></div>
+            </div>
+
+            <div class="copy-block meta-copy">
+              <p><strong>Paciente:</strong> <span id="previewPatient">-</span></p>
+              <p><strong>Data:</strong> <span id="previewDate">-</span></p>
+              <p><strong>Validade:</strong> <span id="previewValidity">-</span></p>
+              <p><strong>Condições:</strong> <span id="previewTerms">-</span></p>
+            </div>
+
+            <footer class="sheet-footer">
+              <div class="brand-signature">THIAGO FERRI</div>
+              <div class="brand-subtitle">CIRURGIA PLÁSTICA</div>
+            </footer>
+          </section>
+
+          <section class="pdf-page page-investment">
+            <header class="quote-header">
+              <div>
+                <p class="eyebrow">Planejamento cirúrgico personalizado</p>
+                <h2 id="previewProcedure">Procedimento</h2>
+              </div>
+            </header>
+
+            <section class="sheet-section">
+              <h3>Investimento</h3>
+              <div id="pricingBlocks" class="pricing-blocks"></div>
+              <div class="grand-total-row">
+                <span>Total do orçamento</span>
+                <strong id="previewTotal">R$ 0,00</strong>
+              </div>
+            </section>
+
+            <footer class="sheet-footer">
+              <div class="brand-signature">THIAGO FERRI</div>
+              <div class="brand-subtitle">CIRURGIA PLÁSTICA</div>
+            </footer>
+          </section>
+
+          <section id="implantPreviewSection" class="pdf-page page-content is-hidden">
+            <div class="copy-block">
+              <h3 class="page-section-title">Valores dos implantes de mama</h3>
+              <p id="previewImplantDescription" class="copy-paragraph">-</p>
+              <div id="implantPricingBlock" class="implant-pricing"></div>
+            </div>
+
+            <footer class="sheet-footer">
+              <div class="brand-signature">THIAGO FERRI</div>
+              <div class="brand-subtitle">CIRURGIA PLÁSTICA</div>
+            </footer>
+          </section>
+        </article>
+      </main>
+    </div>
+
+    <script src="./data/procedures.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

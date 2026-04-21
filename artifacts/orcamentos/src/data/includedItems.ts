@@ -14,6 +14,13 @@ export const COMMON_ITEMS: string[] = [
   'Após a cirurgia, **você será cuidada pelo Dr. Thiago**: o acompanhamento não é delegado para a equipe — ele lhe vê em todas as consultas e você tem o telefone pessoal dele para o que precisar',
 ];
 
+export function getArgoplasmaIncludedItems(procedureLabel: string): string[] {
+  return [
+    `[[paragraph]]É ainda possível acrescentar ao seu procedimento de ${procedureLabel}:`,
+    '**Argoplasma - ARGON 4**: tecnologia de última geração, que promove maior retração da pele e estimula a produção de colágeno, melhorando a elasticidade e proporcionando um visual mais firme e rejuvenescido',
+  ];
+}
+
 // ─── Category-specific items ───
 
 const LIPO_SPECIFIC_ITEMS: string[] = [

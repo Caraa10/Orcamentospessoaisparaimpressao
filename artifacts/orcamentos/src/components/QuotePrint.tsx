@@ -1,7 +1,7 @@
 import { forwardRef, Fragment, useLayoutEffect, useRef, useState } from 'react';
 import type { QuoteData } from '@/types/quote';
 import { calcPaymentOptions, formatBRLNoSymbol, calcInstallmentValue } from '@/utils/calculations';
-import { getIncludedSections } from '@/data/includedItems';
+import { getArgoplasmaIncludedItems, getIncludedSections } from '@/data/includedItems';
 import { ARGOPLASMA_PRICE, ARGOPLASMA_PRICE_6X, ARGOPLASMA_PRICE_12X, IMPLANT_PRICES } from '@/data/procedures';
 
 interface Props {
@@ -212,25 +212,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
       (e) => e.procedure.category === 'abdominoplasty' || e.procedure.category === 'lipo',
     );
 
-  // Decide which included-items section will host the argoplasma block (rendered inline at its end).
-  // Prefer abdominoplasty section if present; otherwise the lipo section.
-  let argoHostSectionIdx = -1;
-  if (hasArgoplasmaSection) {
-    argoHostSectionIdx = includedSections.findIndex((s) =>
-      /abdominoplastia/i.test(s.intro),
-    );
-    if (argoHostSectionIdx === -1) {
-      argoHostSectionIdx = includedSections.findIndex((s) =>
-        /lipoescultura/i.test(s.intro),
-      );
-    }
-  }
-  const argoHostProcLabel = (() => {
-    if (argoHostSectionIdx === -1) return 'lipoescultura';
-    return /abdominoplastia/i.test(includedSections[argoHostSectionIdx].intro)
-      ? 'abdominoplastia com lipoescultura'
-      : 'lipoescultura';
-  })();
+  const argoHostSectionIdx = hasArgoplasmaSection && includedSections.length > 0 ? 0 : -1;
 
   // Combined totals for multi-procedure summary page
   const totalSurgery = data.procedures.reduce((s, e) => s + e.prices.surgery, 0);
@@ -303,7 +285,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           height: 297mm;
           padding: 0;
           font-size: 15pt;
-          line-height: 1.48;
+          line-height: 1.54;
           color: ${PRINT_BLACK};
           position: relative;
         }
@@ -350,7 +332,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         .cover-title {
           font-family: 'Avenir Next', sans-serif;
           font-size: 22pt;
-          font-weight: 700;
+          font-weight: 400;
           letter-spacing: normal;
           text-transform: uppercase;
           color: ${PRINT_BLACK};
@@ -376,7 +358,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         .p-intro {
           margin-bottom: 4mm;
           text-align: justify;
-          line-height: 1.52;
+          line-height: 1.58;
         }
         .p-intro + .p-intro {
           margin-bottom: 10pt;
@@ -385,7 +367,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           margin-top: 2mm;
           margin-bottom: 6pt;
           text-align: justify;
-          line-height: 1.52;
+          line-height: 1.58;
         }
         .p-intro + .p-intro + .p-section-intro {
           margin-top: 5mm;
@@ -395,44 +377,31 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           padding-left: 0;
           margin-bottom: 4mm;
         }
-        .p-list-before-argo {
-          margin-bottom: 0.5mm;
-        }
         .p-list li {
           display: flex;
           align-items: flex-start;
           margin-bottom: 1.25mm;
-          line-height: 1.52;
+          line-height: 1.58;
           text-align: justify;
         }
         .p-list li.p-inline-paragraph {
           display: block;
           margin-top: 3mm;
           margin-bottom: 1.5mm;
-          line-height: 1.52;
+          line-height: 1.58;
         }
         .p-list-bullet {
           flex-shrink: 0;
           margin-right: 3mm;
           margin-top: 0.05em;
           font-size: 15pt;
-          line-height: 1.52;
+          line-height: 1.58;
         }
         .p-list-text {
           flex: 1;
           font-size: 14pt;
           text-align: justify;
-          line-height: 1.52;
-        }
-
-        .p-argo-intro {
-          margin-top: 1.5mm;
-          margin-bottom: 0.5mm;
-          text-align: justify;
-          line-height: 1.52;
-        }
-        .p-argo-intro + .p-list li:first-child {
-          margin-top: 0;
+          line-height: 1.58;
         }
 
         /* ══════════════════════════════════════
@@ -470,7 +439,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         }
         .p-fee-options {
           font-size: 14pt;
-          line-height: 1.52;
+          line-height: 1.58;
           text-align: justify;
         }
         .p-fee-optional {
@@ -519,14 +488,14 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         }
         .p-implant-prices {
           font-size: 14pt;
-          line-height: 1.52;
+          line-height: 1.58;
           text-align: justify;
         }
         .p-implant-note {
           font-size: 13pt;
           opacity: 1;
           margin-top: 5mm;
-          line-height: 1.52;
+          line-height: 1.58;
           text-align: justify;
         }
 
@@ -537,7 +506,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           margin-bottom: 4mm;
           text-align: justify;
           font-size: 14pt;
-          line-height: 1.52;
+          line-height: 1.58;
         }
         .p-closing p:last-child { margin-bottom: 0; }
 
@@ -621,8 +590,11 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
                   <BoldText text={section.intro} />
                 </p>
               )}
-              <ul className={`p-list ${showArgoHere ? 'p-list-before-argo' : ''}`}>
-                {part.items.map((item, j) =>
+              <ul className="p-list">
+                {[
+                  ...part.items,
+                  ...(showArgoHere ? getArgoplasmaIncludedItems('lipoescultura') : []),
+                ].map((item, j) =>
                   isInlineParagraph(item) ? (
                     <li key={j} className="p-inline-paragraph">
                       <span className="p-list-text">
@@ -639,44 +611,10 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
                   ),
                 )}
               </ul>
-              {showArgoHere && (
-                <>
-                  <p className="p-argo-intro">
-                    É ainda possível acrescentar ao seu procedimento de {argoHostProcLabel}:
-                  </p>
-                  <ul className="p-list">
-                    <li>
-                      <span className="p-list-bullet">•</span>
-                      <span className="p-list-text">
-                        <BoldText text="**Argoplasma - ARGON 4**: tecnologia de última geração, que promove maior retração da pele e estimula a produção de colágeno, melhorando a elasticidade e proporcionando um visual mais firme e rejuvenescido" />
-                      </span>
-                    </li>
-                  </ul>
-                </>
-              )}
             </div>
           </div>
         );
       })}
-
-      {/* Fallback page only if argoplasma applies but no host section was found (shouldn't normally happen) */}
-      {hasArgoplasmaSection && argoHostSectionIdx === -1 && (
-        <div className="page page-content">
-          <div className="page-body">
-          <p className="p-argo-intro">
-            É ainda possível acrescentar ao seu procedimento de {argoHostProcLabel}:
-          </p>
-          <ul className="p-list">
-            <li>
-              <span className="p-list-bullet">•</span>
-              <span className="p-list-text">
-                <BoldText text="**Argoplasma - ARGON 4**: tecnologia de última geração, que promove maior retração da pele e estimula a produção de colágeno, melhorando a elasticidade e proporcionando um visual mais firme e rejuvenescido" />
-              </span>
-            </li>
-          </ul>
-          </div>
-        </div>
-      )}
 
       {/* ════════════════════════════════════════════════
           INDIVIDUAL PROCEDURE PAGES

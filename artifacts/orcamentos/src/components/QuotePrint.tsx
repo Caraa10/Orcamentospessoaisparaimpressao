@@ -72,9 +72,20 @@ function stripInlineParagraphMarker(item: string) {
 }
 
 function joinProcedureTitles(names: string[]) {
-  if (names.length <= 1) return names[0] ?? '';
-  if (names.length === 2) return `${names[0]} e ${names[1]}`;
-  return `${names.slice(0, -1).join(', ')} e ${names[names.length - 1]}`;
+  const cleanNames = names.map((name) => normalizeProcedureTitle(name));
+  if (cleanNames.length <= 1) return cleanNames[0] ?? '';
+  if (cleanNames.length === 2) return `${cleanNames[0]} e ${cleanNames[1]}`;
+  return `${cleanNames.slice(0, -1).join(', ')} e ${cleanNames[cleanNames.length - 1]}`;
+}
+
+function normalizeProcedureTitle(title: string) {
+  const parts = title
+    .split(/\s*\+\s*/g)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (parts.length <= 1) return title;
+  if (parts.length === 2) return `${parts[0]} e ${parts[1]}`;
+  return `${parts.slice(0, -1).join(', ')} e ${parts[parts.length - 1]}`;
 }
 
 function getBalancedTitleLines(title: string) {
@@ -695,7 +706,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         return (
           <div key={idx} className="page page-content">
             <div className="page-body">
-            <ProcedureTitle title={entry.procedure.name} />
+            <ProcedureTitle title={normalizeProcedureTitle(entry.procedure.name)} />
 
             <div className="p-hr" />
 
@@ -795,10 +806,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           <p>O custo é calculado somando-se os valores de {costComponents.join(' + ')}.</p>
           <p>Os valores de equipe cirúrgica e anestesista são válidos para realização do procedimento em até 2 meses, considerando a data deste orçamento.</p>
           <p>
-            <span style={{ display: 'block', textAlignLast: 'justify' }}>
-              Caso opte por fazer a cirurgia, o primeiro passo é agendar a data do procedimento. Depois disso, marcaremos seu retorno
-            </span>
-            com o {data.doctorName} e a consulta pré-anestésica com a {data.anesthesiologistName} (valor de R$ 200).
+            Caso opte por fazer a cirurgia, o primeiro passo é agendar a data do procedimento. Depois disso, marcaremos seu retorno com o {data.doctorName} e a consulta pré-anestésica com a {data.anesthesiologistName} (valor de R$ 200).
           </p>
           <p>Se tiver qualquer dúvida, estamos à disposição para conversar. Até breve! 🌷</p>
         </div>

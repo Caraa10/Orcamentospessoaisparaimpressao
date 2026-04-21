@@ -303,7 +303,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           height: 297mm;
           padding: 0;
           font-size: 15pt;
-          line-height: 1.42;
+          line-height: 1.48;
           color: ${PRINT_BLACK};
           position: relative;
         }
@@ -376,7 +376,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         .p-intro {
           margin-bottom: 4mm;
           text-align: justify;
-          line-height: 1.46;
+          line-height: 1.52;
         }
         .p-intro + .p-intro {
           margin-bottom: 10pt;
@@ -385,7 +385,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           margin-top: 2mm;
           margin-bottom: 6pt;
           text-align: justify;
-          line-height: 1.46;
+          line-height: 1.52;
         }
         .p-intro + .p-intro + .p-section-intro {
           margin-top: 5mm;
@@ -402,34 +402,34 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           display: flex;
           align-items: flex-start;
           margin-bottom: 1.25mm;
-          line-height: 1.46;
+          line-height: 1.52;
           text-align: justify;
         }
         .p-list li.p-inline-paragraph {
           display: block;
           margin-top: 3mm;
           margin-bottom: 1.5mm;
-          line-height: 1.46;
+          line-height: 1.52;
         }
         .p-list-bullet {
           flex-shrink: 0;
           margin-right: 3mm;
           margin-top: 0.05em;
           font-size: 15pt;
-          line-height: 1.46;
+          line-height: 1.52;
         }
         .p-list-text {
           flex: 1;
           font-size: 14pt;
           text-align: justify;
-          line-height: 1.46;
+          line-height: 1.52;
         }
 
         .p-argo-intro {
           margin-top: 1.5mm;
           margin-bottom: 0.5mm;
           text-align: justify;
-          line-height: 1.46;
+          line-height: 1.52;
         }
         .p-argo-intro + .p-list li:first-child {
           margin-top: 0;
@@ -470,7 +470,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         }
         .p-fee-options {
           font-size: 14pt;
-          line-height: 1.46;
+          line-height: 1.52;
           text-align: justify;
         }
         .p-fee-optional {
@@ -519,14 +519,14 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         }
         .p-implant-prices {
           font-size: 14pt;
-          line-height: 1.46;
+          line-height: 1.52;
           text-align: justify;
         }
         .p-implant-note {
           font-size: 13pt;
           opacity: 1;
           margin-top: 5mm;
-          line-height: 1.46;
+          line-height: 1.52;
           text-align: justify;
         }
 
@@ -537,7 +537,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           margin-bottom: 4mm;
           text-align: justify;
           font-size: 14pt;
-          line-height: 1.46;
+          line-height: 1.52;
         }
         .p-closing p:last-child { margin-bottom: 0; }
 

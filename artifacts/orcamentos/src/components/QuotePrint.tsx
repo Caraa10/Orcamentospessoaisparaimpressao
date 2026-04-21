@@ -8,9 +8,8 @@ interface Props {
   data: QuoteData;
 }
 
-const NAVY = '#1e2446';
-const GOLD_GRAD = 'linear-gradient(160deg, #d4ca8e 0%, #c5ba7e 45%, #b0a46b 100%)';
-const HOSPITAL_GOLD = '#a07c1a';
+const PRINT_BLACK = '#000000';
+const PRINT_BACKGROUND = '#ffffff';
 const LOGO_URL = `${import.meta.env.BASE_URL}logo-thiago-ferri.png`;
 
 function withLineBreaks(text: string, keyPrefix: string) {
@@ -257,6 +256,12 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         .print-root {
           font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
           font-weight: 400;
+          --pdf-margin-top: 23mm;
+          --pdf-margin-right: 10mm;
+          --pdf-margin-bottom: 26mm;
+          --pdf-margin-left: 31mm;
+          color: ${PRINT_BLACK};
+          background: ${PRINT_BACKGROUND};
         }
 
         @media print {
@@ -274,7 +279,8 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         ══════════════════════════════════════ */
         .page {
           width: 210mm;
-          background: ${GOLD_GRAD};
+          background: ${PRINT_BACKGROUND};
+          color: ${PRINT_BLACK};
           position: relative;
           page-break-before: always;
           break-before: page;
@@ -286,26 +292,26 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         }
         /* Cover is exact height */
         .page-cover {
-          height: 296mm;
+          height: 297mm;
           display: flex;
           flex-direction: column;
           align-items: center;
-          padding: 0 24mm;
+          padding: 0 var(--pdf-margin-right) 0 var(--pdf-margin-left);
           page-break-before: avoid;
           break-before: avoid;
         }
         /* Content/pricing pages: exact A4 height to avoid overflow into next page */
         .page-content {
-          height: 296mm;
+          height: 297mm;
           padding: 0;
-          font-size: 18pt;
-          line-height: 1.25;
-          color: ${NAVY};
+          font-size: 15pt;
+          line-height: 1.28;
+          color: ${PRINT_BLACK};
           position: relative;
         }
         .page-body {
-          height: 262mm;
-          margin: 20mm 16mm 0 16mm;
+          height: calc(297mm - var(--pdf-margin-top) - var(--pdf-margin-bottom));
+          margin: var(--pdf-margin-top) var(--pdf-margin-right) var(--pdf-margin-bottom) var(--pdf-margin-left);
           overflow: hidden;
           font-family: 'Avenir Next', sans-serif;
         }
@@ -316,11 +322,11 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         ══════════════════════════════════════ */
         .content-flow {
           width: 210mm;
-          background: ${GOLD_GRAD};
-          padding: 16mm 22mm 32mm 22mm;
-          font-size: 12pt;
-          line-height: 1.75;
-          color: ${NAVY};
+          background: ${PRINT_BACKGROUND};
+          padding: var(--pdf-margin-top) var(--pdf-margin-right) var(--pdf-margin-bottom) var(--pdf-margin-left);
+          font-size: 11pt;
+          line-height: 1.55;
+          color: ${PRINT_BLACK};
           font-family: 'Avenir Next', sans-serif;
           /* force a new page after this section in print */
           page-break-after: always;
@@ -344,19 +350,19 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         }
         .cover-title {
           font-family: 'Avenir Next', sans-serif;
-          font-size: 26pt;
+          font-size: 22pt;
           font-weight: 700;
           letter-spacing: normal;
           text-transform: uppercase;
-          color: #f2ecc8;
+          color: ${PRINT_BLACK};
           text-align: center;
           line-height: 1.4;
         }
         .cover-patient-name {
           font-family: 'Snell Roundhand', 'Pinyon Script', cursive;
-          font-size: 40pt;
+          font-size: 34pt;
           font-weight: 700;
-          color: ${NAVY};
+          color: ${PRINT_BLACK};
           text-align: center;
           line-height: 1.1;
           position: absolute;
@@ -383,18 +389,18 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
            CONTENT — TEXT
         ══════════════════════════════════════ */
         .p-intro {
-          margin-bottom: 5mm;
+          margin-bottom: 4mm;
           text-align: justify;
-          line-height: 1.35;
+          line-height: 1.32;
         }
         .p-intro + .p-intro {
-          margin-bottom: 18pt;
+          margin-bottom: 14pt;
         }
         .p-section-intro {
           margin-top: 5mm;
-          margin-bottom: 18pt;
+          margin-bottom: 14pt;
           text-align: justify;
-          line-height: 1.35;
+          line-height: 1.32;
         }
         .p-list {
           list-style: none;
@@ -404,24 +410,29 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         .p-list li {
           display: flex;
           align-items: flex-start;
-          margin-bottom: 2mm;
-          line-height: 1.35;
+          margin-bottom: 1.8mm;
+          line-height: 1.32;
           text-align: justify;
         }
         .p-list-bullet {
           flex-shrink: 0;
           margin-right: 3mm;
           margin-top: 0.05em;
-          font-size: 19pt;
-          line-height: 1.35;
+          font-size: 15pt;
+          line-height: 1.32;
         }
-        .p-list-text { flex: 1; text-align: justify; line-height: 1.35; }
+        .p-list-text {
+          flex: 1;
+          font-size: 14pt;
+          text-align: justify;
+          line-height: 1.32;
+        }
 
         .p-argo-intro {
           margin-top: 5mm;
           margin-bottom: 3mm;
           text-align: justify;
-          line-height: 1.35;
+          line-height: 1.32;
         }
 
         /* ══════════════════════════════════════
@@ -429,52 +440,52 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         ══════════════════════════════════════ */
         .p-hr {
           border: none;
-          border-top: 0.5pt solid rgba(30,36,70,0.20);
+          border-top: 0.5pt solid rgba(0,0,0,0.35);
           margin: 6mm 0;
         }
         .p-proc-title {
-          font-size: 22pt;
+          font-size: 17pt;
           font-weight: 700;
           text-align: center;
           text-transform: uppercase;
           letter-spacing: 0.05em;
-          color: #f2ecc8;
-          margin: 0 0 9mm 0;
+          color: ${PRINT_BLACK};
+          margin: 0 0 7mm 0;
           line-height: 1.3;
         }
-        .p-fee { margin-bottom: 7mm; }
+        .p-fee { margin-bottom: 5.5mm; }
         .p-fee-label {
-          font-size: 19pt;
+          font-size: 15pt;
           font-weight: 700;
           font-variant: small-caps;
           letter-spacing: 0.03em;
           margin-bottom: 0.5mm;
         }
         .p-fee-value {
-          font-size: 22pt;
+          font-size: 17pt;
           font-weight: 700;
           margin-bottom: 1.5mm;
           letter-spacing: 0.01em;
           padding-left: 5mm;
         }
         .p-fee-options {
-          font-size: 17pt;
-          line-height: 1.35;
+          font-size: 14pt;
+          line-height: 1.34;
         }
         .p-fee-optional {
-          font-size: 13pt;
-          opacity: 0.65;
+          font-size: 11pt;
+          opacity: 1;
           margin-top: 1mm;
         }
         .p-hospital-name {
-          font-size: 19pt;
+          font-size: 15pt;
           font-weight: 700;
-          color: ${HOSPITAL_GOLD};
+          color: ${PRINT_BLACK};
           padding-left: 5mm;
           margin-bottom: 0.5mm;
         }
         .p-hospital-range {
-          font-size: 22pt;
+          font-size: 17pt;
           font-weight: 700;
           padding-left: 5mm;
           margin-bottom: 1.5mm;
@@ -485,7 +496,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           line-height: 1.3;
         }
         .p-hospital-range-note {
-          font-size: 14pt;
+          font-size: 11pt;
           font-weight: 400;
         }
 
@@ -493,27 +504,27 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
            IMPLANTS
         ══════════════════════════════════════ */
         .p-implant-section-title {
-          font-size: 22pt;
+          font-size: 17pt;
           font-weight: 700;
-          color: ${NAVY};
+          color: ${PRINT_BLACK};
           margin: 0 0 6mm 0;
           line-height: 1.3;
         }
         .p-implant-brand {
-          font-size: 19pt;
+          font-size: 15pt;
           font-weight: 700;
           margin-top: 5mm;
           margin-bottom: 1mm;
         }
         .p-implant-prices {
-          font-size: 17pt;
-          line-height: 1.35;
+          font-size: 14pt;
+          line-height: 1.34;
         }
         .p-implant-note {
-          font-size: 17pt;
-          opacity: 0.8;
+          font-size: 13pt;
+          opacity: 1;
           margin-top: 5mm;
-          line-height: 1.35;
+          line-height: 1.34;
           text-align: justify;
         }
 
@@ -521,9 +532,10 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
            CLOSING
         ══════════════════════════════════════ */
         .p-closing p {
-          margin-bottom: 5mm;
+          margin-bottom: 4mm;
           text-align: justify;
-          line-height: 1.35;
+          font-size: 14pt;
+          line-height: 1.34;
         }
         .p-closing p:last-child { margin-bottom: 0; }
 
@@ -572,8 +584,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             height: 297mm;
           }
           html, body {
-            background: ${GOLD_GRAD} !important;
-            background-attachment: fixed !important;
+            background: ${PRINT_BACKGROUND} !important;
           }
           @page {
             size: A4;
@@ -816,7 +827,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             </span>
             no com o {data.doctorName} e a consulta pré-anestésica com a {data.anesthesiologistName} (valor de R$ 200).
           </p>
-          <p>Se tiver qualquer dúvida, estamos à disposição para conversar. Até breve! 🌷</p>
+          <p>Se tiver qualquer dúvida, estamos à disposição para conversar. Até breve!</p>
         </div>
 
         </div>

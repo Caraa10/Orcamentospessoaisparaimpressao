@@ -4,6 +4,40 @@ import QuotePrint from '@/components/QuotePrint';
 import type { QuoteData } from '@/types/quote';
 import { ArrowLeft, Download, Loader2 } from 'lucide-react';
 
+const SAO_PAULO_TIME_ZONE = 'America/Sao_Paulo';
+
+function toTitleCasePart(part: string) {
+  const lower = part.toLocaleLowerCase('pt-BR');
+  return lower.charAt(0).toLocaleUpperCase('pt-BR') + lower.slice(1);
+}
+
+function formatPatientFileName(patientName: string) {
+  const nameParts = patientName
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9 ]+/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(toTitleCasePart);
+
+  const safeName = nameParts.length > 0 ? nameParts.join('_') : 'Orcamento';
+  const dateParts = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: SAO_PAULO_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  })
+    .formatToParts(new Date())
+    .reduce<Record<string, string>>((parts, part) => {
+      parts[part.type] = part.value;
+      return parts;
+    }, {});
+  const generatedDate = [dateParts.day, dateParts.month, dateParts.year].join('_');
+
+  return `${safeName}_${generatedDate}.pdf`;
+}
+
 export default function Preview() {
   const [, setLocation] = useLocation();
   const [data, setData] = useState<QuoteData | null>(null);
@@ -100,7 +134,7 @@ export default function Preview() {
         const canvas = await html2canvas(el, {
           scale: 2,
           useCORS: true,
-          backgroundColor: null,
+          backgroundColor: '#ffffff',
           logging: false,
           windowWidth: el.scrollWidth,
           windowHeight: el.scrollHeight,
@@ -112,12 +146,7 @@ export default function Preview() {
         pdf.addImage(imgData, 'JPEG', 0, 0, pageWidthMM, pageHeightMM, undefined, 'FAST');
       }
 
-      const safeName = (data.patientName || 'orcamento')
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-zA-Z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-      pdf.save(`orcamento-${safeName}.pdf`);
+      pdf.save(formatPatientFileName(data.patientName));
     } catch (err) {
       console.error('Erro ao gerar PDF:', err);
       alert('Não foi possível gerar o PDF. Tente novamente.');

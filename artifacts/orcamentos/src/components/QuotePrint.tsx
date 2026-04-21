@@ -71,6 +71,51 @@ function stripInlineParagraphMarker(item: string) {
   return item.replace('[[paragraph]]', '');
 }
 
+function joinProcedureTitles(names: string[]) {
+  if (names.length <= 1) return names[0] ?? '';
+  if (names.length === 2) return `${names[0]} e ${names[1]}`;
+  return `${names.slice(0, -1).join(', ')} e ${names[names.length - 1]}`;
+}
+
+function getBalancedTitleLines(title: string) {
+  const words = title.trim().split(/\s+/);
+  if (title.length < 34 || words.length < 4) return [title.toUpperCase()];
+
+  const target = title.length / 2;
+  let bestIndex = 1;
+  let bestDistance = Number.POSITIVE_INFINITY;
+
+  for (let i = 1; i < words.length; i++) {
+    const firstLine = words.slice(0, i).join(' ');
+    const secondLine = words.slice(i).join(' ');
+    const distance = Math.abs(firstLine.length - secondLine.length);
+    const midpointDistance = Math.abs(firstLine.length - target);
+    const score = distance + midpointDistance * 0.35;
+    if (score < bestDistance) {
+      bestDistance = score;
+      bestIndex = i;
+    }
+  }
+
+  return [
+    words.slice(0, bestIndex).join(' ').toUpperCase(),
+    words.slice(bestIndex).join(' ').toUpperCase(),
+  ];
+}
+
+function ProcedureTitle({ title }: { title: string }) {
+  return (
+    <div className="p-proc-title">
+      {getBalancedTitleLines(title).map((line, index) => (
+        <Fragment key={index}>
+          {index > 0 && <br />}
+          {line}
+        </Fragment>
+      ))}
+    </div>
+  );
+}
+
 // Pricing block for equipe cirúrgica
 function FeeEquipe({ surgeryBase }: { surgeryBase: number }) {
   const p = calcPaymentOptions(surgeryBase);
@@ -219,7 +264,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   // Combined totals for multi-procedure summary page
   const totalSurgery = data.procedures.reduce((s, e) => s + e.prices.surgery, 0);
   const totalAnesthesia = data.procedures.reduce((s, e) => s + e.prices.anesthesia, 0);
-  const combinedTitle = data.procedures.map((e) => e.procedure.name.toUpperCase()).join(' + ');
+  const combinedTitle = joinProcedureTitles(data.procedures.map((e) => e.procedure.name));
 
   return (
     <div ref={ref} className="print-root">
@@ -650,7 +695,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         return (
           <div key={idx} className="page page-content">
             <div className="page-body">
-            <div className="p-proc-title">{entry.procedure.name.toUpperCase()}</div>
+            <ProcedureTitle title={entry.procedure.name} />
 
             <div className="p-hr" />
 
@@ -690,7 +735,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
       {isMulti && (
         <div className="page page-content">
           <div className="page-body">
-          <div className="p-proc-title">{combinedTitle}</div>
+          <ProcedureTitle title={combinedTitle} />
 
           <div className="p-hr" />
 

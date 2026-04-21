@@ -28,10 +28,10 @@ const LIPO_SPECIFIC_ITEMS: string[] = [
   '**Vibrofit**: tecnologia que utiliza movimentos vibratórios para facilitar a retirada de gordura',
   '**Philips Lumify**: tecnologia que aumenta a segurança e precisão nas lipoenxertias',
   '**Irrigador cirúrgico**: para infusão de soluções para lipoaspiração de maneira mais controlada e rápida',
-  '**Malha cirúrgica** (modelador): proteção e suporte da área operada',
+  '**Malha cirúrgica** (modelador): quando necessário, para proteção e suporte da área operada',
   '**Cinturão abdominal**: para estabilização dos tecidos operados',
   '**Meia elástica** (meia de compressão cirúrgica): para redução de riscos',
-  '**Canaletas**: para definição das áreas de sombra do abdome',
+  '**Canaletas**: quando necessário, para definição das áreas de sombra do abdome',
   '**Taping**: quando necessário, para melhor posicionamento dos tecidos operados',
 ];
 
@@ -41,10 +41,10 @@ const ABDOMINOPLASTY_SPECIFIC_ITEMS: string[] = [
   '**Philips Lumify**: tecnologia que aumenta a segurança e precisão nas lipoenxertias',
   '**Irrigador cirúrgico**: para infusão de soluções para lipoaspiração de maneira mais controlada e rápida',
   '**Cola cirúrgica** (Prineo® Johnson&Johnson): funciona como curativo (você não precisa se preocupar em fazer curativos no pós-operatório) e não há pontos para retirar no abdome',
-  '**Malha cirúrgica** (modelador): proteção e suporte da área operada',
+  '**Malha cirúrgica** (modelador): quando necessário, para proteção e suporte da área operada',
   '**Cinturão abdominal**: para estabilização dos tecidos operados',
   '**Meia elástica** (meia de compressão cirúrgica): para redução de riscos',
-  '**Canaletas**: para definição das áreas de sombra do abdome',
+  '**Canaletas**: quando necessário, para definição das áreas de sombra do abdome',
   '**Taping**: quando necessário, para melhor posicionamento dos tecidos operados',
 ];
 

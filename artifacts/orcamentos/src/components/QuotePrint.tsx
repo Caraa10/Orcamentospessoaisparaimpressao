@@ -284,7 +284,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         .page-content {
           height: 297mm;
           padding: 0;
-          font-size: 15pt;
+          font-size: 14pt;
           line-height: 1.54;
           color: ${PRINT_BLACK};
           position: relative;
@@ -305,7 +305,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           width: 210mm;
           background: ${PRINT_BACKGROUND};
           padding: var(--pdf-margin-top) var(--pdf-margin-right) var(--pdf-margin-bottom) var(--pdf-margin-left);
-          font-size: 11pt;
+          font-size: 10pt;
           line-height: 1.55;
           color: ${PRINT_BLACK};
           font-family: 'Avenir Next', sans-serif;
@@ -331,7 +331,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         }
         .cover-title {
           font-family: 'Avenir Next', sans-serif;
-          font-size: 22pt;
+          font-size: 20pt;
           font-weight: 400;
           letter-spacing: normal;
           text-transform: uppercase;
@@ -394,12 +394,12 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           flex-shrink: 0;
           margin-right: 3mm;
           margin-top: 0.05em;
-          font-size: 15pt;
+          font-size: 14pt;
           line-height: 1.58;
         }
         .p-list-text {
           flex: 1;
-          font-size: 14pt;
+          font-size: 13pt;
           text-align: justify;
           line-height: 1.58;
         }
@@ -413,7 +413,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           margin: 6mm 0;
         }
         .p-proc-title {
-          font-size: 17pt;
+          font-size: 16pt;
           font-weight: 700;
           text-align: center;
           text-transform: uppercase;
@@ -424,38 +424,38 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         }
         .p-fee { margin-bottom: 5.5mm; }
         .p-fee-label {
-          font-size: 15pt;
+          font-size: 14pt;
           font-weight: 700;
           font-variant: small-caps;
           letter-spacing: 0.03em;
           margin-bottom: 0.5mm;
         }
         .p-fee-value {
-          font-size: 17pt;
+          font-size: 16pt;
           font-weight: 700;
           margin-bottom: 1.5mm;
           letter-spacing: 0.01em;
           padding-left: 5mm;
         }
         .p-fee-options {
-          font-size: 14pt;
+          font-size: 13pt;
           line-height: 1.58;
           text-align: justify;
         }
         .p-fee-optional {
-          font-size: 11pt;
+          font-size: 10pt;
           opacity: 1;
           margin-top: 1mm;
         }
         .p-hospital-name {
-          font-size: 15pt;
+          font-size: 14pt;
           font-weight: 700;
           color: ${PRINT_BLACK};
           padding-left: 5mm;
           margin-bottom: 0.5mm;
         }
         .p-hospital-range {
-          font-size: 17pt;
+          font-size: 16pt;
           font-weight: 700;
           padding-left: 5mm;
           margin-bottom: 1.5mm;
@@ -466,7 +466,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           line-height: 1.38;
         }
         .p-hospital-range-note {
-          font-size: 11pt;
+          font-size: 10pt;
           font-weight: 400;
         }
 
@@ -474,25 +474,25 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
            IMPLANTS
         ══════════════════════════════════════ */
         .p-implant-section-title {
-          font-size: 17pt;
+          font-size: 16pt;
           font-weight: 700;
           color: ${PRINT_BLACK};
           margin: 0 0 6mm 0;
           line-height: 1.36;
         }
         .p-implant-brand {
-          font-size: 15pt;
+          font-size: 14pt;
           font-weight: 700;
           margin-top: 5mm;
           margin-bottom: 1mm;
         }
         .p-implant-prices {
-          font-size: 14pt;
+          font-size: 13pt;
           line-height: 1.58;
           text-align: justify;
         }
         .p-implant-note {
-          font-size: 13pt;
+          font-size: 12pt;
           opacity: 1;
           margin-top: 5mm;
           line-height: 1.58;
@@ -505,7 +505,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         .p-closing p {
           margin-bottom: 4mm;
           text-align: justify;
-          font-size: 14pt;
+          font-size: 13pt;
           line-height: 1.58;
         }
         .p-closing p:last-child { margin-bottom: 0; }
@@ -744,7 +744,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             </span>
             no com o {data.doctorName} e a consulta pré-anestésica com a {data.anesthesiologistName} (valor de R$ 200).
           </p>
-          <p>Se tiver qualquer dúvida, estamos à disposição para conversar. Até breve!</p>
+          <p>Se tiver qualquer dúvida, estamos à disposição para conversar. Até breve! 🌷</p>
         </div>
 
         </div>

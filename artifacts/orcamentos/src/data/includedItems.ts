@@ -50,7 +50,7 @@ const ABDOMINOPLASTY_SPECIFIC_ITEMS: string[] = [
 
 const BREAST_AUGMENTATION_SPECIFIC_ITEMS: string[] = [
   '**Técnicas** de recuperação rápida, sutiã interno, alça de sustentação e, caso necessário, enxertia de gordura nas mamas (mamoplastia de aumento híbrida)',
-  '**Funil de inserção** (funil de Keller): dispositivo que permite a inserção suave dos implantes, reduzindo riscos relacio-\nnados à cirurgia, tempo cirúrgico, dor pós-operatória e tamanho da incisão',
+  '**Funil de inserção** (funil de Keller): dispositivo que permite a inserção suave dos implantes, reduzindo riscos relacionados à cirurgia, tempo cirúrgico, dor pós-operatória e tamanho da incisão',
   '**Cola cirúrgica** (Dermabond® Johnson&Johnson): funciona como curativo (você não precisa se preocupar em fazer curativos no pós-operatório) e não há pontos para retirar nas mamas',
   '**Sutiã cirúrgico**: para suporte adequado e proteção das mamas',
 ];
@@ -64,7 +64,7 @@ const BREAST_REDUCTION_SPECIFIC_ITEMS: string[] = [
 
 const MASTOPEXY_SPECIFIC_ITEMS: string[] = [
   '**Técnicas** de sutiã interno, alça de sustentação e, caso necessário, enxertia de gordura nas mamas',
-  '**Funil de inserção** (funil de Keller): dispositivo que permite a inserção suave dos implantes, reduzindo riscos relacio\u00ADnados à cirurgia, tempo cirúrgico e dor pós-operatória',
+  '**Funil de inserção** (funil de Keller): dispositivo que permite a inserção suave dos implantes, reduzindo riscos relacionados à cirurgia, tempo cirúrgico e dor pós-operatória',
   '**Cola cirúrgica** (Prineo® Johnson&Johnson): funciona como curativo (você não precisa se preocupar em fazer curativos no pós-operatório) e não há pontos para retirar nas mamas',
   '**Sutiã cirúrgico**: para suporte adequado e proteção das mamas',
   '**Meia elástica** (meia de compressão cirúrgica): para redução de riscos',
@@ -131,15 +131,23 @@ function getCategoryInfo(category: ProcedureCategory, procedureName: string): Ca
 
 export function getIncludedSections(
   entries: Array<{ category: ProcedureCategory; name: string }>,
+  options: { includeArgoplasma?: boolean } = {},
 ): IncludedSection[] {
   const isMulti = entries.length > 1;
+  const shouldIncludeArgoplasma = options.includeArgoplasma === true;
+  const supportsArgoplasma = (entry: { category: ProcedureCategory; name: string }) =>
+    entry.category === 'abdominoplasty' || entry.category === 'lipo';
 
   if (!isMulti) {
     const info = getCategoryInfo(entries[0].category, entries[0].name);
+    const argoplasmaItems =
+      shouldIncludeArgoplasma && supportsArgoplasma(entries[0])
+        ? getArgoplasmaIncludedItems('lipoescultura')
+        : [];
     return [
       {
         intro: info.firstIntro,
-        items: [...info.items, ...COMMON_ITEMS],
+        items: [...info.items, ...argoplasmaItems, ...COMMON_ITEMS],
       },
     ];
   }
@@ -161,6 +169,9 @@ export function getIncludedSections(
       items.push(...info.items);
     } else {
       items.push(`[[paragraph]]${info.subIntro}`, ...info.items);
+    }
+    if (shouldIncludeArgoplasma && supportsArgoplasma(entry)) {
+      items.push(...getArgoplasmaIncludedItems('lipoescultura'));
     }
   }
 

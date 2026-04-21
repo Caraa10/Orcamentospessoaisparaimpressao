@@ -1,7 +1,7 @@
 import { forwardRef, Fragment, useLayoutEffect, useRef, useState } from 'react';
 import type { QuoteData } from '@/types/quote';
 import { calcPaymentOptions, formatBRLNoSymbol, calcInstallmentValue } from '@/utils/calculations';
-import { getArgoplasmaIncludedItems, getIncludedSections } from '@/data/includedItems';
+import { getIncludedSections } from '@/data/includedItems';
 import { ARGOPLASMA_PRICE, ARGOPLASMA_PRICE_6X, ARGOPLASMA_PRICE_12X, IMPLANT_PRICES } from '@/data/procedures';
 
 interface Props {
@@ -151,6 +151,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
 
   const includedSections = getIncludedSections(
     data.procedures.map((e) => ({ category: e.procedure.category, name: e.procedure.name })),
+    { includeArgoplasma: data.includeArgoplasma },
   );
 
   const initialParts: SectionPart[] = includedSections.map((s, idx) => ({
@@ -214,14 +215,6 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const costComponents: string[] = ['equipe cirúrgica', 'anestesista', 'hospital'];
   if (data.includeImplants) costComponents.push('implantes');
   if (data.includeArgoplasma) costComponents.push('argoplasma (opcional)');
-
-  const hasArgoplasmaSection =
-    data.includeArgoplasma &&
-    data.procedures.some(
-      (e) => e.procedure.category === 'abdominoplasty' || e.procedure.category === 'lipo',
-    );
-
-  const argoHostSectionIdx = hasArgoplasmaSection && includedSections.length > 0 ? 0 : -1;
 
   // Combined totals for multi-procedure summary page
   const totalSurgery = data.procedures.reduce((s, e) => s + e.prices.surgery, 0);
@@ -377,6 +370,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
            CONTENT — TEXT
         ══════════════════════════════════════ */
         .p-intro {
+          font-size: 13pt;
           margin-bottom: 4mm;
           text-align: justify;
           line-height: 1.58;
@@ -385,6 +379,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           margin-bottom: 10pt;
         }
         .p-section-intro {
+          font-size: 13pt;
           margin-top: 2mm;
           margin-bottom: 6pt;
           text-align: justify;
@@ -415,7 +410,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           flex-shrink: 0;
           margin-right: 3mm;
           margin-top: 0.05em;
-          font-size: 14pt;
+          font-size: 13pt;
           line-height: 1.58;
         }
         .p-list-text {
@@ -434,7 +429,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           margin: 6mm 0;
         }
         .p-proc-title {
-          font-size: 16pt;
+          font-size: 14pt;
           font-weight: 700;
           text-align: center;
           text-transform: uppercase;
@@ -445,21 +440,21 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         }
         .p-fee { margin-bottom: 5.5mm; }
         .p-fee-label {
-          font-size: 14pt;
+          font-size: 13pt;
           font-weight: 700;
           font-variant: small-caps;
           letter-spacing: 0.03em;
           margin-bottom: 0.5mm;
         }
         .p-fee-value {
-          font-size: 16pt;
+          font-size: 13pt;
           font-weight: 700;
           margin-bottom: 1.5mm;
           letter-spacing: 0.01em;
           padding-left: 5mm;
         }
         .p-fee-options {
-          font-size: 13pt;
+          font-size: 12pt;
           line-height: 1.58;
           text-align: justify;
         }
@@ -469,14 +464,14 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           margin-top: 1mm;
         }
         .p-hospital-name {
-          font-size: 14pt;
+          font-size: 13pt;
           font-weight: 700;
           color: ${PRINT_BLACK};
           padding-left: 5mm;
           margin-bottom: 0.5mm;
         }
         .p-hospital-range {
-          font-size: 16pt;
+          font-size: 13pt;
           font-weight: 700;
           padding-left: 5mm;
           margin-bottom: 1.5mm;
@@ -495,20 +490,20 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
            IMPLANTS
         ══════════════════════════════════════ */
         .p-implant-section-title {
-          font-size: 16pt;
+          font-size: 13pt;
           font-weight: 700;
           color: ${PRINT_BLACK};
           margin: 0 0 6mm 0;
           line-height: 1.36;
         }
         .p-implant-brand {
-          font-size: 14pt;
+          font-size: 13pt;
           font-weight: 700;
           margin-top: 5mm;
           margin-bottom: 1mm;
         }
         .p-implant-prices {
-          font-size: 13pt;
+          font-size: 12pt;
           line-height: 1.58;
           text-align: justify;
         }
@@ -586,9 +581,6 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
       ════════════════════════════════════════════════ */}
       {parts.map((part, i) => {
         const section = includedSections[part.sectionIdx];
-        const isLastOfSection = lastPartIdxBySection.get(part.sectionIdx) === i;
-        const showArgoHere =
-          hasArgoplasmaSection && part.sectionIdx === argoHostSectionIdx && isLastOfSection;
         return (
           <div key={`${part.sectionIdx}-${part.partIdx}`} className="page page-content">
             <div
@@ -613,10 +605,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
                 </p>
               )}
               <ul className="p-list">
-                {[
-                  ...part.items,
-                  ...(showArgoHere ? getArgoplasmaIncludedItems('lipoescultura') : []),
-                ].map((item, j) =>
+                {part.items.map((item, j) =>
                   isInlineParagraph(item) ? (
                     <li key={j} className="p-inline-paragraph">
                       <span className="p-list-text">
@@ -712,7 +701,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             min={data.hospitalMin}
             max={data.hospitalMax}
           />
-          {hasArgoplasmaSection && <FeeArgoplasma />}
+          {data.includeArgoplasma && <FeeArgoplasma />}
 
           </div>
         </div>
@@ -762,9 +751,9 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           <p>Os valores de equipe cirúrgica e anestesista são válidos para realização do procedimento em até 2 meses, considerando a data deste orçamento.</p>
           <p>
             <span style={{ display: 'block', textAlignLast: 'justify' }}>
-              Caso opte por fazer a cirurgia, o primeiro passo é agendar a data do procedimento. Depois disso, marcaremos seu retor-
+              Caso opte por fazer a cirurgia, o primeiro passo é agendar a data do procedimento. Depois disso, marcaremos seu retorno
             </span>
-            no com o {data.doctorName} e a consulta pré-anestésica com a {data.anesthesiologistName} (valor de R$ 200).
+            com o {data.doctorName} e a consulta pré-anestésica com a {data.anesthesiologistName} (valor de R$ 200).
           </p>
           <p>Se tiver qualquer dúvida, estamos à disposição para conversar. Até breve! 🌷</p>
         </div>

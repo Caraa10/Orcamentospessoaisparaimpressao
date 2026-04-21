@@ -137,10 +137,9 @@ export function getIncludedSections(
     ];
   }
 
-  // Multi-procedure: deduplicate and build per-category sections
   const seen = new Set<string>();
-  const sections: IncludedSection[] = [];
-  let isFirst = true;
+  let intro = '';
+  const items: string[] = [];
 
   for (const entry of entries) {
     const key = `${entry.category}:${entry.name.toLowerCase()}`;
@@ -150,26 +149,24 @@ export function getIncludedSections(
     const info = getCategoryInfo(entry.category, entry.name);
     if (info.items.length === 0) continue;
 
-    sections.push({
-      intro: isFirst ? info.firstIntro : info.subIntro,
-      items: info.items,
-    });
-    isFirst = false;
+    if (!intro) {
+      intro = info.firstIntro;
+      items.push(...info.items);
+    } else {
+      items.push(`[[paragraph]]${info.subIntro}`, ...info.items);
+    }
   }
 
   const sharedItems = ['[[paragraph]]Todos os **procedimentos incluem**:', ...COMMON_ITEMS];
-  if (sections.length > 0) {
-    const lastSection = sections[sections.length - 1];
-    sections[sections.length - 1] = {
-      ...lastSection,
-      items: [...lastSection.items, ...sharedItems],
-    };
-  } else {
-    sections.push({
+  if (!intro) {
+    return [{
       intro: 'Todos os **procedimentos incluem**:',
       items: COMMON_ITEMS,
-    });
+    }];
   }
 
-  return sections;
+  return [{
+    intro,
+    items: [...items, ...sharedItems],
+  }];
 }

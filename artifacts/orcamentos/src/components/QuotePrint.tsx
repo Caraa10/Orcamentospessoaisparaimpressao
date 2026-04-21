@@ -125,11 +125,16 @@ function buildLipoGroupedTitle(names: string[]) {
   let hasAnyLipo = false;
 
   for (const rawName of names) {
-    const name = normalizeProcedureTitle(rawName);
-    const parts = name
-      .split(/\s+e\s+/i)
-      .flatMap((part) => part.split(/\s*,\s*/))
-      .map((part) => part.trim())
+    const parts = rawName
+      .split(/\s*\+\s*/g)
+      .flatMap((part) => {
+        const trimmed = part.trim();
+        const splitMatch = trimmed.match(/^(.*?)(?:\s+e\s+)(lipoaspiração.+)$/i);
+        if (splitMatch) {
+          return [splitMatch[1].trim(), splitMatch[2].trim()];
+        }
+        return [trimmed];
+      })
       .filter(Boolean);
 
     for (const part of parts) {
@@ -139,7 +144,7 @@ function buildLipoGroupedTitle(names: string[]) {
         for (const area of areas) areaKeys.add(area.key);
         continue;
       }
-      segments.push(part);
+      segments.push(normalizeProcedureTitle(part));
     }
   }
 

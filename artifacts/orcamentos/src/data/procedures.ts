@@ -32,7 +32,7 @@ export const PROCEDURES: Procedure[] = [
     complexityA: p(17000, 15000, 2000),
     complexityB: p(19000, 17000, 2000),
     complexityC: p(21000, 19000, 2000),
-    hospitalMin: 2800,
+    hospitalMin: 3000,
     hospitalMax: null,
   },
   {
@@ -43,7 +43,7 @@ export const PROCEDURES: Procedure[] = [
     complexityA: p(18000, 16000, 2000),
     complexityB: p(20000, 18000, 2000),
     complexityC: p(22000, 20000, 2000),
-    hospitalMin: 2900,
+    hospitalMin: 3300,
     hospitalMax: null,
   },
   {
@@ -54,7 +54,7 @@ export const PROCEDURES: Procedure[] = [
     complexityA: p(19000, 17000, 2000),
     complexityB: p(21000, 19000, 2000),
     complexityC: p(23000, 21000, 2000),
-    hospitalMin: 2900,
+    hospitalMin: 3300,
     hospitalMax: null,
   },
   {
@@ -65,7 +65,7 @@ export const PROCEDURES: Procedure[] = [
     complexityA: p(19000, 17000, 2000),
     complexityB: p(21000, 19000, 2000),
     complexityC: p(23000, 21000, 2000),
-    hospitalMin: 2900,
+    hospitalMin: 3100,
     hospitalMax: null,
   },
   {
@@ -76,7 +76,7 @@ export const PROCEDURES: Procedure[] = [
     complexityA: p(19000, 17000, 2000),
     complexityB: p(21000, 19000, 2000),
     complexityC: p(23000, 21000, 2000),
-    hospitalMin: 3000,
+    hospitalMin: 3200,
     hospitalMax: null,
   },
   {

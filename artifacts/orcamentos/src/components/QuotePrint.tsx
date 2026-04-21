@@ -382,10 +382,13 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           margin-bottom: 10pt;
         }
         .p-section-intro {
-          margin-top: 5mm;
+          margin-top: 2mm;
           margin-bottom: 6pt;
           text-align: justify;
           line-height: 1.46;
+        }
+        .p-intro + .p-intro + .p-section-intro {
+          margin-top: 5mm;
         }
         .p-list {
           list-style: none;

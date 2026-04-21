@@ -395,6 +395,9 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           padding-left: 0;
           margin-bottom: 4mm;
         }
+        .p-list-before-argo {
+          margin-bottom: 0.5mm;
+        }
         .p-list li {
           display: flex;
           align-items: flex-start;
@@ -618,7 +621,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
                   <BoldText text={section.intro} />
                 </p>
               )}
-              <ul className="p-list">
+              <ul className={`p-list ${showArgoHere ? 'p-list-before-argo' : ''}`}>
                 {part.items.map((item, j) =>
                   isInlineParagraph(item) ? (
                     <li key={j} className="p-inline-paragraph">

@@ -156,7 +156,12 @@ function buildLipoGroupedTitle(names: string[]) {
     if (hasGlutealFatGrafting) {
       lipoTitle += ' e Lipoenxertia Glútea';
     }
-    uniqueSegments.push(lipoTitle);
+    const lastSegment = uniqueSegments[uniqueSegments.length - 1];
+    if (lastSegment && /lipoescultura$/i.test(lastSegment)) {
+      uniqueSegments[uniqueSegments.length - 1] = `${lastSegment} - ${lipoTitle}`;
+    } else {
+      uniqueSegments.push(lipoTitle);
+    }
   } else if (hasGlutealFatGrafting) {
     uniqueSegments.push('Lipoenxertia Glútea');
   }
@@ -490,7 +495,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         }
         .cover-title {
           font-family: 'Avenir Next', sans-serif;
-          font-size: 20pt;
+          font-size: 18pt;
           font-weight: 400;
           letter-spacing: normal;
           text-transform: uppercase;

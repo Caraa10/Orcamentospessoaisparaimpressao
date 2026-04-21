@@ -1826,9 +1826,9 @@ export const ARGOPLASMA_PRICE_12X = 6250;
 
 export const IMPLANT_PRICES = {
   eurosilicone: {
-    avista: 3630,
-    ate6x: 3880,
-    de7a10x: 4180,
+    avista: 3750,
+    ate6x: 3900,
+    de7a10x: 4200,
   },
   silimed: {
     avista: 4603,

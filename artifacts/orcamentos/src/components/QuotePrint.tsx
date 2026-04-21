@@ -166,7 +166,7 @@ function buildLipoGroupedTitle(names: string[]) {
     uniqueSegments.push('Lipoenxertia Glútea');
   }
 
-  return joinPortuguese(uniqueSegments);
+  return joinPortuguese(uniqueSegments).replace(/\s-\s+e\s+(lipoaspiração)/i, ' - $1');
 }
 
 function splitProcedureChunk(part: string) {

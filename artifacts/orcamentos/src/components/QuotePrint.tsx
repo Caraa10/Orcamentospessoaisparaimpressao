@@ -75,17 +75,21 @@ function joinProcedureTitles(names: string[]) {
   const title = buildLipoGroupedTitle(names);
   if (title) return title;
 
-  const cleanNames = names.map((name) => normalizeProcedureTitle(name));
+  const cleanNames = names.map((name) => normalizeProcedureTitleBasic(name));
   return joinPortuguese(cleanNames);
 }
 
-function normalizeProcedureTitle(title: string) {
+function normalizeProcedureTitleBasic(title: string) {
   const parts = title
     .split(/\s*\+\s*/g)
     .map((part) => part.trim())
     .filter(Boolean);
   if (parts.length <= 1) return title;
   return joinPortuguese(parts);
+}
+
+function formatProcedureDisplayTitle(title: string) {
+  return buildLipoGroupedTitle([title]) ?? normalizeProcedureTitleBasic(title);
 }
 
 function joinPortuguese(parts: string[]) {
@@ -142,13 +146,13 @@ function buildLipoGroupedTitle(names: string[]) {
         for (const area of areas) areaKeys.add(area.key);
         continue;
       }
-      segments.push(normalizeProcedureTitle(part));
+      segments.push(normalizeProcedureTitleBasic(part));
     }
   }
 
   if (!hasAnyLipo) return null;
 
-  const uniqueSegments = Array.from(new Set(segments));
+  const uniqueSegments = Array.from(new Set(segments.map(normalizeProcedureTitleBasic)));
   const orderedAreas = LIPO_AREAS.filter((area) => areaKeys.has(area.key)).map((area) => area.label);
 
   if (orderedAreas.length > 0) {
@@ -816,7 +820,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         return (
           <div key={idx} className="page page-content">
             <div className="page-body">
-            <ProcedureTitle title={normalizeProcedureTitle(entry.procedure.name)} />
+            <ProcedureTitle title={formatProcedureDisplayTitle(entry.procedure.name)} />
 
             <div className="p-hr" />
 

@@ -127,14 +127,7 @@ function buildLipoGroupedTitle(names: string[]) {
   for (const rawName of names) {
     const parts = rawName
       .split(/\s*\+\s*/g)
-      .flatMap((part) => {
-        const trimmed = part.trim();
-        const splitMatch = trimmed.match(/^(.*?)(?:\s+e\s+)(lipoaspiração.+)$/i);
-        if (splitMatch) {
-          return [splitMatch[1].trim(), splitMatch[2].trim()];
-        }
-        return [trimmed];
-      })
+      .flatMap((part) => splitProcedureChunk(part))
       .filter(Boolean);
 
     for (const part of parts) {
@@ -158,6 +151,31 @@ function buildLipoGroupedTitle(names: string[]) {
   }
 
   return joinPortuguese(uniqueSegments);
+}
+
+function splitProcedureChunk(part: string) {
+  const trimmed = part.trim();
+  if (!/lipoaspiração/i.test(trimmed)) {
+    return [trimmed];
+  }
+
+  const lipoIndex = trimmed.search(/lipoaspiração/i);
+  const before = trimmed.slice(0, lipoIndex).replace(/[,\s]+$/g, '').trim();
+  let afterLipo = trimmed.slice(lipoIndex).trim();
+  const trailingProcedures = ['Lipoenxertia Glútea'];
+  const extracted: string[] = [];
+
+  for (const procedure of trailingProcedures) {
+    const pattern = new RegExp(`^(.*?)(?:\\s+e\\s+|,\\s*)(${procedure})$`, 'i');
+    const match = afterLipo.match(pattern);
+    if (match) {
+      afterLipo = match[1].trim().replace(/[,\s]+$/g, '');
+      extracted.push(match[2]);
+      break;
+    }
+  }
+
+  return [before, afterLipo, ...extracted].filter(Boolean);
 }
 
 function getBalancedTitleLines(title: string) {

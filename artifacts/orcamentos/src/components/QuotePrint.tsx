@@ -423,10 +423,13 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         }
 
         .p-argo-intro {
-          margin-top: 3mm;
-          margin-bottom: 1.5mm;
+          margin-top: 1.5mm;
+          margin-bottom: 0.5mm;
           text-align: justify;
           line-height: 1.46;
+        }
+        .p-argo-intro + .p-list li:first-child {
+          margin-top: 0;
         }
 
         /* ══════════════════════════════════════

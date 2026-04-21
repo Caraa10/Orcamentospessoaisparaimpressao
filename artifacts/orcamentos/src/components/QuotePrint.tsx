@@ -11,6 +11,15 @@ interface Props {
 const PRINT_BLACK = '#000000';
 const PRINT_BACKGROUND = '#ffffff';
 
+function formatCoverDate(dateValue: string) {
+  const baseDate = dateValue ? new Date(`${dateValue}T12:00:00`) : new Date();
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(baseDate);
+}
+
 function withLineBreaks(text: string, keyPrefix: string) {
   const lines = text.split('\n');
   return lines.map((line, i) => (
@@ -352,6 +361,18 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           right: 0;
           transform: translateY(-50%);
         }
+        .cover-date {
+          position: absolute;
+          left: var(--pdf-margin-left);
+          right: var(--pdf-margin-right);
+          bottom: 34mm;
+          font-family: 'Avenir Next', sans-serif;
+          font-size: 13pt;
+          font-weight: 400;
+          color: ${PRINT_BLACK};
+          text-align: center;
+          line-height: 1.3;
+        }
         /* ══════════════════════════════════════
            CONTENT — TEXT
         ══════════════════════════════════════ */
@@ -556,6 +577,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           </div>
           <div className="cover-patient-name">{data.patientName}</div>
         </div>
+        <div className="cover-date">{formatCoverDate(data.date)}</div>
       </div>
 
       {/* ════════════════════════════════════════════════

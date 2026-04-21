@@ -10,7 +10,6 @@ interface Props {
 
 const PRINT_BLACK = '#000000';
 const PRINT_BACKGROUND = '#ffffff';
-const LOGO_URL = `${import.meta.env.BASE_URL}logo-thiago-ferri.png`;
 
 function withLineBreaks(text: string, keyPrefix: string) {
   const lines = text.split('\n');
@@ -52,15 +51,6 @@ function BoldText({ text }: { text: string }) {
         ),
       )}
     </>
-  );
-}
-
-// Logo rendered at the bottom of each page (screen + print)
-function PageLogo() {
-  return (
-    <div className="page-footer-logo">
-      <img src={LOGO_URL} alt="Thiago Ferri Cirurgia Plástica" />
-    </div>
   );
 }
 
@@ -259,7 +249,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           --pdf-margin-top: 23mm;
           --pdf-margin-right: 10mm;
           --pdf-margin-bottom: 26mm;
-          --pdf-margin-left: 31mm;
+          --pdf-margin-left: 15mm;
           color: ${PRINT_BLACK};
           background: ${PRINT_BACKGROUND};
         }
@@ -314,6 +304,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           margin: var(--pdf-margin-top) var(--pdf-margin-right) var(--pdf-margin-bottom) var(--pdf-margin-left);
           overflow: hidden;
           font-family: 'Avenir Next', sans-serif;
+          text-align: justify;
         }
 
         /* ══════════════════════════════════════
@@ -345,7 +336,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           display: flex;
           flex-direction: column;
           align-items: center;
-          margin-top: 52mm;
+          margin-top: 66mm;
           gap: 26mm;
         }
         .cover-title {
@@ -371,20 +362,6 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           right: 0;
           transform: translateY(-50%);
         }
-        .cover-logo {
-          position: absolute;
-          bottom: 18mm;
-          left: 0; right: 0;
-          display: flex;
-          justify-content: center;
-        }
-        .cover-logo img {
-          width: 78mm;
-          height: auto;
-          display: block;
-          mix-blend-mode: normal;
-        }
-
         /* ══════════════════════════════════════
            CONTENT — TEXT
         ══════════════════════════════════════ */
@@ -471,6 +448,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         .p-fee-options {
           font-size: 14pt;
           line-height: 1.34;
+          text-align: justify;
         }
         .p-fee-optional {
           font-size: 11pt;
@@ -519,6 +497,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         .p-implant-prices {
           font-size: 14pt;
           line-height: 1.34;
+          text-align: justify;
         }
         .p-implant-note {
           font-size: 13pt;
@@ -538,29 +517,6 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           line-height: 1.34;
         }
         .p-closing p:last-child { margin-bottom: 0; }
-
-        /* ══════════════════════════════════════
-           FOOTER LOGO
-           Sits at the absolute bottom of every .page-content
-        ══════════════════════════════════════ */
-        .page-footer-logo {
-          position: absolute;
-          bottom: 12mm;
-          left: 0;
-          right: 0;
-          display: flex;
-          justify-content: center;
-        }
-        .page-footer-logo img {
-          width: 88mm;
-          height: auto;
-          display: block;
-          mix-blend-mode: normal;
-        }
-        /* Fixed logo: extra safety net for any printed page that might overflow */
-        .print-fixed-logo {
-          display: none;
-        }
 
         /* ══════════════════════════════════════
            SCREEN: cards with shadow + gap
@@ -607,9 +563,6 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             Planejamento Cirúrgico<br />Personalizado
           </div>
           <div className="cover-patient-name">{data.patientName}</div>
-        </div>
-        <div className="cover-logo">
-          <img src={LOGO_URL} alt="Thiago Ferri Cirurgia Plástica" />
         </div>
       </div>
 
@@ -671,7 +624,6 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
                 </>
               )}
             </div>
-            <PageLogo />
           </div>
         );
       })}
@@ -692,7 +644,6 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             </li>
           </ul>
           </div>
-          <PageLogo />
         </div>
       )}
 
@@ -748,7 +699,6 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             {showArgoplasmaHere && <FeeArgoplasma />}
 
             </div>
-            <PageLogo />
           </div>
         );
       })}
@@ -774,7 +724,6 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           {hasArgoplasmaSection && <FeeArgoplasma />}
 
           </div>
-          <PageLogo />
         </div>
       )}
 
@@ -809,7 +758,6 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           </div>
 
           </div>
-          <PageLogo />
         </div>
       )}
 
@@ -831,15 +779,6 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         </div>
 
         </div>
-        <PageLogo />
-      </div>
-
-      {/* ════════════════════════════════════════════════
-          FIXED LOGO — appears on every printed page
-          (hidden on screen; shown via @media print)
-      ════════════════════════════════════════════════ */}
-      <div className="print-fixed-logo">
-        <img src={LOGO_URL} alt="Thiago Ferri Cirurgia Plástica" />
       </div>
     </div>
   );

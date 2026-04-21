@@ -74,8 +74,8 @@ interface CategoryInfo {
 function getCategoryInfo(category: ProcedureCategory, procedureName: string): CategoryInfo {
   if (category === 'lipo') {
     return {
-      firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu investimento de lipoescultura**:',
-      subIntro: 'Estão **incluídos em seu investimento de lipoescultura**:',
+      firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de lipoescultura**:',
+      subIntro: 'Estão **incluídos em seu procedimento de lipoescultura**:',
       items: LIPO_SPECIFIC_ITEMS,
     };
   }
@@ -84,8 +84,8 @@ function getCategoryInfo(category: ProcedureCategory, procedureName: string): Ca
     const hasLipo = /lipoaspi|lipo/i.test(procedureName);
     const term = hasLipo ? 'abdominoplastia com lipoescultura' : 'abdominoplastia';
     return {
-      firstIntro: `Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu investimento de ${term}**:`,
-      subIntro: `Estão **incluídos em seu investimento de ${term}**:`,
+      firstIntro: `Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de ${term}**:`,
+      subIntro: `Estão **incluídos em seu procedimento de ${term}**:`,
       items: ABDOMINOPLASTY_SPECIFIC_ITEMS,
     };
   }
@@ -94,28 +94,28 @@ function getCategoryInfo(category: ProcedureCategory, procedureName: string): Ca
     const lower = procedureName.toLowerCase();
     if (lower.includes('redutora')) {
       return {
-        firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu investimento de mamoplastia redutora**:',
-        subIntro: 'Estão **incluídos em seu investimento de mamoplastia redutora**:',
+        firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de mamoplastia redutora**:',
+        subIntro: 'Estão **incluídos em seu procedimento de mamoplastia redutora**:',
         items: BREAST_REDUCTION_SPECIFIC_ITEMS,
       };
     }
     if (lower.includes('mastopexia')) {
       return {
-        firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu investimento de mastopexia**:',
-        subIntro: 'Estão **incluídos em seu investimento de mastopexia**:',
+        firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de mastopexia**:',
+        subIntro: 'Estão **incluídos em seu procedimento de mastopexia**:',
         items: MASTOPEXY_SPECIFIC_ITEMS,
       };
     }
     return {
-      firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu investimento de mamoplastia de aumento**:',
-      subIntro: 'Estão **incluídos em seu investimento de mamoplastia de aumento**:',
+      firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de mamoplastia de aumento**:',
+      subIntro: 'Estão **incluídos em seu procedimento de mamoplastia de aumento**:',
       items: BREAST_AUGMENTATION_SPECIFIC_ITEMS,
     };
   }
 
   return {
-    firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu investimento**:',
-    subIntro: 'Estão **incluídos em seu investimento**:',
+    firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento**:',
+    subIntro: 'Estão **incluídos em seu procedimento**:',
     items: [],
   };
 }
@@ -159,7 +159,7 @@ export function getIncludedSections(
 
   // Shared section
   sections.push({
-    intro: 'Todos os **investimentos incluem**:',
+    intro: 'Todos os **procedimentos incluem**:',
     items: COMMON_ITEMS,
   });
 

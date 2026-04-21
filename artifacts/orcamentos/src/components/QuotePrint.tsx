@@ -54,6 +54,14 @@ function BoldText({ text }: { text: string }) {
   );
 }
 
+function isInlineParagraph(item: string) {
+  return item.startsWith('[[paragraph]]');
+}
+
+function stripInlineParagraphMarker(item: string) {
+  return item.replace('[[paragraph]]', '');
+}
+
 // Pricing block for equipe cirúrgica
 function FeeEquipe({ surgeryBase }: { surgeryBase: number }) {
   const p = calcPaymentOptions(surgeryBase);
@@ -247,9 +255,9 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
           font-weight: 400;
           --pdf-margin-top: 23mm;
-          --pdf-margin-right: 10mm;
+          --pdf-margin-right: 15mm;
           --pdf-margin-bottom: 26mm;
-          --pdf-margin-left: 15mm;
+          --pdf-margin-left: 31mm;
           color: ${PRINT_BLACK};
           background: ${PRINT_BACKGROUND};
         }
@@ -295,7 +303,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           height: 297mm;
           padding: 0;
           font-size: 15pt;
-          line-height: 1.28;
+          line-height: 1.42;
           color: ${PRINT_BLACK};
           position: relative;
         }
@@ -368,7 +376,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         .p-intro {
           margin-bottom: 4mm;
           text-align: justify;
-          line-height: 1.32;
+          line-height: 1.46;
         }
         .p-intro + .p-intro {
           margin-bottom: 14pt;
@@ -377,7 +385,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           margin-top: 5mm;
           margin-bottom: 14pt;
           text-align: justify;
-          line-height: 1.32;
+          line-height: 1.46;
         }
         .p-list {
           list-style: none;
@@ -387,29 +395,35 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         .p-list li {
           display: flex;
           align-items: flex-start;
-          margin-bottom: 1.8mm;
-          line-height: 1.32;
+          margin-bottom: 2.3mm;
+          line-height: 1.46;
           text-align: justify;
+        }
+        .p-list li.p-inline-paragraph {
+          display: block;
+          margin-top: 5mm;
+          margin-bottom: 3mm;
+          line-height: 1.46;
         }
         .p-list-bullet {
           flex-shrink: 0;
           margin-right: 3mm;
           margin-top: 0.05em;
           font-size: 15pt;
-          line-height: 1.32;
+          line-height: 1.46;
         }
         .p-list-text {
           flex: 1;
           font-size: 14pt;
           text-align: justify;
-          line-height: 1.32;
+          line-height: 1.46;
         }
 
         .p-argo-intro {
           margin-top: 5mm;
           margin-bottom: 3mm;
           text-align: justify;
-          line-height: 1.32;
+          line-height: 1.46;
         }
 
         /* ══════════════════════════════════════
@@ -428,7 +442,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           letter-spacing: 0.05em;
           color: ${PRINT_BLACK};
           margin: 0 0 7mm 0;
-          line-height: 1.3;
+          line-height: 1.35;
         }
         .p-fee { margin-bottom: 5.5mm; }
         .p-fee-label {
@@ -447,7 +461,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         }
         .p-fee-options {
           font-size: 14pt;
-          line-height: 1.34;
+          line-height: 1.46;
           text-align: justify;
         }
         .p-fee-optional {
@@ -471,7 +485,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           align-items: baseline;
           flex-wrap: wrap;
           gap: 3mm;
-          line-height: 1.3;
+          line-height: 1.38;
         }
         .p-hospital-range-note {
           font-size: 11pt;
@@ -486,7 +500,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           font-weight: 700;
           color: ${PRINT_BLACK};
           margin: 0 0 6mm 0;
-          line-height: 1.3;
+          line-height: 1.36;
         }
         .p-implant-brand {
           font-size: 15pt;
@@ -496,14 +510,14 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         }
         .p-implant-prices {
           font-size: 14pt;
-          line-height: 1.34;
+          line-height: 1.46;
           text-align: justify;
         }
         .p-implant-note {
           font-size: 13pt;
           opacity: 1;
           margin-top: 5mm;
-          line-height: 1.34;
+          line-height: 1.46;
           text-align: justify;
         }
 
@@ -514,7 +528,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           margin-bottom: 4mm;
           text-align: justify;
           font-size: 14pt;
-          line-height: 1.34;
+          line-height: 1.46;
         }
         .p-closing p:last-child { margin-bottom: 0; }
 
@@ -599,14 +613,22 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
                 </p>
               )}
               <ul className="p-list">
-                {part.items.map((item, j) => (
-                  <li key={j}>
-                    <span className="p-list-bullet">•</span>
-                    <span className="p-list-text">
-                      <ItemRenderer text={item} />
-                    </span>
-                  </li>
-                ))}
+                {part.items.map((item, j) =>
+                  isInlineParagraph(item) ? (
+                    <li key={j} className="p-inline-paragraph">
+                      <span className="p-list-text">
+                        <BoldText text={stripInlineParagraphMarker(item)} />
+                      </span>
+                    </li>
+                  ) : (
+                    <li key={j}>
+                      <span className="p-list-bullet">•</span>
+                      <span className="p-list-text">
+                        <ItemRenderer text={item} />
+                      </span>
+                    </li>
+                  ),
+                )}
               </ul>
               {showArgoHere && (
                 <>

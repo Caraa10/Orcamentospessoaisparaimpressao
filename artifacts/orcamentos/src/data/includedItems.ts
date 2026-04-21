@@ -157,11 +157,19 @@ export function getIncludedSections(
     isFirst = false;
   }
 
-  // Shared section
-  sections.push({
-    intro: 'Todos os **procedimentos incluem**:',
-    items: COMMON_ITEMS,
-  });
+  const sharedItems = ['[[paragraph]]Todos os **procedimentos incluem**:', ...COMMON_ITEMS];
+  if (sections.length > 0) {
+    const lastSection = sections[sections.length - 1];
+    sections[sections.length - 1] = {
+      ...lastSection,
+      items: [...lastSection.items, ...sharedItems],
+    };
+  } else {
+    sections.push({
+      intro: 'Todos os **procedimentos incluem**:',
+      items: COMMON_ITEMS,
+    });
+  }
 
   return sections;
 }

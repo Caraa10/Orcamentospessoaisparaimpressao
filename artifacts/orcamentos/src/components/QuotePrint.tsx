@@ -121,23 +121,38 @@ function stripLipoSegments(title: string) {
 
 function buildLipoGroupedTitle(names: string[]) {
   const areaKeys = new Set<string>();
-  const baseProcedures: string[] = [];
+  const segments: string[] = [];
+  let hasAnyLipo = false;
 
-  for (const name of names) {
-    for (const area of getLipoAreas(name)) {
-      areaKeys.add(area.key);
+  for (const rawName of names) {
+    const name = normalizeProcedureTitle(rawName);
+    const parts = name
+      .split(/\s+e\s+/i)
+      .flatMap((part) => part.split(/\s*,\s*/))
+      .map((part) => part.trim())
+      .filter(Boolean);
+
+    for (const part of parts) {
+      const areas = getLipoAreas(part);
+      if (/lipoaspiração/i.test(part) || areas.length > 0) {
+        hasAnyLipo = true;
+        for (const area of areas) areaKeys.add(area.key);
+        continue;
+      }
+      segments.push(part);
     }
-    baseProcedures.push(...stripLipoSegments(name));
   }
 
-  if (areaKeys.size === 0) return null;
+  if (!hasAnyLipo) return null;
 
-  const uniqueBaseProcedures = Array.from(new Set(baseProcedures.map(normalizeProcedureTitle)));
+  const uniqueSegments = Array.from(new Set(segments));
   const orderedAreas = LIPO_AREAS.filter((area) => areaKeys.has(area.key)).map((area) => area.label);
-  const lipoTitle = `Lipoaspiração de ${joinPortuguese(orderedAreas)}`;
 
-  if (uniqueBaseProcedures.length === 0) return lipoTitle;
-  return joinPortuguese([...uniqueBaseProcedures, lipoTitle]);
+  if (orderedAreas.length > 0) {
+    uniqueSegments.push(`Lipoaspiração de ${joinPortuguese(orderedAreas)}`);
+  }
+
+  return joinPortuguese(uniqueSegments);
 }
 
 function getBalancedTitleLines(title: string) {

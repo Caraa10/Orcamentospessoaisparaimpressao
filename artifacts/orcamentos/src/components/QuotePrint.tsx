@@ -72,10 +72,11 @@ function stripInlineParagraphMarker(item: string) {
 }
 
 function joinProcedureTitles(names: string[]) {
+  const title = buildLipoGroupedTitle(names);
+  if (title) return title;
+
   const cleanNames = names.map((name) => normalizeProcedureTitle(name));
-  if (cleanNames.length <= 1) return cleanNames[0] ?? '';
-  if (cleanNames.length === 2) return `${cleanNames[0]} e ${cleanNames[1]}`;
-  return `${cleanNames.slice(0, -1).join(', ')} e ${cleanNames[cleanNames.length - 1]}`;
+  return joinPortuguese(cleanNames);
 }
 
 function normalizeProcedureTitle(title: string) {
@@ -84,8 +85,59 @@ function normalizeProcedureTitle(title: string) {
     .map((part) => part.trim())
     .filter(Boolean);
   if (parts.length <= 1) return title;
-  if (parts.length === 2) return `${parts[0]} e ${parts[1]}`;
-  return `${parts.slice(0, -1).join(', ')} e ${parts[parts.length - 1]}`;
+  return joinPortuguese(parts);
+}
+
+function joinPortuguese(parts: string[]) {
+  const cleanParts = parts.map((part) => part.trim()).filter(Boolean);
+  if (cleanParts.length <= 1) return cleanParts[0] ?? '';
+  if (cleanParts.length === 2) return `${cleanParts[0]} e ${cleanParts[1]}`;
+  return `${cleanParts.slice(0, -1).join(', ')} e ${cleanParts[cleanParts.length - 1]}`;
+}
+
+const LIPO_AREAS = [
+  { key: 'pre-axilas', label: 'Pré-Axilas', patterns: [/pré-axilas/i, /pre-axilas/i] },
+  { key: 'contorno-mamario', label: 'Contorno Mamário', patterns: [/contorno mamário/i, /contorno mamario/i] },
+  { key: 'submento', label: 'Submento', patterns: [/submento/i] },
+  { key: 'abdome', label: 'Abdome', patterns: [/abdome/i] },
+  { key: 'flancos', label: 'Flancos', patterns: [/flancos?/i] },
+  { key: 'laterais-quadril', label: 'Laterais do Quadril', patterns: [/laterais do quadril/i, /lateral do quadril/i] },
+  { key: 'face-interna-coxas', label: 'Face Interna das Coxas', patterns: [/face interna das coxas/i, /fi coxas/i] },
+  { key: 'culotes', label: 'Culotes', patterns: [/culotes?/i] },
+  { key: 'bracos', label: 'Braços', patterns: [/braços/i, /bracos/i] },
+  { key: 'dorso', label: 'Dorso', patterns: [/dorso/i] },
+];
+
+function getLipoAreas(title: string) {
+  return LIPO_AREAS.filter((area) => area.patterns.some((pattern) => pattern.test(title)));
+}
+
+function stripLipoSegments(title: string) {
+  return title
+    .split(/\s*\+\s*/g)
+    .map((part) => part.trim())
+    .filter((part) => part && !/lipoaspiração/i.test(part) && getLipoAreas(part).length === 0);
+}
+
+function buildLipoGroupedTitle(names: string[]) {
+  const areaKeys = new Set<string>();
+  const baseProcedures: string[] = [];
+
+  for (const name of names) {
+    for (const area of getLipoAreas(name)) {
+      areaKeys.add(area.key);
+    }
+    baseProcedures.push(...stripLipoSegments(name));
+  }
+
+  if (areaKeys.size === 0) return null;
+
+  const uniqueBaseProcedures = Array.from(new Set(baseProcedures.map(normalizeProcedureTitle)));
+  const orderedAreas = LIPO_AREAS.filter((area) => areaKeys.has(area.key)).map((area) => area.label);
+  const lipoTitle = `Lipoaspiração de ${joinPortuguese(orderedAreas)}`;
+
+  if (uniqueBaseProcedures.length === 0) return lipoTitle;
+  return joinPortuguese([...uniqueBaseProcedures, lipoTitle]);
 }
 
 function getBalancedTitleLines(title: string) {
@@ -458,9 +510,12 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         }
         .p-list li.p-inline-paragraph {
           display: block;
-          margin-top: 3mm;
+          margin-top: 4mm;
           margin-bottom: 1.5mm;
           line-height: 1.58;
+        }
+        .p-list li.p-inline-paragraph + .p-inline-paragraph {
+          margin-top: 4.5mm;
         }
         .p-list-bullet {
           flex-shrink: 0;
@@ -551,6 +606,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           color: ${PRINT_BLACK};
           margin: 0 0 6mm 0;
           line-height: 1.36;
+          text-align: center;
         }
         .p-implant-brand {
           font-size: 13pt;

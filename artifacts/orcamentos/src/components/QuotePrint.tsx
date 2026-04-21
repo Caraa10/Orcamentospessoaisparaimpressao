@@ -182,7 +182,7 @@ function splitProcedureChunk(part: string) {
   const extracted: string[] = [];
 
   for (const procedure of trailingProcedures) {
-    const pattern = new RegExp(`^(.*?)(?:\\s+e\\s+|,\\s*)(${procedure})$`, 'i');
+    const pattern = new RegExp(`^(.*?)(?:\\s+e\\s+|,\\s*|\\s+)(${procedure})$`, 'i');
     const match = afterLipo.match(pattern);
     if (match) {
       afterLipo = match[1].trim().replace(/[,\s]+$/g, '');

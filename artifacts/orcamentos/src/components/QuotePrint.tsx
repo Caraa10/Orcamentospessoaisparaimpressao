@@ -379,11 +379,11 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           line-height: 1.46;
         }
         .p-intro + .p-intro {
-          margin-bottom: 14pt;
+          margin-bottom: 10pt;
         }
         .p-section-intro {
           margin-top: 5mm;
-          margin-bottom: 14pt;
+          margin-bottom: 6pt;
           text-align: justify;
           line-height: 1.46;
         }
@@ -395,14 +395,14 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         .p-list li {
           display: flex;
           align-items: flex-start;
-          margin-bottom: 2.3mm;
+          margin-bottom: 1.25mm;
           line-height: 1.46;
           text-align: justify;
         }
         .p-list li.p-inline-paragraph {
           display: block;
-          margin-top: 5mm;
-          margin-bottom: 3mm;
+          margin-top: 3mm;
+          margin-bottom: 1.5mm;
           line-height: 1.46;
         }
         .p-list-bullet {
@@ -420,8 +420,8 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         }
 
         .p-argo-intro {
-          margin-top: 5mm;
-          margin-bottom: 3mm;
+          margin-top: 3mm;
+          margin-bottom: 1.5mm;
           text-align: justify;
           line-height: 1.46;
         }

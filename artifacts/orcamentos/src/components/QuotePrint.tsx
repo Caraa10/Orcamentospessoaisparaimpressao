@@ -123,6 +123,7 @@ function buildLipoGroupedTitle(names: string[]) {
   const areaKeys = new Set<string>();
   const segments: string[] = [];
   let hasAnyLipo = false;
+  let hasGlutealFatGrafting = false;
 
   for (const rawName of names) {
     const parts = rawName
@@ -131,6 +132,10 @@ function buildLipoGroupedTitle(names: string[]) {
       .filter(Boolean);
 
     for (const part of parts) {
+      if (/lipoenxertia gl[uú]tea/i.test(part)) {
+        hasGlutealFatGrafting = true;
+        continue;
+      }
       const areas = getLipoAreas(part);
       if (/lipoaspiração/i.test(part) || areas.length > 0) {
         hasAnyLipo = true;
@@ -147,7 +152,13 @@ function buildLipoGroupedTitle(names: string[]) {
   const orderedAreas = LIPO_AREAS.filter((area) => areaKeys.has(area.key)).map((area) => area.label);
 
   if (orderedAreas.length > 0) {
-    uniqueSegments.push(`Lipoaspiração de ${joinPortuguese(orderedAreas)}`);
+    let lipoTitle = `Lipoaspiração de ${joinPortuguese(orderedAreas)}`;
+    if (hasGlutealFatGrafting) {
+      lipoTitle += ' e Lipoenxertia Glútea';
+    }
+    uniqueSegments.push(lipoTitle);
+  } else if (hasGlutealFatGrafting) {
+    uniqueSegments.push('Lipoenxertia Glútea');
   }
 
   return joinPortuguese(uniqueSegments);

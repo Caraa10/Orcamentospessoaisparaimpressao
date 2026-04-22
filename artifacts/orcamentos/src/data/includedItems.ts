@@ -17,8 +17,30 @@ export const COMMON_ITEMS: string[] = [
 export function getArgoplasmaIncludedItems(procedureLabel: string): string[] {
   return [
     `[[paragraph]]É ainda possível acrescentar ao seu procedimento de ${procedureLabel}:`,
-    '**Argoplasma - ARGON 4**: é uma tecnologia utilizada na cirurgia plástica que emprega gás argônio ionizado (plasma) para promover estímulo a novas fibras de colágeno, melhorando firmeza, elasticidade e aparência da pele.',
+    '**Argoplasma - ARGON 4**: é uma tecnologia que emprega gás argônio ionizado (plasma) para promover estímulo a novas fibras de colágeno, melhorando firmeza, elasticidade e aparência da pele.',
   ];
+}
+
+function getArgoplasmaProcedureLabel(entry: {
+  category: ProcedureCategory;
+  name: string;
+}): string {
+  const normalizedName = entry.name
+    .replace(/\s*\+\s*/g, ' e ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const baseName = normalizedName
+    .replace(/\s*-\s*lipoaspiraç[aã]o[\s\S]*$/i, '')
+    .replace(/\s+e\s+lipoenxertia gl[uú]tea$/i, '')
+    .trim()
+    .toLowerCase();
+
+  if (entry.category === 'abdominoplasty' && /abdominoplastia/i.test(baseName) && /lipo/i.test(baseName)) {
+    return 'abdominoplastia e lipoescultura';
+  }
+
+  return baseName || 'procedimento';
 }
 
 // ─── Category-specific items ───
@@ -142,7 +164,7 @@ export function getIncludedSections(
     const info = getCategoryInfo(entries[0].category, entries[0].name);
     const argoplasmaItems =
       shouldIncludeArgoplasma && supportsArgoplasma(entries[0])
-        ? getArgoplasmaIncludedItems('lipoescultura')
+        ? getArgoplasmaIncludedItems(getArgoplasmaProcedureLabel(entries[0]))
         : [];
     return [
       {
@@ -171,7 +193,7 @@ export function getIncludedSections(
       items.push(`[[paragraph]]${info.subIntro}`, ...info.items);
     }
     if (shouldIncludeArgoplasma && supportsArgoplasma(entry)) {
-      items.push(...getArgoplasmaIncludedItems('lipoescultura'));
+      items.push(...getArgoplasmaIncludedItems(getArgoplasmaProcedureLabel(entry)));
     }
   }
 

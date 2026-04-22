@@ -436,10 +436,10 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         .print-root {
           font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
           font-weight: 400;
-          --pdf-margin-top: 23mm;
-          --pdf-margin-right: 15mm;
+          --pdf-margin-top: 40mm;
+          --pdf-margin-right: 20mm;
           --pdf-margin-bottom: 26mm;
-          --pdf-margin-left: 31mm;
+          --pdf-margin-left: 40mm;
           color: ${PRINT_BLACK};
           background: ${PRINT_BACKGROUND};
         }
@@ -484,7 +484,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         .page-content {
           height: 297mm;
           padding: 0;
-          font-size: 14pt;
+          font-size: 12pt;
           line-height: 1.54;
           color: ${PRINT_BLACK};
           position: relative;
@@ -505,7 +505,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           width: 210mm;
           background: ${PRINT_BACKGROUND};
           padding: var(--pdf-margin-top) var(--pdf-margin-right) var(--pdf-margin-bottom) var(--pdf-margin-left);
-          font-size: 10pt;
+          font-size: 8pt;
           line-height: 1.55;
           color: ${PRINT_BLACK};
           font-family: 'Avenir Next', sans-serif;
@@ -531,7 +531,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         }
         .cover-title {
           font-family: 'Avenir Next', sans-serif;
-          font-size: 18pt;
+          font-size: 13pt;
           font-weight: 400;
           letter-spacing: normal;
           text-transform: uppercase;
@@ -560,7 +560,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           right: var(--pdf-margin-right);
           bottom: 34mm;
           font-family: 'Avenir Next', sans-serif;
-          font-size: 13pt;
+          font-size: 11pt;
           font-weight: 400;
           color: ${PRINT_BLACK};
           text-align: center;
@@ -570,7 +570,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
            CONTENT — TEXT
         ══════════════════════════════════════ */
         .p-intro {
-          font-size: 13pt;
+          font-size: 11pt;
           margin-bottom: 4mm;
           text-align: justify;
           line-height: 1.58;
@@ -579,7 +579,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           margin-bottom: 10pt;
         }
         .p-section-intro {
-          font-size: 13pt;
+          font-size: 11pt;
           margin-top: 2mm;
           margin-bottom: 6pt;
           text-align: justify;
@@ -613,12 +613,12 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           flex-shrink: 0;
           margin-right: 3mm;
           margin-top: 0.05em;
-          font-size: 13pt;
+          font-size: 11pt;
           line-height: 1.58;
         }
         .p-list-text {
           flex: 1;
-          font-size: 13pt;
+          font-size: 11pt;
           text-align: justify;
           line-height: 1.58;
         }
@@ -632,7 +632,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           margin: 6mm 0;
         }
         .p-proc-title {
-          font-size: 14pt;
+          font-size: 12pt;
           font-weight: 700;
           text-align: center;
           text-transform: uppercase;
@@ -643,38 +643,38 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         }
         .p-fee { margin-bottom: 5.5mm; }
         .p-fee-label {
-          font-size: 13pt;
+          font-size: 11pt;
           font-weight: 700;
           font-variant: small-caps;
           letter-spacing: 0.03em;
           margin-bottom: 0.5mm;
         }
         .p-fee-value {
-          font-size: 13pt;
+          font-size: 11pt;
           font-weight: 700;
           margin-bottom: 1.5mm;
           letter-spacing: 0.01em;
           padding-left: 5mm;
         }
         .p-fee-options {
-          font-size: 12pt;
+          font-size: 10pt;
           line-height: 1.58;
           text-align: justify;
         }
         .p-fee-optional {
-          font-size: 10pt;
+          font-size: 8pt;
           opacity: 1;
           margin-top: 1mm;
         }
         .p-hospital-name {
-          font-size: 13pt;
+          font-size: 11pt;
           font-weight: 700;
           color: ${PRINT_BLACK};
           padding-left: 5mm;
           margin-bottom: 0.5mm;
         }
         .p-hospital-range {
-          font-size: 13pt;
+          font-size: 11pt;
           font-weight: 700;
           padding-left: 5mm;
           margin-bottom: 1.5mm;
@@ -685,7 +685,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           line-height: 1.38;
         }
         .p-hospital-range-note {
-          font-size: 10pt;
+          font-size: 8pt;
           font-weight: 400;
         }
 
@@ -693,7 +693,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
            IMPLANTS
         ══════════════════════════════════════ */
         .p-implant-section-title {
-          font-size: 13pt;
+          font-size: 11pt;
           font-weight: 700;
           color: ${PRINT_BLACK};
           margin: 0 0 6mm 0;
@@ -701,18 +701,18 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           text-align: center;
         }
         .p-implant-brand {
-          font-size: 13pt;
+          font-size: 11pt;
           font-weight: 700;
           margin-top: 5mm;
           margin-bottom: 1mm;
         }
         .p-implant-prices {
-          font-size: 12pt;
+          font-size: 10pt;
           line-height: 1.58;
           text-align: justify;
         }
         .p-implant-note {
-          font-size: 12pt;
+          font-size: 10pt;
           opacity: 1;
           margin-top: 5mm;
           line-height: 1.58;
@@ -725,7 +725,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         .p-closing p {
           margin-bottom: 4mm;
           text-align: justify;
-          font-size: 13pt;
+          font-size: 11pt;
           line-height: 1.58;
         }
         .p-closing p:last-child { margin-bottom: 0; }

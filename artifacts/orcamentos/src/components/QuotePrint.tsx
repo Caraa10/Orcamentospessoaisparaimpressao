@@ -106,7 +106,7 @@ const LIPO_AREAS = [
   { key: 'abdome', label: 'Abdome', patterns: [/abdome/i] },
   { key: 'flancos', label: 'Flancos', patterns: [/flancos?/i] },
   { key: 'laterais-quadril', label: 'Laterais do Quadril', patterns: [/laterais do quadril/i, /lateral do quadril/i] },
-  { key: 'face-interna-coxas', label: 'Face Interna das Coxas', patterns: [/face interna das coxas/i, /fi coxas/i] },
+  { key: 'face-interna-coxas', label: 'Face Interna das Coxas', patterns: [/face interna das coxas/i, /fi coxas/i, /fi das coxas/i, /fi de coxas/i] },
   { key: 'culotes', label: 'Culotes', patterns: [/culotes?/i] },
   { key: 'bracos', label: 'Braços', patterns: [/braços/i, /bracos/i] },
   { key: 'dorso', label: 'Dorso', patterns: [/dorso/i] },
@@ -918,7 +918,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         <div className="page-body">
         <div className="p-closing">
           <p>O custo é calculado somando-se os valores de {costComponents.join(' + ')}.</p>
-          <p>Os valores de equipe cirúrgica e anestesista são válidos para realização do procedimento em até 2 meses, considerando a data deste orçamento.</p>
+          <p>Os valores de equipe cirúrgica e anestesista são válidos para realização do procedimento em até 30 dias, considerando a data deste orçamento.</p>
           <p>
             Caso opte por fazer a cirurgia, o primeiro passo é agendar a data do procedimento. Depois disso, marcaremos seu retorno com o {data.doctorName} e a consulta pré-anestésica com a {data.anesthesiologistName} (valor de R$ 200).
           </p>

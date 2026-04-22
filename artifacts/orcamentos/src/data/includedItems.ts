@@ -17,7 +17,7 @@ export const COMMON_ITEMS: string[] = [
 export function getArgoplasmaIncludedItems(procedureLabel: string): string[] {
   return [
     `[[paragraph]]É ainda possível acrescentar ao seu procedimento de ${procedureLabel}:`,
-    '**Argoplasma - ARGON 4**: tecnologia de última geração, que promove maior retração da pele e estimula a produção de colágeno, melhorando a elasticidade e proporcionando um visual mais firme e rejuvenescido',
+    '**Argoplasma - ARGON 4**: é uma tecnologia utilizada na cirurgia plástica que emprega gás argônio ionizado (plasma) para promover estímulo a novas fibras de colágeno, melhorando firmeza, elasticidade e aparência da pele.',
   ];
 }
 

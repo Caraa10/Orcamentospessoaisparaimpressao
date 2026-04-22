@@ -20,6 +20,38 @@ function formatCoverDate(dateValue: string) {
   }).format(baseDate);
 }
 
+function getCoverPatientNameStyle(patientName: string) {
+  const normalizedName = patientName.trim().replace(/\s+/g, ' ');
+  const nameLength = normalizedName.length;
+  const wordCount = normalizedName ? normalizedName.split(' ').length : 0;
+
+  let fontSize = 34;
+  let lineHeight = 1.1;
+
+  if (nameLength > 28 || wordCount > 4) fontSize = 30;
+  if (nameLength > 38 || wordCount > 5) {
+    fontSize = 27;
+    lineHeight = 1.14;
+  }
+  if (nameLength > 48 || wordCount > 6) {
+    fontSize = 24;
+    lineHeight = 1.16;
+  }
+  if (nameLength > 58 || wordCount > 7) {
+    fontSize = 21;
+    lineHeight = 1.18;
+  }
+  if (nameLength > 70 || wordCount > 8) {
+    fontSize = 19;
+    lineHeight = 1.2;
+  }
+
+  return {
+    fontSize: `${fontSize}pt`,
+    lineHeight,
+  };
+}
+
 function withLineBreaks(text: string, keyPrefix: string) {
   const lines = text.split('\n');
   return lines.map((line, i) => (
@@ -509,16 +541,18 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         }
         .cover-patient-name {
           font-family: 'Snell Roundhand', 'Pinyon Script', cursive;
-          font-size: 34pt;
           font-weight: 700;
           color: ${PRINT_BLACK};
           text-align: center;
-          line-height: 1.1;
           position: absolute;
           top: 50%;
-          left: 0;
-          right: 0;
+          left: var(--pdf-margin-left);
+          right: var(--pdf-margin-right);
           transform: translateY(-50%);
+          max-width: calc(210mm - var(--pdf-margin-left) - var(--pdf-margin-right));
+          overflow-wrap: break-word;
+          word-break: normal;
+          hyphens: none;
         }
         .cover-date {
           position: absolute;
@@ -740,7 +774,9 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           <div className="cover-title">
             Planejamento Cirúrgico<br />Personalizado
           </div>
-          <div className="cover-patient-name">{data.patientName}</div>
+          <div className="cover-patient-name" style={getCoverPatientNameStyle(data.patientName)}>
+            {data.patientName}
+          </div>
         </div>
         <div className="cover-date">{formatCoverDate(data.date)}</div>
       </div>

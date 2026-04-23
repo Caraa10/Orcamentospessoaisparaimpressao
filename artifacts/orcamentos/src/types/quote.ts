@@ -1,20 +1,20 @@
-import type { Procedure } from '@/data/procedures';
+import type { Procedure, PriceSet, Complexity } from '@/data/procedures';
 
 export interface ProcedureEntry {
-  id: string;
   procedure: Procedure;
-  quantity: number;
-  teeth: number[];
-  region: string;
-  notes: string;
+  complexity: Complexity;
+  prices: PriceSet;
 }
 
 export interface QuoteData {
   patientName: string;
   date: string;
-  dentistName: string;
-  cro: string;
-  validityDays: number;
   procedures: ProcedureEntry[];
-  generalNotes: string;
+  hospitalName: string;
+  hospitalMin: number;
+  hospitalMax: number;
+  includeArgoplasma: boolean;
+  includeImplants: boolean;
+  doctorName: string;
+  anesthesiologistName: string;
 }

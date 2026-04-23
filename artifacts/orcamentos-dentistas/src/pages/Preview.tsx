@@ -3,6 +3,7 @@ import { useLocation } from 'wouter';
 import QuotePrint from '@/components/QuotePrint';
 import type { QuoteData } from '@/types/quote';
 import { ArrowLeft, Download, Loader2 } from 'lucide-react';
+import { PROCEDURES } from '@/data/procedures';
 
 const SAO_PAULO_TIME_ZONE = 'America/Sao_Paulo';
 
@@ -46,48 +47,43 @@ export default function Preview() {
 
   useEffect(() => {
     if (import.meta.env.DEV && window.location.search.includes('demo')) {
+      const resina = PROCEDURES.find((procedure) => procedure.id === 'restauracao-em-resina')!;
+      const clareamento = PROCEDURES.find((procedure) => procedure.id === 'clareamento-dental')!;
+      const implante = PROCEDURES.find((procedure) => procedure.id === 'implante-dentario-coroa')!;
       setData({
-        patientName: 'Fabiane Sorgetz',
-        date: '2026-04-12',
+        patientName: 'Paciente Exemplo',
+        date: '2026-04-23',
+        dentistName: 'Dr(a). Responsavel',
+        cro: 'CRO-SC 00000',
+        validityDays: 30,
         procedures: [
           {
-            procedure: {
-              id: 'lipoescultura-demo',
-              name: 'Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea',
-              category: 'lipo',
-              complexityA: null,
-              complexityB: { total: 30000, surgery: 27000, anesthesia: 3000 },
-              complexityC: null,
-              hospitalMin: 3600,
-              hospitalMax: 4100,
-            },
-            complexity: 'B',
-            prices: { total: 30000, surgery: 27000, anesthesia: 3000 },
+            id: 'demo-1',
+            procedure: resina,
+            quantity: 2,
+            teeth: [16, 26],
+            region: '',
+            notes: 'Restauração direta em resina.',
           },
           {
-            procedure: {
-              id: 'mamoplastia-redutora-demo',
-              name: 'Mamoplastia Redutora',
-              category: 'breast',
-              hasImplants: true,
-              complexityA: null,
-              complexityB: { total: 32000, surgery: 29000, anesthesia: 3000 },
-              complexityC: null,
-              hospitalMin: 5700,
-              hospitalMax: 6200,
-            },
-            complexity: 'B',
-            prices: { total: 32000, surgery: 29000, anesthesia: 3000 },
+            id: 'demo-2',
+            procedure: clareamento,
+            quantity: 1,
+            teeth: [],
+            region: 'Arcadas superior e inferior',
+            notes: '',
+          },
+          {
+            id: 'demo-3',
+            procedure: implante,
+            quantity: 1,
+            teeth: [36],
+            region: '',
+            notes: 'Inclui coroa conforme planejamento inicial.',
           },
         ],
-        hospitalName: 'Hospital Accurata',
-        hospitalMin: 9300,
-        hospitalMax: 10300,
-        includeArgoplasma: true,
-        includeImplants: true,
-        doctorName: 'Dr. Thiago',
-        anesthesiologistName: 'Drª. Priscila',
-      } as any);
+        generalNotes: 'Valores sujeitos a confirmação após avaliação clínica e exames complementares.',
+      });
       return;
     }
 
@@ -171,7 +167,7 @@ export default function Preview() {
           </button>
           <div className="flex items-center gap-2">
             <span className="text-sm text-stone-500 mr-2 hidden sm:block">
-              Orçamento para {data.patientName}
+              Orçamento odontológico para {data.patientName}
             </span>
             <button
               onClick={handleDownloadPDF}
@@ -197,7 +193,7 @@ export default function Preview() {
 
       {/* Info note */}
       <div className="max-w-5xl mx-auto px-4 pt-4 pb-2">
-        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-700 flex gap-2">
+        <div className="bg-teal-50 border border-teal-200 rounded-xl px-4 py-3 text-sm text-teal-800 flex gap-2">
           <Download className="w-4 h-4 mt-0.5 flex-shrink-0" />
           <span>
             Clique em <strong>Baixar PDF</strong> para gerar o arquivo em A4 com o layout fiel — funciona em qualquer navegador (Safari, Chrome, Firefox), sem precisar configurar a janela de impressão.

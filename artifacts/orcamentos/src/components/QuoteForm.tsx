@@ -1,573 +1,401 @@
-import { useState, useMemo, useEffect } from 'react';
-import { Search, FileText, Plus, Trash2, ChevronDown } from 'lucide-react';
-import { PROCEDURES, Procedure, Complexity, getPriceForComplexity, ARGOPLASMA_PRICE } from '@/data/procedures';
-import { formatBRL } from '@/utils/calculations';
-import type { QuoteData, ProcedureEntry } from '@/types/quote';
+import { useMemo, useState } from 'react';
+import { CalendarDays, FileText, Plus, Search, Trash2 } from 'lucide-react';
+import { BILLING_UNIT_LABELS, PROCEDURES, Procedure, TOOTH_NUMBERS } from '@/data/procedures';
+import { calcPaymentOptions, formatBRL } from '@/utils/calculations';
+import type { ProcedureEntry, QuoteData } from '@/types/quote';
 
 interface Props {
   onGenerate: (data: QuoteData) => void;
 }
 
-const COMPLEXITY_LABELS: Record<Complexity, string> = {
-  A: 'Complexidade A',
-  B: 'Complexidade B',
-  C: 'Complexidade C',
-};
+const BRAND = '#0f766e';
+const BRAND_DARK = '#115e59';
+const MINT = '#dff7f3';
+const BLUE = '#2563eb';
 
-const HOSPITAL_NAME = 'Hospital Accurata';
+function todayInSaoPaulo() {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
+}
 
-const NAVY = '#1e2446';
-const NAVY_HOVER = '#2a3260';
-const GOLD = '#c5ba7e';
-const GOLD_LIGHT = '#f0ead6';
-const GOLD_BORDER = '#d4ca8e';
+function newEntry(procedure: Procedure): ProcedureEntry {
+  return {
+    id: `${procedure.id}-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    procedure,
+    quantity: procedure.defaultQuantity,
+    teeth: [],
+    region: '',
+    notes: '',
+  };
+}
+
+function calcEntryTotal(entry: ProcedureEntry) {
+  return entry.procedure.price * entry.quantity;
+}
+
+function normalizeText(value: string) {
+  return value
+    .toLocaleLowerCase('pt-BR')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+function ToothPicker({
+  selected,
+  onChange,
+}: {
+  selected: number[];
+  onChange: (teeth: number[]) => void;
+}) {
+  const upper = TOOTH_NUMBERS.slice(0, 16);
+  const lower = TOOTH_NUMBERS.slice(16);
+
+  const toggle = (tooth: number) => {
+    onChange(
+      selected.includes(tooth)
+        ? selected.filter((item) => item !== tooth)
+        : [...selected, tooth].sort((a, b) => a - b),
+    );
+  };
+
+  const renderRow = (items: number[]) => (
+    <div className="grid grid-cols-8 gap-1.5">
+      {items.map((tooth) => {
+        const active = selected.includes(tooth);
+        return (
+          <button
+            key={tooth}
+            type="button"
+            onClick={() => toggle(tooth)}
+            className="h-9 rounded-md border text-xs font-semibold transition-colors"
+            style={
+              active
+                ? { background: BRAND, borderColor: BRAND, color: 'white' }
+                : { background: 'white', borderColor: '#cbd5e1', color: '#334155' }
+            }
+            title={`Dente ${tooth}`}
+          >
+            {tooth}
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  return (
+    <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <span className="text-xs font-semibold uppercase text-slate-500">Odontograma</span>
+        <button
+          type="button"
+          onClick={() => onChange([])}
+          className="text-xs font-medium text-slate-500 hover:text-slate-800"
+        >
+          Limpar
+        </button>
+      </div>
+      <div className="space-y-2">
+        {renderRow(upper)}
+        {renderRow(lower)}
+      </div>
+      <div className="mt-2 text-xs text-slate-500">
+        {selected.length > 0 ? `Selecionados: ${selected.join(', ')}` : 'Selecione os dentes envolvidos.'}
+      </div>
+    </div>
+  );
+}
 
 export default function QuoteForm({ onGenerate }: Props) {
   const [patientName, setPatientName] = useState('');
-  const [date, setDate] = useState(() => {
-    const formatter = new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'America/Sao_Paulo',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
+  const [date, setDate] = useState(todayInSaoPaulo);
+  const [dentistName, setDentistName] = useState('');
+  const [cro, setCro] = useState('');
+  const [validityDays, setValidityDays] = useState(30);
+  const [generalNotes, setGeneralNotes] = useState(
+    'Valores sujeitos a confirmacao apos avaliacao clinica e exames complementares, quando indicados.',
+  );
 
-    return formatter.format(new Date());
-  });
-
-  const [procedureEntries, setProcedureEntries] = useState<ProcedureEntry[]>([]);
-
+  const [entries, setEntries] = useState<ProcedureEntry[]>([]);
   const [search, setSearch] = useState('');
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [pickerProcedure, setPickerProcedure] = useState<Procedure | null>(null);
-  const [pickerComplexity, setPickerComplexity] = useState<Complexity>('A');
+  const [selectedProcedure, setSelectedProcedure] = useState<Procedure | null>(null);
 
-  const [hospitalMin, setHospitalMin] = useState('');
-  const [hospitalMax, setHospitalMax] = useState('');
-  const [hospitalName, setHospitalName] = useState(HOSPITAL_NAME);
-  const [hospitalAuto, setHospitalAuto] = useState(true);
-  const [combinedSurgery, setCombinedSurgery] = useState(true);
-
-  // Auto-fill hospital values from selected procedures
-  useEffect(() => {
-    if (!hospitalAuto) return;
-    if (procedureEntries.length === 0) {
-      setHospitalMin('');
-      setHospitalMax('');
-      return;
-    }
-    const items: { min: number; max: number }[] = [];
-    for (const entry of procedureEntries) {
-      const min = entry.procedure.hospitalMin;
-      if (min === null) continue;
-      const max = entry.procedure.hospitalMax ?? min;
-      items.push({ min, max });
-    }
-    if (items.length === 0) return;
-
-    // When 2+ procedures combined in same surgery, apply 50% discount on the lowest-value procedure
-    const applyDiscount = items.length >= 2 && combinedSurgery;
-    let lowestIdx = 0;
-    if (applyDiscount) {
-      for (let i = 1; i < items.length; i++) {
-        if (items[i].min < items[lowestIdx].min) lowestIdx = i;
-      }
-    }
-    let sumMin = 0;
-    let sumMax = 0;
-    for (let i = 0; i < items.length; i++) {
-      const factor = applyDiscount && i === lowestIdx ? 0.5 : 1;
-      sumMin += items[i].min * factor;
-      sumMax += items[i].max * factor;
-    }
-    setHospitalMin(String(Math.round(sumMin)));
-    setHospitalMax(String(Math.round(sumMax)));
-  }, [procedureEntries, hospitalAuto, combinedSurgery]);
-
-  const [includeArgoplasma, setIncludeArgoplasma] = useState(false);
-  const [includeImplants, setIncludeImplants] = useState(false);
-
-  const [doctorName, setDoctorName] = useState('Dr. Thiago');
-  const [anesthesiologistName, setAnesthesiologistName] = useState('Drª. Priscila');
-
-  const filtered = useMemo(() => {
-    const q = search.toLowerCase().trim();
-    if (!q) return PROCEDURES.slice(0, 30);
-    return PROCEDURES.filter((p) => p.name.toLowerCase().includes(q)).slice(0, 40);
+  const filteredProcedures = useMemo(() => {
+    const q = normalizeText(search.trim());
+    if (!q) return PROCEDURES;
+    return PROCEDURES.filter((procedure) => {
+      const haystack = normalizeText(`${procedure.name} ${procedure.category} ${procedure.description}`);
+      return haystack.includes(q);
+    });
   }, [search]);
 
-  const pickerPrices = useMemo(() => {
-    if (!pickerProcedure) return null;
-    return getPriceForComplexity(pickerProcedure, pickerComplexity);
-  }, [pickerProcedure, pickerComplexity]);
+  const total = entries.reduce((sum, entry) => sum + calcEntryTotal(entry), 0);
+  const payment = calcPaymentOptions(total);
 
-  const anyProcedureHasImplants = procedureEntries.some((e) => e.procedure.hasImplants);
-
-  const handleSelectProcedure = (proc: Procedure) => {
-    setPickerProcedure(proc);
-    setSearch(proc.name);
-    setShowDropdown(false);
-    const prices = getPriceForComplexity(proc, 'A');
-    if (prices) {
-      setPickerComplexity('A');
-    } else {
-      const fallback: Complexity[] = ['B', 'C'];
-      const next = fallback.find((c) => getPriceForComplexity(proc, c));
-      if (next) setPickerComplexity(next);
-    }
+  const updateEntry = (id: string, patch: Partial<ProcedureEntry>) => {
+    setEntries((prev) => prev.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)));
   };
 
-  const handleAddProcedure = () => {
-    if (!pickerProcedure || !pickerPrices) return;
-    const entry: ProcedureEntry = {
-      procedure: pickerProcedure,
-      complexity: pickerComplexity,
-      prices: pickerPrices,
-    };
-    setProcedureEntries((prev) => [...prev, entry]);
-    if (pickerProcedure.hasImplants) setIncludeImplants(true);
-    setPickerProcedure(null);
+  const handleAdd = () => {
+    if (!selectedProcedure) return;
+    setEntries((prev) => [...prev, newEntry(selectedProcedure)]);
     setSearch('');
-    setPickerComplexity('A');
+    setSelectedProcedure(null);
   };
 
-  const handleRemoveProcedure = (idx: number) => {
-    setProcedureEntries((prev) => {
-      const next = prev.filter((_, i) => i !== idx);
-      if (!next.some((e) => e.procedure.hasImplants)) setIncludeImplants(false);
-      return next;
-    });
-  };
-
-  const canAdd = pickerProcedure !== null && pickerPrices !== null;
-  const canGenerate =
-    patientName.trim() &&
-    procedureEntries.length > 0 &&
-    hospitalMin &&
-    hospitalMax;
-
-  const handleGenerate = () => {
-    if (!canGenerate) return;
-    onGenerate({
-      patientName: patientName.trim(),
-      date,
-      procedures: procedureEntries,
-      hospitalName: hospitalName.trim() || HOSPITAL_NAME,
-      hospitalMin: parseFloat(hospitalMin.replace(',', '.')),
-      hospitalMax: parseFloat(hospitalMax.replace(',', '.')),
-      includeArgoplasma,
-      includeImplants,
-      doctorName: doctorName.trim(),
-      anesthesiologistName: anesthesiologistName.trim(),
-    });
-  };
+  const canGenerate = patientName.trim() && entries.length > 0;
 
   const inputClass =
-    'w-full px-4 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 text-stone-800 placeholder-stone-400 transition-colors';
-  const inputFocusStyle = {
-    '--tw-ring-color': GOLD_BORDER,
-  } as React.CSSProperties;
+    'w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-teal-600 focus:ring-2 focus:ring-teal-100';
 
   return (
-    <div className="space-y-6">
-      {/* Patient & Date */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-6">
-        <h2 className="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-4">
-          Dados da Paciente
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1.5">
-              Nome da paciente *
-            </label>
+    <div className="space-y-5">
+      <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="mb-4 text-xs font-bold uppercase tracking-wide text-slate-500">Dados do orçamento</h2>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <label className="block">
+            <span className="mb-1.5 block text-sm font-medium text-slate-700">Paciente *</span>
             <input
-              type="text"
               value={patientName}
-              onChange={(e) => setPatientName(e.target.value)}
+              onChange={(event) => setPatientName(event.target.value)}
+              className={inputClass}
               placeholder="Nome completo"
-              className={inputClass}
-              style={{ borderColor: patientName ? GOLD_BORDER : undefined }}
-              onFocus={(e) => (e.target.style.borderColor = GOLD_BORDER)}
-              onBlur={(e) => (e.target.style.borderColor = '')}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1.5">
-              Data do orçamento *
-            </label>
+          </label>
+          <label className="block">
+            <span className="mb-1.5 block text-sm font-medium text-slate-700">Data *</span>
+            <div className="relative">
+              <CalendarDays className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                type="date"
+                value={date}
+                onChange={(event) => setDate(event.target.value)}
+                className={`${inputClass} pl-10`}
+              />
+            </div>
+          </label>
+          <label className="block">
+            <span className="mb-1.5 block text-sm font-medium text-slate-700">Dentista</span>
             <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
+              value={dentistName}
+              onChange={(event) => setDentistName(event.target.value)}
               className={inputClass}
-              onFocus={(e) => (e.target.style.borderColor = GOLD_BORDER)}
-              onBlur={(e) => (e.target.style.borderColor = '')}
+              placeholder="Dr(a)."
             />
-          </div>
+          </label>
+          <label className="block">
+            <span className="mb-1.5 block text-sm font-medium text-slate-700">CRO</span>
+            <input value={cro} onChange={(event) => setCro(event.target.value)} className={inputClass} placeholder="CRO-SC" />
+          </label>
+          <label className="block">
+            <span className="mb-1.5 block text-sm font-medium text-slate-700">Validade</span>
+            <input
+              type="number"
+              min={1}
+              value={validityDays}
+              onChange={(event) => setValidityDays(Number(event.target.value) || 30)}
+              className={inputClass}
+            />
+          </label>
         </div>
-      </div>
+      </section>
 
-      {/* Procedures */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-6">
-        <h2 className="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-4">
-          Procedimentos
-        </h2>
+      <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="mb-4 text-xs font-bold uppercase tracking-wide text-slate-500">Procedimentos</h2>
 
-        {/* Added procedures list */}
-        {procedureEntries.length > 0 && (
-          <div className="mb-5 space-y-2">
-            {procedureEntries.map((entry, idx) => (
-              <div
-                key={idx}
-                className="flex items-center justify-between rounded-xl px-4 py-3"
-                style={{ background: GOLD_LIGHT, border: `1px solid ${GOLD_BORDER}` }}
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="font-medium text-stone-800 text-sm truncate">
-                    {entry.procedure.name}
-                  </div>
-                  <div className="text-xs text-stone-500 mt-0.5">
-                    {COMPLEXITY_LABELS[entry.complexity]} ·{' '}
-                    <span className="font-semibold" style={{ color: NAVY }}>
-                      Equipe: {formatBRL(entry.prices.surgery)}
-                    </span>
-                    {entry.prices.anesthesia > 0 && (
-                      <span className="ml-1">· Anestesia: {formatBRL(entry.prices.anesthesia)}</span>
-                    )}
-                  </div>
-                </div>
-                <button
-                  onClick={() => handleRemoveProcedure(idx)}
-                  className="ml-3 text-stone-400 hover:text-stone-600 transition-colors flex-shrink-0"
-                  title="Remover"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Procedure picker */}
-        <div className="border border-stone-200 rounded-xl p-4 bg-stone-50">
-          <div className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-3">
-            {procedureEntries.length === 0 ? 'Selecionar procedimento *' : 'Adicionar outro procedimento'}
-          </div>
-
-          {/* Search */}
-          <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input
-              type="text"
               value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setShowDropdown(true);
-                if (e.target.value !== pickerProcedure?.name) setPickerProcedure(null);
+              onChange={(event) => {
+                setSearch(event.target.value);
+                setSelectedProcedure(null);
               }}
-              onFocus={() => setShowDropdown(true)}
+              className={`${inputClass} pl-10`}
               placeholder="Buscar procedimento..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-300 focus:outline-none text-stone-800 placeholder-stone-400 bg-white transition-colors"
             />
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
-            {showDropdown && (
-              <div className="absolute z-50 w-full mt-1 bg-white border border-stone-200 rounded-xl shadow-xl max-h-64 overflow-y-auto">
-                {filtered.length === 0 ? (
-                  <div className="px-4 py-3 text-sm text-stone-500">Nenhum procedimento encontrado</div>
-                ) : (
-                  filtered.map((proc) => (
-                    <button
-                      key={proc.id}
-                      onMouseDown={() => handleSelectProcedure(proc)}
-                      className="w-full text-left px-4 py-3 text-sm text-stone-700 transition-colors border-b border-stone-100 last:border-0"
-                      style={{}}
-                      onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLButtonElement).style.background = GOLD_LIGHT;
-                        (e.currentTarget as HTMLButtonElement).style.color = NAVY;
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLButtonElement).style.background = '';
-                        (e.currentTarget as HTMLButtonElement).style.color = '';
-                      }}
-                    >
-                      <span className="font-medium">{proc.name}</span>
-                      <span className="ml-2 text-xs text-stone-400">
-                        {proc.category === 'breast' ? '• Mama' :
-                          proc.category === 'lipo' ? '• Lipoaspiração' :
-                          proc.category === 'abdominoplasty' ? '• Abdômen' : '• Outros'}
-                      </span>
-                    </button>
-                  ))
-                )}
-              </div>
-            )}
           </div>
 
-          {/* Complexity selector */}
-          {pickerProcedure && (
-            <div className="mb-3">
-              <div className="text-xs font-medium text-stone-500 mb-2">Complexidade</div>
-              <div className="flex gap-2">
-                {(['A', 'B', 'C'] as Complexity[]).map((c) => {
-                  const prices = getPriceForComplexity(pickerProcedure, c);
-                  const available = prices !== null;
-                  const selected = pickerComplexity === c;
-                  return (
-                    <button
-                      key={c}
-                      onClick={() => available && setPickerComplexity(c)}
-                      disabled={!available}
-                      className="flex-1 py-2.5 rounded-xl border-2 font-semibold transition-all text-sm"
-                      style={
-                        !available
-                          ? { borderColor: '#e7e5e4', color: '#d6d3d1', background: 'white', cursor: 'not-allowed' }
-                          : selected
-                          ? { borderColor: GOLD, background: GOLD_LIGHT, color: NAVY }
-                          : { borderColor: '#e7e5e4', color: '#57534e', background: 'white' }
-                      }
-                    >
-                      <div>{c}</div>
-                      {available && prices && (
-                        <div className="text-xs font-normal opacity-70 mt-0.5">
-                          {formatBRL(prices.surgery)}
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
+          <div className="mt-3 max-h-56 overflow-y-auto rounded-lg border border-slate-200 bg-white">
+            {filteredProcedures.map((procedure) => {
+              const active = selectedProcedure?.id === procedure.id;
+              return (
+                <button
+                  key={procedure.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedProcedure(procedure);
+                    setSearch(procedure.name);
+                  }}
+                  className="flex w-full items-start justify-between gap-3 border-b border-slate-100 px-3 py-3 text-left last:border-0"
+                  style={active ? { background: MINT } : undefined}
+                >
+                  <span>
+                    <span className="block text-sm font-semibold text-slate-800">{procedure.name}</span>
+                    <span className="block text-xs text-slate-500">
+                      {procedure.category} · {BILLING_UNIT_LABELS[procedure.billingUnit]}
+                    </span>
+                  </span>
+                  <span className="shrink-0 text-sm font-bold" style={{ color: BRAND }}>
+                    {formatBRL(procedure.price)}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {selectedProcedure && (
+            <div className="mt-3 rounded-lg border border-teal-100 bg-white p-3 text-sm text-slate-600">
+              {selectedProcedure.description}
             </div>
           )}
 
-          {/* Price preview */}
-          {pickerPrices && (
-            <div className="bg-white rounded-xl px-3 py-2.5 text-sm text-stone-700 border border-stone-200 mb-3 space-y-0.5">
-              <div className="flex justify-between">
-                <span className="text-stone-500">Equipe cirúrgica:</span>
-                <span className="font-semibold">{formatBRL(pickerPrices.surgery)}</span>
-              </div>
-              {pickerPrices.anesthesia > 0 && (
-                <div className="flex justify-between">
-                  <span className="text-stone-500">Anestesista:</span>
-                  <span className="font-semibold">{formatBRL(pickerPrices.anesthesia)}</span>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Add button */}
           <button
-            onClick={handleAddProcedure}
-            disabled={!canAdd}
-            className="w-full py-2.5 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-all"
-            style={
-              canAdd
-                ? { background: NAVY, color: 'white' }
-                : { background: '#e7e5e4', color: '#a8a29e', cursor: 'not-allowed' }
-            }
-            onMouseEnter={(e) => { if (canAdd) (e.currentTarget as HTMLButtonElement).style.background = NAVY_HOVER; }}
-            onMouseLeave={(e) => { if (canAdd) (e.currentTarget as HTMLButtonElement).style.background = NAVY; }}
+            type="button"
+            onClick={handleAdd}
+            disabled={!selectedProcedure}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:bg-slate-300"
+            style={selectedProcedure ? { background: BRAND } : undefined}
           >
-            <Plus className="w-4 h-4" />
-            {procedureEntries.length === 0 ? 'Adicionar procedimento' : 'Adicionar mais um procedimento'}
+            <Plus className="h-4 w-4" />
+            Adicionar procedimento
           </button>
         </div>
-      </div>
 
-      {/* Hospital */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-stone-500 uppercase tracking-wider">
-            Hospital
-          </h2>
-          <label className="flex items-center gap-2 text-xs text-stone-600 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={hospitalAuto}
-              onChange={(e) => setHospitalAuto(e.target.checked)}
-              className="w-4 h-4 rounded"
-            />
-            Calcular automaticamente
-          </label>
-        </div>
-        {hospitalAuto && procedureEntries.length >= 2 && (
-          <label className="flex items-start gap-2 text-xs text-stone-700 cursor-pointer mb-3 bg-stone-50 rounded-lg px-3 py-2">
-            <input
-              type="checkbox"
-              checked={combinedSurgery}
-              onChange={(e) => setCombinedSurgery(e.target.checked)}
-              className="w-4 h-4 rounded mt-0.5"
-            />
-            <span>
-              Procedimentos realizados na mesma cirurgia (combinados)
-              <span className="block text-stone-500 mt-0.5">
-                Quando combinados, aplica 50% de desconto no procedimento de menor valor do hospital.
-              </span>
-            </span>
-          </label>
-        )}
-        {hospitalAuto && procedureEntries.length > 0 && (
-          <div className="mb-3 text-xs text-stone-500 bg-stone-50 rounded-lg px-3 py-2">
-            {procedureEntries.length === 1
-              ? 'Valor do hospital do procedimento selecionado. Desmarque para editar manualmente.'
-              : combinedSurgery
-                ? 'Soma com 50% de desconto no procedimento de menor valor. Desmarque para editar manualmente.'
-                : 'Soma integral dos valores (sem desconto, pois cirurgias separadas). Desmarque para editar manualmente.'}
-          </div>
-        )}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="md:col-span-3">
-            <label className="block text-sm font-medium text-stone-700 mb-1.5">
-              Nome do hospital
-            </label>
-            <input
-              type="text"
-              value={hospitalName}
-              onChange={(e) => setHospitalName(e.target.value)}
-              className={inputClass}
-              onFocus={(e) => (e.target.style.borderColor = GOLD_BORDER)}
-              onBlur={(e) => (e.target.style.borderColor = '')}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1.5">
-              Valor mínimo (R$) *
-            </label>
-            <input
-              type="text"
-              value={hospitalMin}
-              onChange={(e) => setHospitalMin(e.target.value)}
-              disabled={hospitalAuto}
-              placeholder="Ex: 4700"
-              className={inputClass + (hospitalAuto ? ' bg-stone-100 text-stone-500' : '')}
-              onFocus={(e) => (e.target.style.borderColor = GOLD_BORDER)}
-              onBlur={(e) => (e.target.style.borderColor = '')}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1.5">
-              Valor máximo (R$) *
-            </label>
-            <input
-              type="text"
-              value={hospitalMax}
-              onChange={(e) => setHospitalMax(e.target.value)}
-              disabled={hospitalAuto}
-              placeholder="Ex: 5700"
-              className={inputClass + (hospitalAuto ? ' bg-stone-100 text-stone-500' : '')}
-              onFocus={(e) => (e.target.style.borderColor = GOLD_BORDER)}
-              onBlur={(e) => (e.target.style.borderColor = '')}
-            />
-          </div>
-          {hospitalMin && hospitalMax && (
-            <div className="flex items-end">
-              <div className="bg-stone-100 rounded-xl px-4 py-2.5 text-sm text-stone-600 w-full">
-                {formatBRL(parseFloat(hospitalMin.replace(',', '.')))} – {formatBRL(parseFloat(hospitalMax.replace(',', '.')))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+        {entries.length > 0 && (
+          <div className="mt-5 space-y-3">
+            {entries.map((entry, index) => {
+              const isByTooth = entry.procedure.billingUnit === 'tooth';
+              return (
+                <div key={entry.id} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-xs font-bold uppercase text-slate-400">Item {index + 1}</div>
+                      <h3 className="text-base font-semibold text-slate-900">{entry.procedure.name}</h3>
+                      <p className="text-sm text-slate-500">
+                        {formatBRL(entry.procedure.price)} · {BILLING_UNIT_LABELS[entry.procedure.billingUnit]}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setEntries((prev) => prev.filter((item) => item.id !== entry.id))}
+                      className="rounded-md p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                      title="Remover procedimento"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
 
-      {/* Optional Items */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-6">
-        <h2 className="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-4">
-          Itens Opcionais / Adicionais
-        </h2>
-        <div className="space-y-3">
-          <label className="flex items-center gap-3 cursor-pointer group">
-            <input
-              type="checkbox"
-              checked={includeArgoplasma}
-              onChange={(e) => setIncludeArgoplasma(e.target.checked)}
-              className="w-5 h-5 rounded"
-            />
-            <div>
-              <div className="font-medium text-stone-700 group-hover:text-stone-900 transition-colors">
-                Argoplasma - ARGON 4
-              </div>
-              <div className="text-sm text-stone-500">
-                R$ 5.000,00 à vista · 6x R$ 937,50 · 12x R$ 520,84 (opcional)
-              </div>
-            </div>
-          </label>
+                  <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+                    <label className="block">
+                      <span className="mb-1.5 block text-sm font-medium text-slate-700">Quantidade</span>
+                      <input
+                        type="number"
+                        min={1}
+                        value={entry.quantity}
+                        onChange={(event) => {
+                          const quantity = Math.max(1, Number(event.target.value) || 1);
+                          updateEntry(entry.id, { quantity });
+                        }}
+                        className={inputClass}
+                      />
+                    </label>
+                    <label className="block md:col-span-2">
+                      <span className="mb-1.5 block text-sm font-medium text-slate-700">Região / arcada / observação curta</span>
+                      <input
+                        value={entry.region}
+                        onChange={(event) => updateEntry(entry.id, { region: event.target.value })}
+                        className={inputClass}
+                        placeholder={isByTooth ? 'Opcional se os dentes estiverem marcados' : 'Ex: arcada superior, quadrante inferior direito'}
+                      />
+                    </label>
+                  </div>
 
-          {(anyProcedureHasImplants || includeImplants) && (
-            <label className="flex items-center gap-3 cursor-pointer group">
-              <input
-                type="checkbox"
-                checked={includeImplants}
-                onChange={(e) => setIncludeImplants(e.target.checked)}
-                className="w-5 h-5 rounded"
-              />
-              <div>
-                <div className="font-medium text-stone-700 group-hover:text-stone-900 transition-colors">
-                  Tabela de implantes de mama
+                  {isByTooth && (
+                    <div className="mt-3">
+                      <ToothPicker
+                        selected={entry.teeth}
+                        onChange={(teeth) => updateEntry(entry.id, { teeth, quantity: Math.max(1, teeth.length || entry.quantity) })}
+                      />
+                    </div>
+                  )}
+
+                  <label className="mt-3 block">
+                    <span className="mb-1.5 block text-sm font-medium text-slate-700">Observações do item</span>
+                    <input
+                      value={entry.notes}
+                      onChange={(event) => updateEntry(entry.id, { notes: event.target.value })}
+                      className={inputClass}
+                      placeholder="Ex: depende de radiografia, laboratorio incluso, material a definir"
+                    />
+                  </label>
+
+                  <div className="mt-3 flex justify-end text-sm">
+                    <span className="rounded-md bg-slate-100 px-3 py-2 font-bold text-slate-800">
+                      Subtotal: {formatBRL(calcEntryTotal(entry))}
+                    </span>
+                  </div>
                 </div>
-                <div className="text-sm text-stone-500">
-                  Eurosilicone e Silimed BioDesign (Redondos Texturizados)
-                </div>
-              </div>
-            </label>
-          )}
-        </div>
-      </div>
-
-      {/* Doctor Info */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-6">
-        <h2 className="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-4">
-          Equipe Médica
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1.5">
-              Cirurgião
-            </label>
-            <input
-              type="text"
-              value={doctorName}
-              onChange={(e) => setDoctorName(e.target.value)}
-              className={inputClass}
-              onFocus={(e) => (e.target.style.borderColor = GOLD_BORDER)}
-              onBlur={(e) => (e.target.style.borderColor = '')}
-            />
+              );
+            })}
           </div>
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1.5">
-              Anestesiologista
-            </label>
-            <input
-              type="text"
-              value={anesthesiologistName}
-              onChange={(e) => setAnesthesiologistName(e.target.value)}
-              className={inputClass}
-              onFocus={(e) => (e.target.style.borderColor = GOLD_BORDER)}
-              onBlur={(e) => (e.target.style.borderColor = '')}
-            />
+        )}
+      </section>
+
+      <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="mb-4 text-xs font-bold uppercase tracking-wide text-slate-500">Condições comerciais</h2>
+        <label className="block">
+          <span className="mb-1.5 block text-sm font-medium text-slate-700">Observações gerais</span>
+          <textarea
+            value={generalNotes}
+            onChange={(event) => setGeneralNotes(event.target.value)}
+            className={`${inputClass} min-h-24 resize-y`}
+          />
+        </label>
+
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+            <div className="text-xs font-semibold uppercase text-slate-500">À vista</div>
+            <div className="mt-1 text-lg font-bold" style={{ color: BRAND_DARK }}>{formatBRL(payment.avista)}</div>
+          </div>
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+            <div className="text-xs font-semibold uppercase text-slate-500">Até 6x</div>
+            <div className="mt-1 text-lg font-bold text-slate-900">{formatBRL(payment.ate6x)}</div>
+          </div>
+          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+            <div className="text-xs font-semibold uppercase text-slate-500">Até 12x</div>
+            <div className="mt-1 text-lg font-bold text-slate-900">{formatBRL(payment.ate12x)}</div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Generate Button */}
       <button
-        onClick={handleGenerate}
-        disabled={!canGenerate}
-        className="w-full py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 transition-all shadow-sm"
-        style={
-          canGenerate
-            ? { background: NAVY, color: 'white' }
-            : { background: '#e7e5e4', color: '#a8a29e', cursor: 'not-allowed' }
+        type="button"
+        onClick={() =>
+          canGenerate &&
+          onGenerate({
+            patientName: patientName.trim(),
+            date,
+            dentistName: dentistName.trim(),
+            cro: cro.trim(),
+            validityDays,
+            procedures: entries,
+            generalNotes: generalNotes.trim(),
+          })
         }
-        onMouseEnter={(e) => { if (canGenerate) (e.currentTarget as HTMLButtonElement).style.background = NAVY_HOVER; }}
-        onMouseLeave={(e) => { if (canGenerate) (e.currentTarget as HTMLButtonElement).style.background = NAVY; }}
+        disabled={!canGenerate}
+        className="flex w-full items-center justify-center gap-2 rounded-lg px-4 py-4 text-base font-bold text-white shadow-sm transition disabled:cursor-not-allowed disabled:bg-slate-300"
+        style={canGenerate ? { background: BLUE } : undefined}
       >
-        <FileText className="w-5 h-5" />
-        Gerar Orçamento
+        <FileText className="h-5 w-5" />
+        Gerar orçamento em PDF
       </button>
       {!canGenerate && (
-        <p className="text-center text-sm text-stone-400">
-          Preencha: nome da paciente, ao menos um procedimento e os valores do hospital
-        </p>
+        <p className="text-center text-sm text-slate-400">Preencha o paciente e adicione pelo menos um procedimento.</p>
       )}
     </div>
   );

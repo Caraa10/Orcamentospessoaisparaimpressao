@@ -16,11 +16,14 @@ const COMPLEXITY_LABELS: Record<Complexity, string> = {
 
 const HOSPITAL_NAME = 'Hospital Accurata';
 
-const NAVY = '#1e2446';
-const NAVY_HOVER = '#2a3260';
-const GOLD = '#c5ba7e';
-const GOLD_LIGHT = '#f0ead6';
-const GOLD_BORDER = '#d4ca8e';
+const BRAND = '#0f766e';
+const BRAND_HOVER = '#115e59';
+const BRAND_SOFT = '#dff7f3';
+const BRAND_BORDER = '#99f6e4';
+const SURFACE = '#f8fafc';
+const SURFACE_BORDER = '#e2e8f0';
+const TEXT = '#0f172a';
+const TEXT_MUTED = '#64748b';
 
 export default function QuoteForm({ onGenerate }: Props) {
   const [patientName, setPatientName] = useState('');
@@ -163,21 +166,21 @@ export default function QuoteForm({ onGenerate }: Props) {
   };
 
   const inputClass =
-    'w-full px-4 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 text-stone-800 placeholder-stone-400 transition-colors';
+    'w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 text-slate-800 placeholder-slate-400 transition-colors';
   const inputFocusStyle = {
-    '--tw-ring-color': GOLD_BORDER,
+    '--tw-ring-color': '#ccfbf1',
   } as React.CSSProperties;
 
   return (
     <div className="space-y-6">
       {/* Patient & Date */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-6">
-        <h2 className="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-4">
+      <div className="bg-white rounded-2xl border shadow-sm p-6" style={{ borderColor: SURFACE_BORDER }}>
+        <h2 className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: TEXT_MUTED }}>
           Dados da Paciente
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1.5">
+            <label className="block text-sm font-medium mb-1.5" style={{ color: '#334155' }}>
               Nome da paciente *
             </label>
             <input
@@ -186,13 +189,13 @@ export default function QuoteForm({ onGenerate }: Props) {
               onChange={(e) => setPatientName(e.target.value)}
               placeholder="Nome completo"
               className={inputClass}
-              style={{ borderColor: patientName ? GOLD_BORDER : undefined }}
-              onFocus={(e) => (e.target.style.borderColor = GOLD_BORDER)}
+              style={{ ...inputFocusStyle, borderColor: patientName ? BRAND_BORDER : undefined }}
+              onFocus={(e) => (e.target.style.borderColor = BRAND)}
               onBlur={(e) => (e.target.style.borderColor = '')}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1.5">
+            <label className="block text-sm font-medium mb-1.5" style={{ color: '#334155' }}>
               Data do orçamento *
             </label>
             <input
@@ -200,7 +203,8 @@ export default function QuoteForm({ onGenerate }: Props) {
               value={date}
               onChange={(e) => setDate(e.target.value)}
               className={inputClass}
-              onFocus={(e) => (e.target.style.borderColor = GOLD_BORDER)}
+              style={inputFocusStyle}
+              onFocus={(e) => (e.target.style.borderColor = BRAND)}
               onBlur={(e) => (e.target.style.borderColor = '')}
             />
           </div>
@@ -208,8 +212,8 @@ export default function QuoteForm({ onGenerate }: Props) {
       </div>
 
       {/* Procedures */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-6">
-        <h2 className="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-4">
+      <div className="bg-white rounded-2xl border shadow-sm p-6" style={{ borderColor: SURFACE_BORDER }}>
+        <h2 className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: TEXT_MUTED }}>
           Procedimentos
         </h2>
 
@@ -220,15 +224,15 @@ export default function QuoteForm({ onGenerate }: Props) {
               <div
                 key={idx}
                 className="flex items-center justify-between rounded-xl px-4 py-3"
-                style={{ background: GOLD_LIGHT, border: `1px solid ${GOLD_BORDER}` }}
+                style={{ background: BRAND_SOFT, border: `1px solid ${BRAND_BORDER}` }}
               >
                 <div className="min-w-0 flex-1">
-                  <div className="font-medium text-stone-800 text-sm truncate">
+                  <div className="font-medium text-sm truncate" style={{ color: TEXT }}>
                     {entry.procedure.name}
                   </div>
-                  <div className="text-xs text-stone-500 mt-0.5">
+                  <div className="text-xs mt-0.5" style={{ color: TEXT_MUTED }}>
                     {COMPLEXITY_LABELS[entry.complexity]} ·{' '}
-                    <span className="font-semibold" style={{ color: NAVY }}>
+                    <span className="font-semibold" style={{ color: BRAND }}>
                       Equipe: {formatBRL(entry.prices.surgery)}
                     </span>
                     {entry.prices.anesthesia > 0 && (
@@ -238,7 +242,7 @@ export default function QuoteForm({ onGenerate }: Props) {
                 </div>
                 <button
                   onClick={() => handleRemoveProcedure(idx)}
-                  className="ml-3 text-stone-400 hover:text-stone-600 transition-colors flex-shrink-0"
+                  className="ml-3 transition-colors flex-shrink-0 text-slate-400 hover:text-slate-600"
                   title="Remover"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -249,14 +253,14 @@ export default function QuoteForm({ onGenerate }: Props) {
         )}
 
         {/* Procedure picker */}
-        <div className="border border-stone-200 rounded-xl p-4 bg-stone-50">
-          <div className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-3">
+        <div className="border rounded-xl p-4" style={{ borderColor: SURFACE_BORDER, background: SURFACE }}>
+          <div className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: '#94a3b8' }}>
             {procedureEntries.length === 0 ? 'Selecionar procedimento *' : 'Adicionar outro procedimento'}
           </div>
 
           {/* Search */}
           <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
               value={search}
@@ -267,23 +271,24 @@ export default function QuoteForm({ onGenerate }: Props) {
               }}
               onFocus={() => setShowDropdown(true)}
               placeholder="Buscar procedimento..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-300 focus:outline-none text-stone-800 placeholder-stone-400 bg-white transition-colors"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none text-slate-800 placeholder-slate-400 bg-white transition-colors"
+              style={inputFocusStyle}
             />
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             {showDropdown && (
-              <div className="absolute z-50 w-full mt-1 bg-white border border-stone-200 rounded-xl shadow-xl max-h-64 overflow-y-auto">
+              <div className="absolute z-50 w-full mt-1 bg-white border rounded-xl shadow-xl max-h-64 overflow-y-auto" style={{ borderColor: SURFACE_BORDER }}>
                 {filtered.length === 0 ? (
-                  <div className="px-4 py-3 text-sm text-stone-500">Nenhum procedimento encontrado</div>
+                  <div className="px-4 py-3 text-sm text-slate-500">Nenhum procedimento encontrado</div>
                 ) : (
                   filtered.map((proc) => (
                     <button
                       key={proc.id}
                       onMouseDown={() => handleSelectProcedure(proc)}
-                      className="w-full text-left px-4 py-3 text-sm text-stone-700 transition-colors border-b border-stone-100 last:border-0"
+                      className="w-full text-left px-4 py-3 text-sm text-slate-700 transition-colors border-b border-slate-100 last:border-0"
                       style={{}}
                       onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLButtonElement).style.background = GOLD_LIGHT;
-                        (e.currentTarget as HTMLButtonElement).style.color = NAVY;
+                        (e.currentTarget as HTMLButtonElement).style.background = BRAND_SOFT;
+                        (e.currentTarget as HTMLButtonElement).style.color = BRAND;
                       }}
                       onMouseLeave={(e) => {
                         (e.currentTarget as HTMLButtonElement).style.background = '';
@@ -306,7 +311,7 @@ export default function QuoteForm({ onGenerate }: Props) {
           {/* Complexity selector */}
           {pickerProcedure && (
             <div className="mb-3">
-              <div className="text-xs font-medium text-stone-500 mb-2">Complexidade</div>
+              <div className="text-xs font-medium text-slate-500 mb-2">Complexidade</div>
               <div className="flex gap-2">
                 {(['A', 'B', 'C'] as Complexity[]).map((c) => {
                   const prices = getPriceForComplexity(pickerProcedure, c);
@@ -320,10 +325,10 @@ export default function QuoteForm({ onGenerate }: Props) {
                       className="flex-1 py-2.5 rounded-xl border-2 font-semibold transition-all text-sm"
                       style={
                         !available
-                          ? { borderColor: '#e7e5e4', color: '#d6d3d1', background: 'white', cursor: 'not-allowed' }
+                          ? { borderColor: '#e2e8f0', color: '#cbd5e1', background: 'white', cursor: 'not-allowed' }
                           : selected
-                          ? { borderColor: GOLD, background: GOLD_LIGHT, color: NAVY }
-                          : { borderColor: '#e7e5e4', color: '#57534e', background: 'white' }
+                          ? { borderColor: BRAND, background: BRAND_SOFT, color: BRAND }
+                          : { borderColor: '#e2e8f0', color: '#475569', background: 'white' }
                       }
                     >
                       <div>{c}</div>
@@ -341,14 +346,14 @@ export default function QuoteForm({ onGenerate }: Props) {
 
           {/* Price preview */}
           {pickerPrices && (
-            <div className="bg-white rounded-xl px-3 py-2.5 text-sm text-stone-700 border border-stone-200 mb-3 space-y-0.5">
+            <div className="bg-white rounded-xl px-3 py-2.5 text-sm text-slate-700 border border-slate-200 mb-3 space-y-0.5">
               <div className="flex justify-between">
-                <span className="text-stone-500">Equipe cirúrgica:</span>
+                <span className="text-slate-500">Equipe cirúrgica:</span>
                 <span className="font-semibold">{formatBRL(pickerPrices.surgery)}</span>
               </div>
               {pickerPrices.anesthesia > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-stone-500">Anestesista:</span>
+                  <span className="text-slate-500">Anestesista:</span>
                   <span className="font-semibold">{formatBRL(pickerPrices.anesthesia)}</span>
                 </div>
               )}
@@ -362,11 +367,11 @@ export default function QuoteForm({ onGenerate }: Props) {
             className="w-full py-2.5 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-all"
             style={
               canAdd
-                ? { background: NAVY, color: 'white' }
-                : { background: '#e7e5e4', color: '#a8a29e', cursor: 'not-allowed' }
+                ? { background: BRAND, color: 'white' }
+                : { background: '#e2e8f0', color: '#94a3b8', cursor: 'not-allowed' }
             }
-            onMouseEnter={(e) => { if (canAdd) (e.currentTarget as HTMLButtonElement).style.background = NAVY_HOVER; }}
-            onMouseLeave={(e) => { if (canAdd) (e.currentTarget as HTMLButtonElement).style.background = NAVY; }}
+            onMouseEnter={(e) => { if (canAdd) (e.currentTarget as HTMLButtonElement).style.background = BRAND_HOVER; }}
+            onMouseLeave={(e) => { if (canAdd) (e.currentTarget as HTMLButtonElement).style.background = BRAND; }}
           >
             <Plus className="w-4 h-4" />
             {procedureEntries.length === 0 ? 'Adicionar procedimento' : 'Adicionar mais um procedimento'}
@@ -375,12 +380,12 @@ export default function QuoteForm({ onGenerate }: Props) {
       </div>
 
       {/* Hospital */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-6">
+      <div className="bg-white rounded-2xl border shadow-sm p-6" style={{ borderColor: SURFACE_BORDER }}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-stone-500 uppercase tracking-wider">
+          <h2 className="text-sm font-semibold uppercase tracking-wider" style={{ color: TEXT_MUTED }}>
             Hospital
           </h2>
-          <label className="flex items-center gap-2 text-xs text-stone-600 cursor-pointer">
+          <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
             <input
               type="checkbox"
               checked={hospitalAuto}
@@ -391,7 +396,7 @@ export default function QuoteForm({ onGenerate }: Props) {
           </label>
         </div>
         {hospitalAuto && procedureEntries.length >= 2 && (
-          <label className="flex items-start gap-2 text-xs text-stone-700 cursor-pointer mb-3 bg-stone-50 rounded-lg px-3 py-2">
+          <label className="flex items-start gap-2 text-xs text-slate-700 cursor-pointer mb-3 rounded-lg px-3 py-2" style={{ background: SURFACE }}>
             <input
               type="checkbox"
               checked={combinedSurgery}
@@ -400,14 +405,14 @@ export default function QuoteForm({ onGenerate }: Props) {
             />
             <span>
               Procedimentos realizados na mesma cirurgia (combinados)
-              <span className="block text-stone-500 mt-0.5">
+              <span className="block text-slate-500 mt-0.5">
                 Quando combinados, aplica 50% de desconto no procedimento de menor valor do hospital.
               </span>
             </span>
           </label>
         )}
         {hospitalAuto && procedureEntries.length > 0 && (
-          <div className="mb-3 text-xs text-stone-500 bg-stone-50 rounded-lg px-3 py-2">
+          <div className="mb-3 text-xs text-slate-500 rounded-lg px-3 py-2" style={{ background: SURFACE }}>
             {procedureEntries.length === 1
               ? 'Valor do hospital do procedimento selecionado. Desmarque para editar manualmente.'
               : combinedSurgery
@@ -417,7 +422,7 @@ export default function QuoteForm({ onGenerate }: Props) {
         )}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="md:col-span-3">
-            <label className="block text-sm font-medium text-stone-700 mb-1.5">
+            <label className="block text-sm font-medium mb-1.5" style={{ color: '#334155' }}>
               Nome do hospital
             </label>
             <input
@@ -425,12 +430,13 @@ export default function QuoteForm({ onGenerate }: Props) {
               value={hospitalName}
               onChange={(e) => setHospitalName(e.target.value)}
               className={inputClass}
-              onFocus={(e) => (e.target.style.borderColor = GOLD_BORDER)}
+              style={inputFocusStyle}
+              onFocus={(e) => (e.target.style.borderColor = BRAND)}
               onBlur={(e) => (e.target.style.borderColor = '')}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1.5">
+            <label className="block text-sm font-medium mb-1.5" style={{ color: '#334155' }}>
               Valor mínimo (R$) *
             </label>
             <input
@@ -439,13 +445,14 @@ export default function QuoteForm({ onGenerate }: Props) {
               onChange={(e) => setHospitalMin(e.target.value)}
               disabled={hospitalAuto}
               placeholder="Ex: 4700"
-              className={inputClass + (hospitalAuto ? ' bg-stone-100 text-stone-500' : '')}
-              onFocus={(e) => (e.target.style.borderColor = GOLD_BORDER)}
+              className={inputClass + (hospitalAuto ? ' bg-slate-100 text-slate-500' : '')}
+              style={inputFocusStyle}
+              onFocus={(e) => (e.target.style.borderColor = BRAND)}
               onBlur={(e) => (e.target.style.borderColor = '')}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1.5">
+            <label className="block text-sm font-medium mb-1.5" style={{ color: '#334155' }}>
               Valor máximo (R$) *
             </label>
             <input
@@ -454,14 +461,15 @@ export default function QuoteForm({ onGenerate }: Props) {
               onChange={(e) => setHospitalMax(e.target.value)}
               disabled={hospitalAuto}
               placeholder="Ex: 5700"
-              className={inputClass + (hospitalAuto ? ' bg-stone-100 text-stone-500' : '')}
-              onFocus={(e) => (e.target.style.borderColor = GOLD_BORDER)}
+              className={inputClass + (hospitalAuto ? ' bg-slate-100 text-slate-500' : '')}
+              style={inputFocusStyle}
+              onFocus={(e) => (e.target.style.borderColor = BRAND)}
               onBlur={(e) => (e.target.style.borderColor = '')}
             />
           </div>
           {hospitalMin && hospitalMax && (
             <div className="flex items-end">
-              <div className="bg-stone-100 rounded-xl px-4 py-2.5 text-sm text-stone-600 w-full">
+              <div className="bg-slate-100 rounded-xl px-4 py-2.5 text-sm text-slate-600 w-full">
                 {formatBRL(parseFloat(hospitalMin.replace(',', '.')))} – {formatBRL(parseFloat(hospitalMax.replace(',', '.')))}
               </div>
             </div>
@@ -470,8 +478,8 @@ export default function QuoteForm({ onGenerate }: Props) {
       </div>
 
       {/* Optional Items */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-6">
-        <h2 className="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-4">
+      <div className="bg-white rounded-2xl border shadow-sm p-6" style={{ borderColor: SURFACE_BORDER }}>
+        <h2 className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: TEXT_MUTED }}>
           Itens Opcionais / Adicionais
         </h2>
         <div className="space-y-3">
@@ -483,10 +491,10 @@ export default function QuoteForm({ onGenerate }: Props) {
               className="w-5 h-5 rounded"
             />
             <div>
-              <div className="font-medium text-stone-700 group-hover:text-stone-900 transition-colors">
+              <div className="font-medium text-slate-700 group-hover:text-slate-900 transition-colors">
                 Argoplasma - ARGON 4
               </div>
-              <div className="text-sm text-stone-500">
+              <div className="text-sm text-slate-500">
                 R$ 5.000,00 à vista · 6x R$ 937,50 · 12x R$ 520,84 (opcional)
               </div>
             </div>
@@ -501,10 +509,10 @@ export default function QuoteForm({ onGenerate }: Props) {
                 className="w-5 h-5 rounded"
               />
               <div>
-                <div className="font-medium text-stone-700 group-hover:text-stone-900 transition-colors">
+                <div className="font-medium text-slate-700 group-hover:text-slate-900 transition-colors">
                   Tabela de implantes de mama
                 </div>
-                <div className="text-sm text-stone-500">
+                <div className="text-sm text-slate-500">
                   Eurosilicone e Silimed BioDesign (Redondos Texturizados)
                 </div>
               </div>
@@ -514,13 +522,13 @@ export default function QuoteForm({ onGenerate }: Props) {
       </div>
 
       {/* Doctor Info */}
-      <div className="bg-white rounded-2xl border border-stone-200 shadow-sm p-6">
-        <h2 className="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-4">
+      <div className="bg-white rounded-2xl border shadow-sm p-6" style={{ borderColor: SURFACE_BORDER }}>
+        <h2 className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: TEXT_MUTED }}>
           Equipe Médica
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1.5">
+            <label className="block text-sm font-medium mb-1.5" style={{ color: '#334155' }}>
               Cirurgião
             </label>
             <input
@@ -528,12 +536,13 @@ export default function QuoteForm({ onGenerate }: Props) {
               value={doctorName}
               onChange={(e) => setDoctorName(e.target.value)}
               className={inputClass}
-              onFocus={(e) => (e.target.style.borderColor = GOLD_BORDER)}
+              style={inputFocusStyle}
+              onFocus={(e) => (e.target.style.borderColor = BRAND)}
               onBlur={(e) => (e.target.style.borderColor = '')}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1.5">
+            <label className="block text-sm font-medium mb-1.5" style={{ color: '#334155' }}>
               Anestesiologista
             </label>
             <input
@@ -541,7 +550,8 @@ export default function QuoteForm({ onGenerate }: Props) {
               value={anesthesiologistName}
               onChange={(e) => setAnesthesiologistName(e.target.value)}
               className={inputClass}
-              onFocus={(e) => (e.target.style.borderColor = GOLD_BORDER)}
+              style={inputFocusStyle}
+              onFocus={(e) => (e.target.style.borderColor = BRAND)}
               onBlur={(e) => (e.target.style.borderColor = '')}
             />
           </div>
@@ -555,17 +565,17 @@ export default function QuoteForm({ onGenerate }: Props) {
         className="w-full py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2 transition-all shadow-sm"
         style={
           canGenerate
-            ? { background: NAVY, color: 'white' }
-            : { background: '#e7e5e4', color: '#a8a29e', cursor: 'not-allowed' }
+            ? { background: BRAND, color: 'white' }
+            : { background: '#e2e8f0', color: '#94a3b8', cursor: 'not-allowed' }
         }
-        onMouseEnter={(e) => { if (canGenerate) (e.currentTarget as HTMLButtonElement).style.background = NAVY_HOVER; }}
-        onMouseLeave={(e) => { if (canGenerate) (e.currentTarget as HTMLButtonElement).style.background = NAVY; }}
+        onMouseEnter={(e) => { if (canGenerate) (e.currentTarget as HTMLButtonElement).style.background = BRAND_HOVER; }}
+        onMouseLeave={(e) => { if (canGenerate) (e.currentTarget as HTMLButtonElement).style.background = BRAND; }}
       >
         <FileText className="w-5 h-5" />
         Gerar Orçamento
       </button>
       {!canGenerate && (
-        <p className="text-center text-sm text-stone-400">
+        <p className="text-center text-sm text-slate-400">
           Preencha: nome da paciente, ao menos um procedimento e os valores do hospital
         </p>
       )}

@@ -262,38 +262,79 @@ function splitProcedureChunk(part: string) {
   return [before, afterLipo, ...extracted].filter(Boolean);
 }
 
+function getTitleBreakPenalty(firstLine: string, nextLine: string) {
+  let penalty = 0;
+
+  if (/[,:;]$/.test(firstLine)) penalty += 24;
+  if (/\b(de|da|do|das|dos|e)\s*$/i.test(firstLine)) penalty += 18;
+  if (/[-–—]\s*$/i.test(firstLine)) penalty += 22;
+  if (/^(abdome|flancos?|dorso|braços|bracos|culotes?|submento|pré-axilas|pre-axilas|face|laterais|lipoaspiração|lipoenxertia)/i.test(nextLine)) {
+    penalty += 18;
+  }
+
+  return penalty;
+}
+
+function scoreTitleLines(lines: string[], titleLength: number) {
+  const target = titleLength / lines.length;
+  let score = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const diff = Math.abs(line.length - target);
+    score += diff * diff;
+
+    if (line.length < 18) score += 160;
+    if (line.split(/\s+/).length <= 1) score += 220;
+
+    if (i < lines.length - 1) {
+      score += getTitleBreakPenalty(line, lines[i + 1]);
+    }
+  }
+
+  const longest = Math.max(...lines.map((line) => line.length));
+  score += Math.max(0, longest - 46) * 35;
+
+  return score;
+}
+
 function getBalancedTitleLines(title: string) {
   const words = title.trim().split(/\s+/);
   if (title.length < 34 || words.length < 4) return [title.toUpperCase()];
 
-  const target = title.length / 2;
-  let bestIndex = 1;
-  let bestDistance = Number.POSITIVE_INFINITY;
+  let bestLines = [title];
+  let bestScore = Number.POSITIVE_INFINITY;
 
   for (let i = 1; i < words.length; i++) {
-    const firstLine = words.slice(0, i).join(' ');
-    const secondLine = words.slice(i).join(' ');
-    const distance = Math.abs(firstLine.length - secondLine.length);
-    const midpointDistance = Math.abs(firstLine.length - target);
-    let score = distance + midpointDistance * 0.35;
-
-    // Avoid awkward manual breaks after punctuation or right before a list continuation.
-    if (/[,:;]$/.test(firstLine)) score += 24;
-    if (/\b(de|da|do|das|dos|e)\s*$/i.test(firstLine)) score += 18;
-    if (/^(abdome|flancos?|dorso|braços|bracos|culotes?|submento|pré-axilas|pre-axilas|face|laterais)/i.test(secondLine)) {
-      score += 18;
-    }
-
-    if (score < bestDistance) {
-      bestDistance = score;
-      bestIndex = i;
+    const lines = [
+      words.slice(0, i).join(' '),
+      words.slice(i).join(' '),
+    ];
+    const score = scoreTitleLines(lines, title.length);
+    if (score < bestScore) {
+      bestScore = score;
+      bestLines = lines;
     }
   }
 
-  return [
-    words.slice(0, bestIndex).join(' ').toUpperCase(),
-    words.slice(bestIndex).join(' ').toUpperCase(),
-  ];
+  if (words.length >= 6) {
+    for (let i = 1; i < words.length - 1; i++) {
+      for (let j = i + 1; j < words.length; j++) {
+        const lines = [
+          words.slice(0, i).join(' '),
+          words.slice(i, j).join(' '),
+          words.slice(j).join(' '),
+        ];
+        const score = scoreTitleLines(lines, title.length);
+        if (score < bestScore) {
+          bestScore = score;
+          bestLines = lines;
+        }
+      }
+    }
+  }
+
+  return bestLines.map((line) => line.toUpperCase());
 }
 
 function preventCompoundWordBreaks(text: string) {

@@ -1024,9 +1024,6 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           </div>
 
           <div className="p-implant-note">
-            O valor do par de implantes deve ser acrescentado ao valor total da cirurgia apresentado neste orçamento.
-          </div>
-          <div className="p-implant-note" style={{ marginTop: '3mm' }}>
             A marca é escolhida levando em consideração o que for mais adequado para seu caso e conforme a disponibilidade dos revendedores.
           </div>
           <div className="p-implant-note" style={{ marginTop: '3mm' }}>

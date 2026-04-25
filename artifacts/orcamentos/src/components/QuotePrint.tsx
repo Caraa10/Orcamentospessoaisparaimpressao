@@ -222,9 +222,11 @@ function buildLipoGroupedTitle(names: string[]) {
     if (hasGlutealFatGrafting) {
       lipoTitle += ' e Lipoenxertia Glútea';
     }
-    const lastSegment = uniqueSegments[uniqueSegments.length - 1];
-    if (lastSegment && /lipoescultura$/i.test(lastSegment)) {
-      uniqueSegments[uniqueSegments.length - 1] = `${lastSegment} - ${lipoTitle}`;
+
+    const lipoesculturaIndex = uniqueSegments.findIndex((segment) => /lipoescultura$/i.test(segment));
+    if (lipoesculturaIndex >= 0) {
+      const [lipoesculturaSegment] = uniqueSegments.splice(lipoesculturaIndex, 1);
+      uniqueSegments.push(`${lipoesculturaSegment} - ${lipoTitle}`);
     } else {
       uniqueSegments.push(lipoTitle);
     }
@@ -242,7 +244,7 @@ function splitProcedureChunk(part: string) {
   }
 
   const lipoIndex = trimmed.search(/lipoaspiração/i);
-  const before = trimmed.slice(0, lipoIndex).replace(/[,\s]+$/g, '').trim();
+  const before = trimmed.slice(0, lipoIndex).replace(/[-,\s]+$/g, '').trim();
   let afterLipo = trimmed.slice(lipoIndex).trim();
   const trailingProcedures = ['Lipoenxertia Glútea'];
   const extracted: string[] = [];

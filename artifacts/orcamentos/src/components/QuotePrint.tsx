@@ -275,7 +275,15 @@ function getBalancedTitleLines(title: string) {
     const secondLine = words.slice(i).join(' ');
     const distance = Math.abs(firstLine.length - secondLine.length);
     const midpointDistance = Math.abs(firstLine.length - target);
-    const score = distance + midpointDistance * 0.35;
+    let score = distance + midpointDistance * 0.35;
+
+    // Avoid awkward manual breaks after punctuation or right before a list continuation.
+    if (/[,:;]$/.test(firstLine)) score += 24;
+    if (/\b(de|da|do|das|dos|e)\s*$/i.test(firstLine)) score += 18;
+    if (/^(abdome|flancos?|dorso|braços|bracos|culotes?|submento|pré-axilas|pre-axilas|face|laterais)/i.test(secondLine)) {
+      score += 18;
+    }
+
     if (score < bestDistance) {
       bestDistance = score;
       bestIndex = i;

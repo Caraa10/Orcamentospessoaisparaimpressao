@@ -137,6 +137,10 @@ function shouldUseNeutralCombinedTitle(names: string[]) {
   return hasMamoplastiaAumento && hasMastopexia;
 }
 
+function shouldHideCombinedSummaryPage(names: string[]) {
+  return shouldUseNeutralCombinedTitle(names);
+}
+
 function normalizeProcedureTitleBasic(title: string) {
   const parts = title
     .split(/\s*\+\s*/g)
@@ -441,9 +445,11 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   if (data.includeArgoplasma) costComponents.push('argoplasma (opcional)');
 
   // Combined totals for multi-procedure summary page
+  const procedureNames = data.procedures.map((e) => e.procedure.name);
   const totalSurgery = data.procedures.reduce((s, e) => s + e.prices.surgery, 0);
   const totalAnesthesia = data.procedures.reduce((s, e) => s + e.prices.anesthesia, 0);
-  const combinedTitle = joinProcedureTitles(data.procedures.map((e) => e.procedure.name));
+  const combinedTitle = joinProcedureTitles(procedureNames);
+  const hideCombinedSummaryPage = shouldHideCombinedSummaryPage(procedureNames);
 
   return (
     <div ref={ref} className="print-root">
@@ -919,7 +925,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           COMBINED SUMMARY PAGE (multi-procedure only)
           Shows total equipe + total anestesista + hospital + argoplasma
       ════════════════════════════════════════════════ */}
-      {isMulti && (
+      {isMulti && !hideCombinedSummaryPage && (
         <div className="page page-content">
           <div className="page-body">
           <ProcedureTitle title={combinedTitle} />

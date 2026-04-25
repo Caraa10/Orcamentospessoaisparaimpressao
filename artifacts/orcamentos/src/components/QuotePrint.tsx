@@ -104,11 +104,37 @@ function stripInlineParagraphMarker(item: string) {
 }
 
 function joinProcedureTitles(names: string[]) {
+  if (shouldUseNeutralCombinedTitle(names)) {
+    return 'Procedimentos Selecionados';
+  }
+
   const title = buildLipoGroupedTitle(names);
   if (title) return title;
 
   const cleanNames = names.map((name) => normalizeProcedureTitleBasic(name));
   return joinPortuguese(cleanNames);
+}
+
+function normalizeComparisonText(value: string) {
+  return value
+    .toLocaleLowerCase('pt-BR')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+function isMamoplastiaAumentoFamily(title: string) {
+  return normalizeComparisonText(title).includes('mamoplastia de aumento');
+}
+
+function isMastopexiaFamily(title: string) {
+  return normalizeComparisonText(title).includes('mastopexia');
+}
+
+function shouldUseNeutralCombinedTitle(names: string[]) {
+  if (names.length <= 1) return false;
+  const hasMamoplastiaAumento = names.some(isMamoplastiaAumentoFamily);
+  const hasMastopexia = names.some(isMastopexiaFamily);
+  return hasMamoplastiaAumento && hasMastopexia;
 }
 
 function normalizeProcedureTitleBasic(title: string) {

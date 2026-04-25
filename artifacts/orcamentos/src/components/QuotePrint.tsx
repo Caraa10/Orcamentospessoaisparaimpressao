@@ -288,13 +288,17 @@ function getBalancedTitleLines(title: string) {
   ];
 }
 
+function preventCompoundWordBreaks(text: string) {
+  return text.replace(/([A-Za-zÀ-ÿ])\-([A-Za-zÀ-ÿ])/g, '$1‑$2');
+}
+
 function ProcedureTitle({ title }: { title: string }) {
   return (
     <div className="p-proc-title">
       {getBalancedTitleLines(title).map((line, index) => (
         <Fragment key={index}>
           {index > 0 && <br />}
-          {line}
+          {preventCompoundWordBreaks(line)}
         </Fragment>
       ))}
     </div>

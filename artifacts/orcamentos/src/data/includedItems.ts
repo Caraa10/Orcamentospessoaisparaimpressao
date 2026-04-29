@@ -60,8 +60,8 @@ function getProcedureLabel(entry: {
 
 const LIPO_SPECIFIC_ITEMS: string[] = [
   '**SAFER (lipoaspiração ultrassônica)**: é um ultrassom cirúrgico que liquefaz a gordura, permitindo sua remoção de forma mais controlada, com menor trauma, menor sangramento, menos dor pós-operatória e mais previsibilidade cirúrgica',
-  '**Vibrofit**: tecnologia que utiliza movimentos vibratórios para facilitar a retirada de gordura',
   '**Irrigador cirúrgico**: para infusão de soluções para lipoaspiração de maneira mais controlada e rápida',
+  '**Vibrofit**: tecnologia que utiliza movimentos vibratórios para facilitar a retirada de gordura',
   '**Malha cirúrgica** (modelador): quando necessário, para proteção e suporte da área operada',
   '**Cinturão abdominal**: para estabilização dos tecidos operados',
   '**Meia elástica** (meia de compressão cirúrgica): para redução de riscos',
@@ -75,8 +75,8 @@ const LIPO_WITH_GRAFTING_EXTRA_ITEMS: string[] = [
 
 const ABDOMINOPLASTY_SPECIFIC_ITEMS: string[] = [
   '**SAFER (lipoaspiração ultrassônica)**: é um ultrassom cirúrgico que liquefaz a gordura, permitindo sua remoção de forma mais controlada, com menor trauma, menor sangramento, menos dor pós-operatória e mais previsibilidade cirúrgica',
-  '**Vibrofit**: tecnologia que utiliza movimentos vibratórios para facilitar a retirada de gordura',
   '**Irrigador cirúrgico**: para infusão de soluções para lipoaspiração de maneira mais controlada e rápida',
+  '**Vibrofit**: tecnologia que utiliza movimentos vibratórios para facilitar a retirada de gordura',
   '**Cola cirúrgica** (Prineo® Johnson&Johnson): funciona como curativo (você não precisa se preocupar em fazer curativos no pós-operatório) e não há pontos para retirar no abdome',
   '**Malha cirúrgica** (modelador): quando necessário, para proteção e suporte da área operada',
   '**Cinturão abdominal**: para estabilização dos tecidos operados',
@@ -124,22 +124,34 @@ function getCategoryInfo(category: ProcedureCategory, procedureName: string): Ca
   const hasFatGrafting = /lipoenxertia gl[uú]tea|lipoescultura/i.test(procedureName);
 
   if (category === 'lipo') {
+    const items = hasFatGrafting
+      ? [
+          LIPO_SPECIFIC_ITEMS[0],
+          ...LIPO_WITH_GRAFTING_EXTRA_ITEMS,
+          ...LIPO_SPECIFIC_ITEMS.slice(1),
+        ]
+      : LIPO_SPECIFIC_ITEMS;
+
     return {
       firstIntro: `Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de ${term}**:`,
       subIntro: `Estão **incluídos em seu procedimento de ${term}**:`,
-      items: hasFatGrafting
-        ? [...LIPO_SPECIFIC_ITEMS, ...LIPO_WITH_GRAFTING_EXTRA_ITEMS]
-        : LIPO_SPECIFIC_ITEMS,
+      items,
     };
   }
 
   if (category === 'abdominoplasty') {
+    const items = hasFatGrafting
+      ? [
+          ABDOMINOPLASTY_SPECIFIC_ITEMS[0],
+          ...ABDOMINOPLASTY_WITH_GRAFTING_EXTRA_ITEMS,
+          ...ABDOMINOPLASTY_SPECIFIC_ITEMS.slice(1),
+        ]
+      : ABDOMINOPLASTY_SPECIFIC_ITEMS;
+
     return {
       firstIntro: `Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de ${term}**:`,
       subIntro: `Estão **incluídos em seu procedimento de ${term}**:`,
-      items: hasFatGrafting
-        ? [...ABDOMINOPLASTY_SPECIFIC_ITEMS, ...ABDOMINOPLASTY_WITH_GRAFTING_EXTRA_ITEMS]
-        : ABDOMINOPLASTY_SPECIFIC_ITEMS,
+      items,
     };
   }
 

@@ -21,24 +21,23 @@ export function getArgoplasmaIncludedItems(procedureLabel: string): string[] {
   ];
 }
 
-function getArgoplasmaProcedureLabel(entry: {
+function normalizeProcedureLabel(name: string) {
+  return name
+    .replace(/\s*\+\s*/g, ' e ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+function getProcedureLabel(entry: {
   category: ProcedureCategory;
   name: string;
 }): string {
-  const normalizedName = entry.name
-    .replace(/\s*\+\s*/g, ' e ')
-    .replace(/\s+/g, ' ')
-    .trim();
-
+  const normalizedName = normalizeProcedureLabel(entry.name);
   const baseName = normalizedName
-    .replace(/\s*-\s*lipoaspiraç[aã]o[\s\S]*$/i, '')
     .replace(/\s+e\s+lipoenxertia gl[uú]tea$/i, '')
     .trim()
-    .toLowerCase();
-
-  if (entry.category === 'abdominoplasty' && /abdominoplastia/i.test(baseName) && /lipo/i.test(baseName)) {
-    return 'abdominoplastia e lipoescultura';
-  }
+    .replace(/\s*-\s*$/g, '');
 
   return baseName || 'procedimento';
 }
@@ -101,17 +100,17 @@ interface CategoryInfo {
 }
 
 function getCategoryInfo(category: ProcedureCategory, procedureName: string): CategoryInfo {
+  const term = getProcedureLabel({ category, name: procedureName });
+
   if (category === 'lipo') {
     return {
-      firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de lipoescultura**:',
-      subIntro: 'Estão **incluídos em seu procedimento de lipoescultura**:',
+      firstIntro: `Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de ${term}**:`,
+      subIntro: `Estão **incluídos em seu procedimento de ${term}**:`,
       items: LIPO_SPECIFIC_ITEMS,
     };
   }
 
   if (category === 'abdominoplasty') {
-    const hasLipo = /lipoaspi|lipo/i.test(procedureName);
-    const term = hasLipo ? 'abdominoplastia com lipoescultura' : 'abdominoplastia';
     return {
       firstIntro: `Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de ${term}**:`,
       subIntro: `Estão **incluídos em seu procedimento de ${term}**:`,
@@ -164,7 +163,7 @@ export function getIncludedSections(
     const info = getCategoryInfo(entries[0].category, entries[0].name);
     const argoplasmaItems =
       shouldIncludeArgoplasma && supportsArgoplasma(entries[0])
-        ? getArgoplasmaIncludedItems(getArgoplasmaProcedureLabel(entries[0]))
+        ? getArgoplasmaIncludedItems(getProcedureLabel(entries[0]))
         : [];
     return [
       {
@@ -193,7 +192,7 @@ export function getIncludedSections(
       items.push(`[[paragraph]]${info.subIntro}`, ...info.items);
     }
     if (shouldIncludeArgoplasma && supportsArgoplasma(entry)) {
-      items.push(...getArgoplasmaIncludedItems(getArgoplasmaProcedureLabel(entry)));
+      items.push(...getArgoplasmaIncludedItems(getProcedureLabel(entry)));
     }
   }
 

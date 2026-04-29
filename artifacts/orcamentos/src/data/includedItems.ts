@@ -61,7 +61,6 @@ function getProcedureLabel(entry: {
 const LIPO_SPECIFIC_ITEMS: string[] = [
   '**SAFER (lipoaspiração ultrassônica)**: é um ultrassom cirúrgico que liquefaz a gordura, permitindo sua remoção de forma mais controlada, com menor trauma, menor sangramento, menos dor pós-operatória e mais previsibilidade cirúrgica',
   '**Vibrofit**: tecnologia que utiliza movimentos vibratórios para facilitar a retirada de gordura',
-  '**Philips Lumify**: tecnologia que aumenta a segurança e precisão nas lipoenxertias',
   '**Irrigador cirúrgico**: para infusão de soluções para lipoaspiração de maneira mais controlada e rápida',
   '**Malha cirúrgica** (modelador): quando necessário, para proteção e suporte da área operada',
   '**Cinturão abdominal**: para estabilização dos tecidos operados',
@@ -70,10 +69,13 @@ const LIPO_SPECIFIC_ITEMS: string[] = [
   '**Taping**: quando necessário, para melhor posicionamento dos tecidos operados',
 ];
 
+const LIPO_WITH_GRAFTING_EXTRA_ITEMS: string[] = [
+  '**Philips Lumify**: tecnologia que aumenta a segurança e precisão nas lipoenxertias',
+];
+
 const ABDOMINOPLASTY_SPECIFIC_ITEMS: string[] = [
   '**SAFER (lipoaspiração ultrassônica)**: é um ultrassom cirúrgico que liquefaz a gordura, permitindo sua remoção de forma mais controlada, com menor trauma, menor sangramento, menos dor pós-operatória e mais previsibilidade cirúrgica',
   '**Vibrofit**: tecnologia que utiliza movimentos vibratórios para facilitar a retirada de gordura',
-  '**Philips Lumify**: tecnologia que aumenta a segurança e precisão nas lipoenxertias',
   '**Irrigador cirúrgico**: para infusão de soluções para lipoaspiração de maneira mais controlada e rápida',
   '**Cola cirúrgica** (Prineo® Johnson&Johnson): funciona como curativo (você não precisa se preocupar em fazer curativos no pós-operatório) e não há pontos para retirar no abdome',
   '**Malha cirúrgica** (modelador): quando necessário, para proteção e suporte da área operada',
@@ -81,6 +83,10 @@ const ABDOMINOPLASTY_SPECIFIC_ITEMS: string[] = [
   '**Meia elástica** (meia de compressão cirúrgica): para redução de riscos',
   '**Canaletas**: quando necessário, para definição das áreas de sombra do abdome',
   '**Taping**: quando necessário, para melhor posicionamento dos tecidos operados',
+];
+
+const ABDOMINOPLASTY_WITH_GRAFTING_EXTRA_ITEMS: string[] = [
+  '**Philips Lumify**: tecnologia que aumenta a segurança e precisão nas lipoenxertias',
 ];
 
 const BREAST_AUGMENTATION_SPECIFIC_ITEMS: string[] = [
@@ -115,12 +121,15 @@ interface CategoryInfo {
 
 function getCategoryInfo(category: ProcedureCategory, procedureName: string): CategoryInfo {
   const term = getProcedureLabel({ category, name: procedureName });
+  const hasFatGrafting = /lipoenxertia gl[uú]tea|lipoescultura/i.test(procedureName);
 
   if (category === 'lipo') {
     return {
       firstIntro: `Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de ${term}**:`,
       subIntro: `Estão **incluídos em seu procedimento de ${term}**:`,
-      items: LIPO_SPECIFIC_ITEMS,
+      items: hasFatGrafting
+        ? [...LIPO_SPECIFIC_ITEMS, ...LIPO_WITH_GRAFTING_EXTRA_ITEMS]
+        : LIPO_SPECIFIC_ITEMS,
     };
   }
 
@@ -128,7 +137,9 @@ function getCategoryInfo(category: ProcedureCategory, procedureName: string): Ca
     return {
       firstIntro: `Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de ${term}**:`,
       subIntro: `Estão **incluídos em seu procedimento de ${term}**:`,
-      items: ABDOMINOPLASTY_SPECIFIC_ITEMS,
+      items: hasFatGrafting
+        ? [...ABDOMINOPLASTY_SPECIFIC_ITEMS, ...ABDOMINOPLASTY_WITH_GRAFTING_EXTRA_ITEMS]
+        : ABDOMINOPLASTY_SPECIFIC_ITEMS,
     };
   }
 

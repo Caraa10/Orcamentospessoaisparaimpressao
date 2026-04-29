@@ -1050,7 +1050,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           <p>
             Caso opte por fazer a cirurgia, o primeiro passo é agendar a data do procedimento. Depois disso, marcaremos seu retorno com o {data.doctorName} e a consulta pré-anestésica com a {data.anesthesiologistName} (valor de R$ 200).
           </p>
-          <p>Se tiver qualquer dúvida, estamos à disposição para conversar. Até breve! 🌷</p>
+          <p>Se tiver qualquer dúvida, estamos à disposição para conversar. Até breve!</p>
         </div>
 
         </div>

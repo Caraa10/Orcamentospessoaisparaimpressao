@@ -244,7 +244,11 @@ function splitProcedureChunk(part: string) {
   }
 
   const lipoIndex = trimmed.search(/lipoaspiração/i);
-  const before = trimmed.slice(0, lipoIndex).replace(/[-,\s]+$/g, '').trim();
+  const before = trimmed
+    .slice(0, lipoIndex)
+    .replace(/[-,\s]+$/g, '')
+    .replace(/\s+e\s*$/i, '')
+    .trim();
   let afterLipo = trimmed.slice(lipoIndex).trim();
   const trailingProcedures = ['Lipoenxertia Glútea'];
   const extracted: string[] = [];

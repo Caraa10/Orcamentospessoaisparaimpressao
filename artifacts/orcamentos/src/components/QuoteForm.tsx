@@ -155,6 +155,7 @@ export default function QuoteForm({ onGenerate }: Props) {
       patientName: patientName.trim(),
       date,
       procedures: procedureEntries,
+      combinedSurgery,
       hospitalName: hospitalName.trim() || HOSPITAL_NAME,
       hospitalMin: parseFloat(hospitalMin.replace(',', '.')),
       hospitalMax: parseFloat(hospitalMax.replace(',', '.')),

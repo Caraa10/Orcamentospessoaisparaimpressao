@@ -431,6 +431,7 @@ type SectionPart = {
 
 const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const isMulti = data.procedures.length > 1;
+  const isCombinedSurgery = data.combinedSurgery ?? true;
 
   const includedSections = getIncludedSections(
     data.procedures.map((e) => ({ category: e.procedure.category, name: e.procedure.name })),
@@ -980,7 +981,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           COMBINED SUMMARY PAGE (multi-procedure only)
           Shows total equipe + total anestesista + hospital + argoplasma
       ════════════════════════════════════════════════ */}
-      {isMulti && !hideCombinedSummaryPage && (
+      {isMulti && isCombinedSurgery && !hideCombinedSummaryPage && (
         <div className="page page-content">
           <div className="page-body">
           <ProcedureTitle title={combinedTitle} />

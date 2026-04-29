@@ -10,6 +10,7 @@ export interface QuoteData {
   patientName: string;
   date: string;
   procedures: ProcedureEntry[];
+  combinedSurgery: boolean;
   hospitalName: string;
   hospitalMin: number;
   hospitalMax: number;

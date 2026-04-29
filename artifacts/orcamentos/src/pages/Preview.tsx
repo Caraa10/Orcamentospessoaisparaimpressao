@@ -80,6 +80,7 @@ export default function Preview() {
             prices: { total: 32000, surgery: 29000, anesthesia: 3000 },
           },
         ],
+        combinedSurgery: true,
         hospitalName: 'Hospital Accurata',
         hospitalMin: 9300,
         hospitalMax: 10300,
@@ -96,7 +97,11 @@ export default function Preview() {
       setLocation('/');
       return;
     }
-    setData(JSON.parse(stored));
+    const parsed = JSON.parse(stored);
+    setData({
+      ...parsed,
+      combinedSurgery: parsed.combinedSurgery ?? true,
+    });
   }, [setLocation]);
 
   const handleDownloadPDF = async () => {

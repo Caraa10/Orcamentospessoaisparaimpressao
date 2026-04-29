@@ -44,6 +44,10 @@ function getProcedureLabel(entry: {
     return compactLipoLabel || 'procedimento';
   }
 
+  if (entry.category === 'abdominoplasty' && /abdominoplastia/i.test(normalizedName) && /lipoaspiraç[aã]o/i.test(normalizedName)) {
+    return 'abdominoplastia com lipoaspiração';
+  }
+
   const baseName = normalizedName
     .replace(/\s+e\s+lipoenxertia gl[uú]tea$/i, '')
     .trim()

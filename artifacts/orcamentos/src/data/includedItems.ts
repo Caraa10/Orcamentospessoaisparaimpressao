@@ -34,6 +34,16 @@ function getProcedureLabel(entry: {
   name: string;
 }): string {
   const normalizedName = normalizeProcedureLabel(entry.name);
+
+  if (/lipoescultura/i.test(normalizedName)) {
+    const compactLipoLabel = normalizedName
+      .replace(/(\blipoescultura\b)[\s\S]*$/i, '$1')
+      .trim()
+      .replace(/\s*-\s*$/g, '');
+
+    return compactLipoLabel || 'procedimento';
+  }
+
   const baseName = normalizedName
     .replace(/\s+e\s+lipoenxertia gl[uú]tea$/i, '')
     .trim()

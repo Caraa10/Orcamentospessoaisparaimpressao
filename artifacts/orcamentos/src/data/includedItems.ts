@@ -29,6 +29,23 @@ function normalizeProcedureLabel(name: string) {
     .toLowerCase();
 }
 
+function isMamoplastiaAumentoFamily(name: string) {
+  return normalizeProcedureLabel(name).includes('mamoplastia de aumento');
+}
+
+function isMastopexiaFamily(name: string) {
+  return normalizeProcedureLabel(name).includes('mastopexia');
+}
+
+function shouldTreatAsAlternativeProcedures(
+  entries: Array<{ category: ProcedureCategory; name: string }>,
+) {
+  if (entries.length <= 1) return false;
+  const hasMamoplastiaAumento = entries.some((entry) => isMamoplastiaAumentoFamily(entry.name));
+  const hasMastopexia = entries.some((entry) => isMastopexiaFamily(entry.name));
+  return hasMamoplastiaAumento && hasMastopexia;
+}
+
 function getProcedureLabel(entry: {
   category: ProcedureCategory;
   name: string;
@@ -200,6 +217,7 @@ export function getIncludedSections(
   options: { includeArgoplasma?: boolean } = {},
 ): IncludedSection[] {
   const isMulti = entries.length > 1;
+  const hasAlternativeProcedures = shouldTreatAsAlternativeProcedures(entries);
   const shouldIncludeArgoplasma = options.includeArgoplasma === true;
   const supportsArgoplasma = (entry: { category: ProcedureCategory; name: string }) =>
     entry.category === 'abdominoplasty' || entry.category === 'lipo';
@@ -216,6 +234,37 @@ export function getIncludedSections(
         items: [...info.items, ...COMMON_ITEMS, ...argoplasmaItems],
       },
     ];
+  }
+
+  if (hasAlternativeProcedures) {
+    const seen = new Set<string>();
+    const sections: IncludedSection[] = [];
+
+    for (const entry of entries) {
+      const key = `${entry.category}:${entry.name.toLowerCase()}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+
+      const info = getCategoryInfo(entry.category, entry.name);
+      if (info.items.length === 0) continue;
+
+      const argoplasmaItems =
+        shouldIncludeArgoplasma && supportsArgoplasma(entry)
+          ? getArgoplasmaIncludedItems(getProcedureLabel(entry))
+          : [];
+
+      sections.push({
+        intro: sections.length === 0 ? info.firstIntro : info.subIntro,
+        items: [...info.items, ...argoplasmaItems],
+      });
+    }
+
+    sections.push({
+      intro: 'Todos os **procedimentos incluem**:',
+      items: COMMON_ITEMS,
+    });
+
+    return sections;
   }
 
   const seen = new Set<string>();

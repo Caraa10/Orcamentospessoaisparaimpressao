@@ -238,7 +238,8 @@ export function getIncludedSections(
 
   if (hasAlternativeProcedures) {
     const seen = new Set<string>();
-    const sections: IncludedSection[] = [];
+    let intro = '';
+    const items: string[] = [];
 
     for (const entry of entries) {
       const key = `${entry.category}:${entry.name.toLowerCase()}`;
@@ -253,18 +254,18 @@ export function getIncludedSections(
           ? getArgoplasmaIncludedItems(getProcedureLabel(entry))
           : [];
 
-      sections.push({
-        intro: sections.length === 0 ? info.firstIntro : info.subIntro,
-        items: [...info.items, ...argoplasmaItems],
-      });
+      if (!intro) {
+        intro = info.firstIntro;
+        items.push(...info.items, ...argoplasmaItems);
+      } else {
+        items.push(`[[paragraph]]${info.subIntro}`, ...info.items, ...argoplasmaItems);
+      }
     }
 
-    sections.push({
-      intro: 'Todos os **procedimentos incluem**:',
-      items: COMMON_ITEMS,
-    });
-
-    return sections;
+    return [{
+      intro,
+      items: [...items, '[[paragraph]]Todos os **procedimentos incluem**:', ...COMMON_ITEMS],
+    }];
   }
 
   const seen = new Set<string>();

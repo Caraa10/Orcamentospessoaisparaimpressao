@@ -424,8 +424,8 @@ function FeeArgoplasma() {
       <div className="p-fee-value">R$ {formatBRLNoSymbol(ARGOPLASMA_PRICE)}</div>
       <div className="p-fee-options">
         - à vista (PIX ou transferência)<br />
-        - em 6 vezes (cartão de crédito): 6x R$ {formatBRLNoSymbol(calcInstallmentValue(ARGOPLASMA_PRICE_6X, 6))}<br />
-        - em 12 vezes (cartão de crédito): 12x R$ {formatBRLNoSymbol(calcInstallmentValue(ARGOPLASMA_PRICE_12X, 12))}
+        - de 1 a 6 vezes (cartão de crédito): R$ {formatBRLNoSymbol(ARGOPLASMA_PRICE_6X)}<br />
+        - de 7 a 12 vezes (cartão de crédito): R$ {formatBRLNoSymbol(ARGOPLASMA_PRICE_12X)}
       </div>
     </div>
   );

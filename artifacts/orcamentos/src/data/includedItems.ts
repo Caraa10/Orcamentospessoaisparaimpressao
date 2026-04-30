@@ -36,6 +36,10 @@ function getProcedureLabel(entry: {
   const normalizedName = normalizeProcedureLabel(entry.name);
 
   if (/lipoescultura/i.test(normalizedName)) {
+    if (entry.category === 'abdominoplasty' && /abdominoplastia/i.test(normalizedName)) {
+      return 'abdominoplastia com lipoescultura';
+    }
+
     const compactLipoLabel = normalizedName
       .replace(/(\blipoescultura\b)[\s\S]*$/i, '$1')
       .trim()

@@ -210,11 +210,10 @@ export function getIncludedSections(
       shouldIncludeArgoplasma && supportsArgoplasma(entries[0])
         ? getArgoplasmaIncludedItems(getProcedureLabel(entries[0]))
         : [];
-    const procedureItems = [...info.items, ...argoplasmaItems];
     return [
       {
         intro: info.firstIntro,
-        items: [...procedureItems, ...COMMON_ITEMS],
+        items: [...info.items, ...COMMON_ITEMS, ...argoplasmaItems],
       },
     ];
   }

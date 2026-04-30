@@ -219,7 +219,6 @@ export function getIncludedSections(
   }
 
   const seen = new Set<string>();
-  const seenItems = new Set<string>();
   let intro = '';
   const items: string[] = [];
 
@@ -231,25 +230,14 @@ export function getIncludedSections(
     const info = getCategoryInfo(entry.category, entry.name);
     if (info.items.length === 0) continue;
 
-    const uniqueInfoItems = info.items.filter((item) => !seenItems.has(item));
-    uniqueInfoItems.forEach((item) => seenItems.add(item));
-
-    const argoplasmaItems =
-      shouldIncludeArgoplasma && supportsArgoplasma(entry)
-        ? getArgoplasmaIncludedItems(getProcedureLabel(entry)).filter((item) => !seenItems.has(item))
-        : [];
-    argoplasmaItems.forEach((item) => seenItems.add(item));
-
     if (!intro) {
       intro = info.firstIntro;
-      items.push(...uniqueInfoItems);
-      if (argoplasmaItems.length > 0) items.push(...argoplasmaItems);
-      continue;
+      items.push(...info.items);
+    } else {
+      items.push(`[[paragraph]]${info.subIntro}`, ...info.items);
     }
-
-    const sectionItems = [...uniqueInfoItems, ...argoplasmaItems];
-    if (sectionItems.length > 0) {
-      items.push(`[[paragraph]]${info.subIntro}`, ...sectionItems);
+    if (shouldIncludeArgoplasma && supportsArgoplasma(entry)) {
+      items.push(...getArgoplasmaIncludedItems(getProcedureLabel(entry)));
     }
   }
 

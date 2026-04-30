@@ -137,8 +137,70 @@ function shouldUseNeutralCombinedTitle(names: string[]) {
   return hasMamoplastiaAumento && hasMastopexia;
 }
 
-function shouldHideCombinedSummaryPage(names: string[]) {
-  return shouldUseNeutralCombinedTitle(names);
+function calculateCombinedHospitalValues(
+  procedures: QuoteData['procedures'],
+) {
+  const items = procedures
+    .map((entry) => {
+      const min = entry.procedure.hospitalMin;
+      if (min === null) return null;
+      const max = entry.procedure.hospitalMax ?? min;
+      return { min, max };
+    })
+    .filter((item): item is { min: number; max: number } => item !== null);
+
+  if (items.length === 0) {
+    return { min: 0, max: 0 };
+  }
+
+  const applyDiscount = items.length >= 2;
+  let lowestIdx = 0;
+  if (applyDiscount) {
+    for (let i = 1; i < items.length; i++) {
+      if (items[i].min < items[lowestIdx].min) lowestIdx = i;
+    }
+  }
+
+  let min = 0;
+  let max = 0;
+  for (let i = 0; i < items.length; i++) {
+    const factor = applyDiscount && i === lowestIdx ? 0.5 : 1;
+    min += items[i].min * factor;
+    max += items[i].max * factor;
+  }
+
+  return {
+    min: Math.round(min),
+    max: Math.round(max),
+  };
+}
+
+function getCombinedSummarySets(procedures: QuoteData['procedures']) {
+  const mamoplastiaEntries = procedures.filter((entry) =>
+    isMamoplastiaAumentoFamily(entry.procedure.name),
+  );
+  const mastopexiaEntries = procedures.filter((entry) =>
+    isMastopexiaFamily(entry.procedure.name),
+  );
+
+  if (mamoplastiaEntries.length === 0 || mastopexiaEntries.length === 0) {
+    return [procedures];
+  }
+
+  const sharedEntries = procedures.filter(
+    (entry) =>
+      !isMamoplastiaAumentoFamily(entry.procedure.name) &&
+      !isMastopexiaFamily(entry.procedure.name),
+  );
+
+  if (sharedEntries.length === 0) {
+    return [];
+  }
+
+  return [
+    ...mamoplastiaEntries.map((entry) => [entry, ...sharedEntries]),
+    ...mastopexiaEntries.map((entry) => [entry, ...sharedEntries]),
+  ];
 }
 
 function normalizeProcedureTitleBasic(title: string) {
@@ -510,12 +572,9 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   if (data.includeImplants) costComponents.push('implantes');
   if (data.includeArgoplasma) costComponents.push('argoplasma (opcional)');
 
-  // Combined totals for multi-procedure summary page
-  const procedureNames = data.procedures.map((e) => e.procedure.name);
-  const totalSurgery = data.procedures.reduce((s, e) => s + e.prices.surgery, 0);
-  const totalAnesthesia = data.procedures.reduce((s, e) => s + e.prices.anesthesia, 0);
-  const combinedTitle = joinProcedureTitles(procedureNames);
-  const hideCombinedSummaryPage = shouldHideCombinedSummaryPage(procedureNames);
+  const combinedSummarySets = isCombinedSurgery && isMulti
+    ? getCombinedSummarySets(data.procedures)
+    : [];
 
   return (
     <div ref={ref} className="print-root">
@@ -991,10 +1050,31 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           COMBINED SUMMARY PAGE (multi-procedure only)
           Shows total equipe + total anestesista + hospital + argoplasma
       ════════════════════════════════════════════════ */}
-      {isMulti && isCombinedSurgery && !hideCombinedSummaryPage && (
-        <div className="page page-content">
+      {combinedSummarySets.map((procedureSet, idx) => {
+        const procedureNames = procedureSet.map((entry) => entry.procedure.name);
+        const totalSurgery = procedureSet.reduce((sum, entry) => sum + entry.prices.surgery, 0);
+        const totalAnesthesia = procedureSet.reduce((sum, entry) => sum + entry.prices.anesthesia, 0);
+        const totalHospital = calculateCombinedHospitalValues(procedureSet);
+        const showArgoplasmaHere =
+          data.includeArgoplasma &&
+          procedureSet.some((entry) => {
+            const procName = entry.procedure.name.toLowerCase();
+            return (
+              procName.includes('abdominoplastia') ||
+              procName.includes('miniabdominoplastia') ||
+              (procName.includes('lipoaspiração') &&
+                (procName.includes('abdome') ||
+                  procName.includes('flanco') ||
+                  procName.includes('dorso') ||
+                  procName.includes('coxa') ||
+                  procName.includes('braço')))
+            );
+          });
+
+        return (
+        <div key={`combined-${idx}`} className="page page-content">
           <div className="page-body">
-          <ProcedureTitle title={combinedTitle} />
+          <ProcedureTitle title={joinProcedureTitles(procedureNames)} />
 
           <div className="p-hr" />
 
@@ -1002,14 +1082,15 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           <FeeAnestesista anesthesiaBase={totalAnesthesia} />
           <FeeHospital
             name={data.hospitalName}
-            min={data.hospitalMin}
-            max={data.hospitalMax}
+            min={totalHospital.min}
+            max={totalHospital.max}
           />
-          {data.includeArgoplasma && <FeeArgoplasma />}
+          {showArgoplasmaHere && <FeeArgoplasma />}
 
           </div>
         </div>
-      )}
+        );
+      })}
 
       {/* ════════════════════════════════════════════════
           IMPLANTS PAGE

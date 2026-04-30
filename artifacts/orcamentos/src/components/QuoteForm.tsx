@@ -105,6 +105,23 @@ export default function QuoteForm({ onGenerate }: Props) {
   }, [pickerProcedure, pickerComplexity]);
 
   const anyProcedureHasImplants = procedureEntries.some((e) => e.procedure.hasImplants);
+  const anyProcedureSupportsArgoplasma = procedureEntries.some((entry) => {
+    const procName = entry.procedure.name.toLowerCase();
+    return (
+      procName.includes('abdominoplastia') ||
+      procName.includes('miniabdominoplastia') ||
+      (procName.includes('lipoaspiração') &&
+        (procName.includes('abdome') ||
+          procName.includes('flanco') ||
+          procName.includes('dorso') ||
+          procName.includes('coxa') ||
+          procName.includes('braço')))
+    );
+  });
+
+  useEffect(() => {
+    setIncludeArgoplasma(anyProcedureSupportsArgoplasma);
+  }, [anyProcedureSupportsArgoplasma]);
 
   const handleSelectProcedure = (proc: Procedure) => {
     setPickerProcedure(proc);
@@ -484,22 +501,24 @@ export default function QuoteForm({ onGenerate }: Props) {
           Itens Opcionais / Adicionais
         </h2>
         <div className="space-y-3">
-          <label className="flex items-center gap-3 cursor-pointer group">
-            <input
-              type="checkbox"
-              checked={includeArgoplasma}
-              onChange={(e) => setIncludeArgoplasma(e.target.checked)}
-              className="w-5 h-5 rounded"
-            />
-            <div>
-              <div className="font-medium text-slate-700 group-hover:text-slate-900 transition-colors">
-                Argoplasma - ARGON 4
+          {anyProcedureSupportsArgoplasma && (
+            <label className="flex items-center gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={includeArgoplasma}
+                onChange={(e) => setIncludeArgoplasma(e.target.checked)}
+                className="w-5 h-5 rounded"
+              />
+              <div>
+                <div className="font-medium text-slate-700 group-hover:text-slate-900 transition-colors">
+                  Argoplasma - ARGON 4
+                </div>
+                <div className="text-sm text-slate-500">
+                  R$ 5.000,00 à vista · 6x R$ 5.625,00 · 12x R$ 6.250,00 (opcional)
+                </div>
               </div>
-              <div className="text-sm text-slate-500">
-                R$ 5.000,00 à vista · 6x R$ 937,50 · 12x R$ 520,84 (opcional)
-              </div>
-            </div>
-          </label>
+            </label>
+          )}
 
           {(anyProcedureHasImplants || includeImplants) && (
             <label className="flex items-center gap-3 cursor-pointer group">

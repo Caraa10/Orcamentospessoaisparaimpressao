@@ -59,7 +59,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "mamoplastia-de-aumento-papiloplastia-reducao-papilas-mamarias",
-    name: "Mamoplastia de Aumento + Papiloplastia - Redução Papilas Mamárias",
+    name: "Mamoplastia de Aumento + Papiloplastia - Redução de Papilas Mamárias",
     category: "breast",
     hasImplants: true,
     complexityA: p(19000, 17000, 2000),
@@ -70,7 +70,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "mamoplastia-de-aumento-papiloplastia-eversao-papilas-mamarias",
-    name: "Mamoplastia de Aumento + Papiloplastia - Eversão Papilas Mamárias",
+    name: "Mamoplastia de Aumento + Papiloplastia - Eversão de Papilas Mamárias",
     category: "breast",
     hasImplants: true,
     complexityA: p(19000, 17000, 2000),
@@ -124,7 +124,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "substituicao-de-implantes-tratamento-cirurgico-de-contratura-capsular",
-    name: "Substituição de Implantes + Tratamento Cirúrgico de Contratura Capsular",
+    name: "Substituição de Implantes e Tratamento Cirúrgico de Contratura Capsular",
     category: "breast",
     hasImplants: true,
     complexityA: p(20000, 18000, 2000),
@@ -135,7 +135,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "substituicao-de-implantes-tratamento-cirurgico-de-contratura-capsular-",
-    name: "Substituição de Implantes + Tratamento Cirúrgico de Contratura Capsular + Lipoaspiração de Pré-Axilas",
+    name: "Substituição de Implantes e Tratamento Cirúrgico de Contratura Capsular + Lipoaspiração de Pré-Axilas",
     category: "breast",
     hasImplants: true,
     complexityA: p(21000, 19000, 2000),
@@ -146,7 +146,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "substituicao-de-implantes-tratamento-cirurgico-de-contratura-capsular--2",
-    name: "Substituição de Implantes + Tratamento Cirúrgico de Contratura Capsular + Lipoaspiração de Contorno Mamário",
+    name: "Substituição de Implantes e Tratamento Cirúrgico de Contratura Capsular + Lipoaspiração de Contorno Mamário",
     category: "breast",
     hasImplants: true,
     complexityA: p(22000, 20000, 2000),
@@ -157,7 +157,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "retirada-de-implantes-lipoenxertia-mamaria",
-    name: "Retirada de Implantes + Lipoenxertia Mamária",
+    name: "Retirada de Implantes e Lipoenxertia Mamária",
     category: "breast",
     complexityA: p(22000, 19000, 3000),
     complexityB: p(26000, 23000, 3000),
@@ -338,38 +338,17 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "mamoplastia-redutora-com-implantes",
-    name: "Mamoplastia Redutora com Implantes",
+    name: "Mamoplastia Redutora + Lipoaspiração de Pré-Axilas",
     category: "breast",
     hasImplants: true,
-    complexityA: p(29000, 26000, 3000),
-    complexityB: p(32000, 29000, 3000),
-    complexityC: p(35000, 32000, 3000),
-    hospitalMin: 5700,
-    hospitalMax: 6200,
+    complexityA: p(30000, 27000, 3000),
+    complexityB: p(33000, 30000, 3000),
+    complexityC: p(36000, 33000, 3000),
+    hospitalMin: 5900,
+    hospitalMax: 6400,
   },
   {
     id: "mamoplastia-redutora-lipoaspiracao-de-pre-axilas",
-    name: "Mamoplastia Redutora + Lipoaspiração de Pré-Axilas",
-    category: "breast",
-    complexityA: p(30000, 27000, 3000),
-    complexityB: p(33000, 30000, 3000),
-    complexityC: p(36000, 33000, 3000),
-    hospitalMin: 5900,
-    hospitalMax: 6400,
-  },
-  {
-    id: "mamoplastia-redutora-com-implantes-lipoaspiracao-de-pre-axilas",
-    name: "Mamoplastia Redutora com Implantes + Lipoaspiração de Pré-Axilas",
-    category: "breast",
-    hasImplants: true,
-    complexityA: p(30000, 27000, 3000),
-    complexityB: p(33000, 30000, 3000),
-    complexityC: p(36000, 33000, 3000),
-    hospitalMin: 5900,
-    hospitalMax: 6400,
-  },
-  {
-    id: "mamoplastia-redutora-lipoaspiracao-de-contorno-mamario",
     name: "Mamoplastia Redutora + Lipoaspiração de Contorno Mamário",
     category: "breast",
     complexityA: p(31000, 28000, 3000),
@@ -379,19 +358,51 @@ export const PROCEDURES: Procedure[] = [
     hospitalMax: 6400,
   },
   {
-    id: "mamoplastia-redutora-com-implantes-lipoaspiracao-de-contorno-mamario",
-    name: "Mamoplastia Redutora com Implantes + Lipoaspiração de Contorno Mamário",
+    id: "mamoplastia-redutora-com-implantes-lipoaspiracao-de-pre-axilas",
+    name: "Mamoplastia Redutora com Implantes",
     category: "breast",
     hasImplants: true,
     complexityA: p(31000, 28000, 3000),
     complexityB: p(34000, 31000, 3000),
     complexityC: p(37000, 34000, 3000),
+    hospitalMin: 5700,
+    hospitalMax: 6200,
+  },
+  {
+    id: "mamoplastia-redutora-lipoaspiracao-de-contorno-mamario",
+    name: "Mamoplastia Redutora com Implantes + Lipoaspiração de Pré-Axilas",
+    category: "breast",
+    complexityA: p(32000, 29000, 3000),
+    complexityB: p(35000, 32000, 3000),
+    complexityC: p(38000, 35000, 3000),
+    hospitalMin: 5900,
+    hospitalMax: 6400,
+  },
+  {
+    id: "mamoplastia-redutora-com-implantes-lipoaspiracao-de-contorno-mamario",
+    name: "Mamoplastia Redutora com Implantes + Lipoaspiração de Contorno Mamário",
+    category: "breast",
+    hasImplants: true,
+    complexityA: p(33000, 30000, 3000),
+    complexityB: p(36000, 33000, 3000),
+    complexityC: p(39000, 36000, 3000),
     hospitalMin: 5900,
     hospitalMax: 6400,
   },
   {
     id: "mamoplastia-redutora-substituicao-de-implantes",
-    name: "Mamoplastia Redutora + Substituição de Implantes",
+    name: "Mamoplastia Redutora com Substituição de Implantes",
+    category: "breast",
+    hasImplants: true,
+    complexityA: p(31000, 28000, 3000),
+    complexityB: p(34000, 31000, 3000),
+    complexityC: p(37000, 34000, 3000),
+    hospitalMin: 5700,
+    hospitalMax: 6200,
+  },
+  {
+    id: "mamoplastia-redutora-substituicao-de-implantes-lipoaspiracao-de-pre-axilas",
+    name: "Mamoplastia Redutora com Substituição de Implantes + Lipoaspiração de Pré-Axilas",
     category: "breast",
     hasImplants: true,
     complexityA: p(32000, 29000, 3000),
@@ -402,12 +413,12 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "mamoplastia-redutora-substituicao-de-implantes-lipoaspiracao-de-contor",
-    name: "Mamoplastia Redutora + Substituição de Implantes + Lipoaspiração de Contorno Mamário",
+    name: "Mamoplastia Redutora com Substituição de Implantes + Lipoaspiração de Contorno Mamário",
     category: "breast",
     hasImplants: true,
-    complexityA: p(34000, 31000, 3000),
-    complexityB: p(37000, 34000, 3000),
-    complexityC: p(40000, 37000, 3000),
+    complexityA: p(33000, 30000, 3000),
+    complexityB: p(36000, 33000, 3000),
+    complexityC: p(39000, 36000, 3000),
     hospitalMin: 5900,
     hospitalMax: 6400,
   },
@@ -443,7 +454,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoaspiracao-de-abdome-e-flancos-fi-coxas",
-    name: "Lipoaspiração de Abdome e Flancos + FI Coxas",
+    name: "Lipoaspiração de Abdome e Flancos + Face Interna das Coxas",
     category: "lipo",
     complexityA: p(23000, 20000, 3000),
     complexityB: p(26000, 23000, 3000),
@@ -473,7 +484,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoaspiracao-de-abdome-e-flancos-pre-axilas-e-fi-coxas",
-    name: "Lipoaspiração de Abdome e Flancos + Pré-Axilas e FI Coxas",
+    name: "Lipoaspiração de Abdome e Flancos + Pré-Axilas e Face Interna das Coxas",
     category: "lipo",
     complexityA: p(23000, 20000, 3000),
     complexityB: p(26000, 23000, 3000),
@@ -503,7 +514,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoaspiracao-de-abdome-e-flancos-pre-axilas-fi-coxas-e-culotes",
-    name: "Lipoaspiração de Abdome e Flancos + Pré-Axilas, FI Coxas e Culotes",
+    name: "Lipoaspiração de Abdome e Flancos + Pré-Axilas, Face Interna das Coxas e Culotes",
     category: "lipo",
     complexityA: p(25000, 22000, 3000),
     complexityB: p(28000, 25000, 3000),
@@ -513,7 +524,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoaspiracao-de-abdome-e-flancos-pre-axilas-fi-coxas-e-bracos",
-    name: "Lipoaspiração de Abdome e Flancos + Pré-Axilas, FI Coxas e Braços",
+    name: "Lipoaspiração de Abdome e Flancos + Pré-Axilas, Face Interna das Coxas e Braços",
     category: "lipo",
     complexityA: p(26000, 23000, 3000),
     complexityB: p(29000, 26000, 3000),
@@ -533,7 +544,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoaspiracao-de-abdome-e-flancos-pre-axilas-fi-coxas-culotes-e-bracos",
-    name: "Lipoaspiração de Abdome e Flancos + Pré-Axilas, FI Coxas, Culotes e Braços",
+    name: "Lipoaspiração de Abdome e Flancos + Pré-Axilas, Face Interna das Coxas, Culotes e Braços",
     category: "lipo",
     complexityA: p(28000, 25000, 3000),
     complexityB: p(31000, 28000, 3000),
@@ -543,7 +554,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoaspiracao-de-abdome-e-flancos-fi-coxas-e-culotes",
-    name: "Lipoaspiração de Abdome e Flancos + FI Coxas e Culotes",
+    name: "Lipoaspiração de Abdome e Flancos + Face Interna das Coxas e Culotes",
     category: "lipo",
     complexityA: p(25000, 22000, 3000),
     complexityB: p(28000, 25000, 3000),
@@ -553,7 +564,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoaspiracao-de-abdome-e-flancos-fi-coxas-e-bracos",
-    name: "Lipoaspiração de Abdome e Flancos + FI Coxas e Braços",
+    name: "Lipoaspiração de Abdome e Flancos + Face Interna das Coxas e Braços",
     category: "lipo",
     complexityA: p(26000, 23000, 3000),
     complexityB: p(29000, 26000, 3000),
@@ -573,7 +584,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoaspiracao-de-abdome-e-flancos-fi-coxas-culotes-e-bracos",
-    name: "Lipoaspiração de Abdome e Flancos + FI Coxas, Culotes e Braços",
+    name: "Lipoaspiração de Abdome e Flancos + Face Interna das Coxas, Culotes e Braços",
     category: "lipo",
     complexityA: p(28000, 25000, 3000),
     complexityB: p(31000, 28000, 3000),
@@ -613,7 +624,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoaspiracao-de-abdome-flancos-e-dorso-fi-coxas",
-    name: "Lipoaspiração de Abdome, Flancos e Dorso + FI Coxas",
+    name: "Lipoaspiração de Abdome, Flancos e Dorso + Face Interna das Coxas",
     category: "lipo",
     complexityA: p(28000, 25000, 3000),
     complexityB: p(31000, 28000, 3000),
@@ -643,7 +654,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoaspiracao-de-abdome-flancos-e-dorso-pre-axilas-e-fi-coxas",
-    name: "Lipoaspiração de Abdome, Flancos e Dorso + Pré-Axilas e FI Coxas",
+    name: "Lipoaspiração de Abdome, Flancos e Dorso + Pré-Axilas e Face Interna das Coxas",
     category: "lipo",
     complexityA: p(28000, 25000, 3000),
     complexityB: p(31000, 28000, 3000),
@@ -673,7 +684,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoaspiracao-de-abdome-flancos-e-dorso-pre-axilas-fi-coxas-e-culotes",
-    name: "Lipoaspiração de Abdome, Flancos e Dorso + Pré-Axilas, FI Coxas e Culotes",
+    name: "Lipoaspiração de Abdome, Flancos e Dorso + Pré-Axilas, Face Interna das Coxas e Culotes",
     category: "lipo",
     complexityA: p(30000, 27000, 3000),
     complexityB: p(33000, 30000, 3000),
@@ -683,7 +694,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoaspiracao-de-abdome-flancos-e-dorso-pre-axilas-fi-coxas-e-bracos",
-    name: "Lipoaspiração de Abdome, Flancos e Dorso + Pré-Axilas, FI Coxas e Braços",
+    name: "Lipoaspiração de Abdome, Flancos e Dorso + Pré-Axilas, Face Interna das Coxas e Braços",
     category: "lipo",
     complexityA: p(31000, 28000, 3000),
     complexityB: p(34000, 31000, 3000),
@@ -703,7 +714,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoaspiracao-de-abdome-flancos-e-dorso-pre-axilas-fi-coxas-culotes-e-",
-    name: "Lipoaspiração de Abdome, Flancos e Dorso + Pré-Axilas, FI Coxas, Culotes e Braços",
+    name: "Lipoaspiração de Abdome, Flancos e Dorso + Pré-Axilas, Face Interna das Coxas, Culotes e Braços",
     category: "lipo",
     complexityA: p(33000, 30000, 3000),
     complexityB: p(36000, 33000, 3000),
@@ -713,7 +724,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoaspiracao-de-abdome-flancos-e-dorso-fi-coxas-e-culotes",
-    name: "Lipoaspiração de Abdome, Flancos e Dorso + FI Coxas e Culotes",
+    name: "Lipoaspiração de Abdome, Flancos e Dorso + Face Interna das Coxas e Culotes",
     category: "lipo",
     complexityA: p(30000, 27000, 3000),
     complexityB: p(33000, 30000, 3000),
@@ -723,7 +734,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoaspiracao-de-abdome-flancos-e-dorso-fi-coxas-e-bracos",
-    name: "Lipoaspiração de Abdome, Flancos e Dorso + FI Coxas e Braços",
+    name: "Lipoaspiração de Abdome, Flancos e Dorso + Face Interna das Coxas e Braços",
     category: "lipo",
     complexityA: p(31000, 28000, 3000),
     complexityB: p(34000, 31000, 3000),
@@ -743,7 +754,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoaspiracao-de-abdome-flancos-e-dorso-fi-coxas-culotes-e-bracos",
-    name: "Lipoaspiração de Abdome, Flancos e Dorso + FI Coxas, Culotes e Braços",
+    name: "Lipoaspiração de Abdome, Flancos e Dorso + Face Interna das Coxas, Culotes e Braços",
     category: "lipo",
     complexityA: p(33000, 30000, 3000),
     complexityB: p(36000, 33000, 3000),
@@ -783,7 +794,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoescultura-lipoaspiracao-de-abdome-flancos-e-dorso-e-lipoenxertia-g-3",
-    name: "Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + FI Coxas",
+    name: "Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Face Interna das Coxas",
     category: "lipo",
     complexityA: p(30000, 27000, 3000),
     complexityB: p(33000, 30000, 3000),
@@ -813,7 +824,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoescultura-lipoaspiracao-de-abdome-flancos-e-dorso-e-lipoenxertia-g-6",
-    name: "Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Pré-Axilas e FI Coxas",
+    name: "Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Pré-Axilas e Face Interna das Coxas",
     category: "lipo",
     complexityA: p(30000, 27000, 3000),
     complexityB: p(33000, 30000, 3000),
@@ -843,7 +854,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoescultura-lipoaspiracao-de-abdome-flancos-e-dorso-e-lipoenxertia-g-9",
-    name: "Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Pré-Axilas, FI Coxas e Culotes",
+    name: "Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Pré-Axilas, Face Interna das Coxas e Culotes",
     category: "lipo",
     complexityA: p(32000, 29000, 3000),
     complexityB: p(35000, 32000, 3000),
@@ -853,7 +864,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoescultura-lipoaspiracao-de-abdome-flancos-e-dorso-e-lipoenxertia-g-10",
-    name: "Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Pré-Axilas, FI Coxas e Braços",
+    name: "Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Pré-Axilas, Face Interna das Coxas e Braços",
     category: "lipo",
     complexityA: p(33000, 30000, 3000),
     complexityB: p(36000, 33000, 3000),
@@ -873,7 +884,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoescultura-lipoaspiracao-de-abdome-flancos-e-dorso-e-lipoenxertia-g-12",
-    name: "Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Pré-Axilas, FI Coxas, Culotes e Braços",
+    name: "Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Pré-Axilas, Face Interna das Coxas, Culotes e Braços",
     category: "lipo",
     complexityA: p(35000, 32000, 3000),
     complexityB: p(38000, 35000, 3000),
@@ -883,7 +894,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoescultura-lipoaspiracao-de-abdome-flancos-e-dorso-e-lipoenxertia-g-13",
-    name: "Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + FI Coxas e Culotes",
+    name: "Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Face Interna das Coxas e Culotes",
     category: "lipo",
     complexityA: p(32000, 29000, 3000),
     complexityB: p(35000, 32000, 3000),
@@ -893,7 +904,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoescultura-lipoaspiracao-de-abdome-flancos-e-dorso-e-lipoenxertia-g-14",
-    name: "Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + FI Coxas e Braços",
+    name: "Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Face Interna das Coxas e Braços",
     category: "lipo",
     complexityA: p(33000, 30000, 3000),
     complexityB: p(36000, 33000, 3000),
@@ -913,7 +924,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoescultura-lipoaspiracao-de-abdome-flancos-e-dorso-e-lipoenxertia-g-16",
-    name: "Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + FI Coxas, Culotes e Braços",
+    name: "Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Face Interna das Coxas, Culotes e Braços",
     category: "lipo",
     complexityA: p(35000, 32000, 3000),
     complexityB: p(38000, 35000, 3000),
@@ -953,7 +964,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoescultura-lipoaspiracao-de-dorso-e-lipoenxertia-glutea-fi-coxas",
-    name: "Lipoescultura - Lipoaspiração de Dorso e Lipoenxertia Glútea + FI Coxas",
+    name: "Lipoescultura - Lipoaspiração de Dorso e Lipoenxertia Glútea + Face Interna das Coxas",
     category: "lipo",
     complexityA: p(23000, 20000, 3000),
     complexityB: p(26000, 23000, 3000),
@@ -983,7 +994,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoescultura-lipoaspiracao-de-dorso-e-lipoenxertia-glutea-pre-axilas-",
-    name: "Lipoescultura - Lipoaspiração de Dorso e Lipoenxertia Glútea + Pré-Axilas e FI Coxas",
+    name: "Lipoescultura - Lipoaspiração de Dorso e Lipoenxertia Glútea + Pré-Axilas e Face Interna das Coxas",
     category: "lipo",
     complexityA: p(23000, 20000, 3000),
     complexityB: p(26000, 23000, 3000),
@@ -1013,7 +1024,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoescultura-lipoaspiracao-de-dorso-e-lipoenxertia-glutea-pre-axilas--4",
-    name: "Lipoescultura - Lipoaspiração de Dorso e Lipoenxertia Glútea + Pré-Axilas, FI Coxas e Culotes",
+    name: "Lipoescultura - Lipoaspiração de Dorso e Lipoenxertia Glútea + Pré-Axilas, Face Interna das Coxas e Culotes",
     category: "lipo",
     complexityA: p(25000, 22000, 3000),
     complexityB: p(28000, 25000, 3000),
@@ -1023,7 +1034,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoescultura-lipoaspiracao-de-dorso-e-lipoenxertia-glutea-pre-axilas--5",
-    name: "Lipoescultura - Lipoaspiração de Dorso e Lipoenxertia Glútea + Pré-Axilas, FI Coxas e Braços",
+    name: "Lipoescultura - Lipoaspiração de Dorso e Lipoenxertia Glútea + Pré-Axilas, Face Interna das Coxas e Braços",
     category: "lipo",
     complexityA: p(26000, 23000, 3000),
     complexityB: p(29000, 26000, 3000),
@@ -1043,7 +1054,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoescultura-lipoaspiracao-de-dorso-e-lipoenxertia-glutea-pre-axilas--7",
-    name: "Lipoescultura - Lipoaspiração de Dorso e Lipoenxertia Glútea + Pré-Axilas, FI Coxas, Culotes e Braços",
+    name: "Lipoescultura - Lipoaspiração de Dorso e Lipoenxertia Glútea + Pré-Axilas, Face Interna das Coxas, Culotes e Braços",
     category: "lipo",
     complexityA: p(28000, 25000, 3000),
     complexityB: p(31000, 28000, 3000),
@@ -1053,7 +1064,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoescultura-lipoaspiracao-de-dorso-e-lipoenxertia-glutea-fi-coxas-e-",
-    name: "Lipoescultura - Lipoaspiração de Dorso e Lipoenxertia Glútea + FI Coxas e Culotes",
+    name: "Lipoescultura - Lipoaspiração de Dorso e Lipoenxertia Glútea + Face Interna das Coxas e Culotes",
     category: "lipo",
     complexityA: p(25000, 22000, 3000),
     complexityB: p(28000, 25000, 3000),
@@ -1063,7 +1074,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoescultura-lipoaspiracao-de-dorso-e-lipoenxertia-glutea-fi-coxas-e--2",
-    name: "Lipoescultura - Lipoaspiração de Dorso e Lipoenxertia Glútea + FI Coxas e Braços",
+    name: "Lipoescultura - Lipoaspiração de Dorso e Lipoenxertia Glútea + Face Interna das Coxas e Braços",
     category: "lipo",
     complexityA: p(26000, 23000, 3000),
     complexityB: p(29000, 26000, 3000),
@@ -1083,7 +1094,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoescultura-lipoaspiracao-de-dorso-e-lipoenxertia-glutea-fi-coxas-cu",
-    name: "Lipoescultura - Lipoaspiração de Dorso e Lipoenxertia Glútea + FI Coxas, Culotes e Braços",
+    name: "Lipoescultura - Lipoaspiração de Dorso e Lipoenxertia Glútea + Face Interna das Coxas, Culotes e Braços",
     category: "lipo",
     complexityA: p(28000, 25000, 3000),
     complexityB: p(31000, 28000, 3000),
@@ -1133,7 +1144,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "lipoaspiracao-de-fi-coxas",
-    name: "Lipoaspiração de FI Coxas",
+    name: "Lipoaspiração de Face Interna das Coxas",
     category: "lipo",
     complexityA: p(10000, 8000, 2000),
     complexityB: p(13000, 11000, 2000),
@@ -1233,7 +1244,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoaspiracao-de-abdome-e-flancos-fi-coxas",
-    name: "Abdominoplastia e Lipoaspiração de Abdome e Flancos + FI Coxas",
+    name: "Abdominoplastia e Lipoaspiração de Abdome e Flancos + Face Interna das Coxas",
     category: "abdominoplasty",
     complexityA: p(30000, 26000, 4000),
     complexityB: p(33000, 29000, 4000),
@@ -1263,7 +1274,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoaspiracao-de-abdome-e-flancos-pre-axilas-e-fi-co",
-    name: "Abdominoplastia e Lipoaspiração de Abdome e Flancos + Pré-Axilas e FI Coxas",
+    name: "Abdominoplastia e Lipoaspiração de Abdome e Flancos + Pré-Axilas e Face Interna das Coxas",
     category: "abdominoplasty",
     complexityA: p(30000, 26000, 4000),
     complexityB: p(33000, 29000, 4000),
@@ -1293,7 +1304,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoaspiracao-de-abdome-e-flancos-pre-axilas-fi-coxa",
-    name: "Abdominoplastia e Lipoaspiração de Abdome e Flancos + Pré-Axilas, FI Coxas e Culotes",
+    name: "Abdominoplastia e Lipoaspiração de Abdome e Flancos + Pré-Axilas, Face Interna das Coxas e Culotes",
     category: "abdominoplasty",
     complexityA: p(32000, 28000, 4000),
     complexityB: p(35000, 31000, 4000),
@@ -1303,7 +1314,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoaspiracao-de-abdome-e-flancos-pre-axilas-fi-coxa-2",
-    name: "Abdominoplastia e Lipoaspiração de Abdome e Flancos + Pré-Axilas, FI Coxas e Braços",
+    name: "Abdominoplastia e Lipoaspiração de Abdome e Flancos + Pré-Axilas, Face Interna das Coxas e Braços",
     category: "abdominoplasty",
     complexityA: p(33000, 29000, 4000),
     complexityB: p(36000, 32000, 4000),
@@ -1323,7 +1334,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoaspiracao-de-abdome-e-flancos-pre-axilas-fi-coxa-3",
-    name: "Abdominoplastia e Lipoaspiração de Abdome e Flancos + Pré-Axilas, FI Coxas, Culotes e Braços",
+    name: "Abdominoplastia e Lipoaspiração de Abdome e Flancos + Pré-Axilas, Face Interna das Coxas, Culotes e Braços",
     category: "abdominoplasty",
     complexityA: p(35000, 31000, 4000),
     complexityB: p(38000, 34000, 4000),
@@ -1333,7 +1344,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoaspiracao-de-abdome-e-flancos-fi-coxas-e-culotes",
-    name: "Abdominoplastia e Lipoaspiração de Abdome e Flancos + FI Coxas e Culotes",
+    name: "Abdominoplastia e Lipoaspiração de Abdome e Flancos + Face Interna das Coxas e Culotes",
     category: "abdominoplasty",
     complexityA: p(32000, 28000, 4000),
     complexityB: p(35000, 31000, 4000),
@@ -1343,7 +1354,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoaspiracao-de-abdome-e-flancos-fi-coxas-e-bracos",
-    name: "Abdominoplastia e Lipoaspiração de Abdome e Flancos + FI Coxas e Braços",
+    name: "Abdominoplastia e Lipoaspiração de Abdome e Flancos + Face Interna das Coxas e Braços",
     category: "abdominoplasty",
     complexityA: p(33000, 29000, 4000),
     complexityB: p(36000, 32000, 4000),
@@ -1363,7 +1374,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoaspiracao-de-abdome-e-flancos-fi-coxas-culotes-e",
-    name: "Abdominoplastia e Lipoaspiração de Abdome e Flancos + FI Coxas, Culotes e Braços",
+    name: "Abdominoplastia e Lipoaspiração de Abdome e Flancos + Face Interna das Coxas, Culotes e Braços",
     category: "abdominoplasty",
     complexityA: p(35000, 31000, 4000),
     complexityB: p(38000, 34000, 4000),
@@ -1393,7 +1404,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoaspiracao-de-abdome-flancos-e-dorso-fi-coxas",
-    name: "Abdominoplastia e Lipoaspiração de Abdome, Flancos e Dorso + FI Coxas",
+    name: "Abdominoplastia e Lipoaspiração de Abdome, Flancos e Dorso + Face Interna das Coxas",
     category: "abdominoplasty",
     complexityA: p(34000, 29000, 5000),
     complexityB: p(37000, 32000, 5000),
@@ -1423,7 +1434,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoaspiracao-de-abdome-flancos-e-dorso-pre-axilas-e",
-    name: "Abdominoplastia e Lipoaspiração de Abdome, Flancos e Dorso + Pré-Axilas e FI Coxas",
+    name: "Abdominoplastia e Lipoaspiração de Abdome, Flancos e Dorso + Pré-Axilas e Face Interna das Coxas",
     category: "abdominoplasty",
     complexityA: p(34000, 29000, 5000),
     complexityB: p(37000, 32000, 5000),
@@ -1453,7 +1464,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoaspiracao-de-abdome-flancos-e-dorso-pre-axilas-f",
-    name: "Abdominoplastia e Lipoaspiração de Abdome, Flancos e Dorso + Pré-Axilas, FI Coxas e Culotes",
+    name: "Abdominoplastia e Lipoaspiração de Abdome, Flancos e Dorso + Pré-Axilas, Face Interna das Coxas e Culotes",
     category: "abdominoplasty",
     complexityA: p(36000, 31000, 5000),
     complexityB: p(39000, 34000, 5000),
@@ -1463,7 +1474,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoaspiracao-de-abdome-flancos-e-dorso-pre-axilas-f-2",
-    name: "Abdominoplastia e Lipoaspiração de Abdome, Flancos e Dorso + Pré-Axilas, FI Coxas e Braços",
+    name: "Abdominoplastia e Lipoaspiração de Abdome, Flancos e Dorso + Pré-Axilas, Face Interna das Coxas e Braços",
     category: "abdominoplasty",
     complexityA: p(37000, 32000, 5000),
     complexityB: p(40000, 35000, 5000),
@@ -1483,7 +1494,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoaspiracao-de-abdome-flancos-e-dorso-pre-axilas-f-3",
-    name: "Abdominoplastia e Lipoaspiração de Abdome, Flancos e Dorso + Pré-Axilas, FI Coxas, Culotes e Braços",
+    name: "Abdominoplastia e Lipoaspiração de Abdome, Flancos e Dorso + Pré-Axilas, Face Interna das Coxas, Culotes e Braços",
     category: "abdominoplasty",
     complexityA: p(39000, 34000, 5000),
     complexityB: p(42000, 37000, 5000),
@@ -1493,7 +1504,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoaspiracao-de-abdome-flancos-e-dorso-fi-coxas-e-c",
-    name: "Abdominoplastia e Lipoaspiração de Abdome, Flancos e Dorso + FI Coxas e Culotes",
+    name: "Abdominoplastia e Lipoaspiração de Abdome, Flancos e Dorso + Face Interna das Coxas e Culotes",
     category: "abdominoplasty",
     complexityA: p(36000, 31000, 5000),
     complexityB: p(39000, 34000, 5000),
@@ -1503,7 +1514,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoaspiracao-de-abdome-flancos-e-dorso-fi-coxas-e-b",
-    name: "Abdominoplastia e Lipoaspiração de Abdome, Flancos e Dorso + FI Coxas e Braços",
+    name: "Abdominoplastia e Lipoaspiração de Abdome, Flancos e Dorso + Face Interna das Coxas e Braços",
     category: "abdominoplasty",
     complexityA: p(37000, 32000, 5000),
     complexityB: p(40000, 35000, 5000),
@@ -1523,7 +1534,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoaspiracao-de-abdome-flancos-e-dorso-fi-coxas-cul",
-    name: "Abdominoplastia e Lipoaspiração de Abdome, Flancos e Dorso + FI Coxas, Culotes e Braços",
+    name: "Abdominoplastia e Lipoaspiração de Abdome, Flancos e Dorso + Face Interna das Coxas, Culotes e Braços",
     category: "abdominoplasty",
     complexityA: p(39000, 34000, 5000),
     complexityB: p(42000, 37000, 5000),
@@ -1553,7 +1564,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoescultura-lipoaspiracao-de-abdome-flancos-e-dors-3",
-    name: "Abdominoplastia e Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + FI Coxas",
+    name: "Abdominoplastia e Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Face Interna das Coxas",
     category: "abdominoplasty",
     complexityA: p(36000, 31000, 5000),
     complexityB: p(39000, 34000, 5000),
@@ -1583,7 +1594,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoescultura-lipoaspiracao-de-abdome-flancos-e-dors-6",
-    name: "Abdominoplastia e Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Pré-Axilas e FI Coxas",
+    name: "Abdominoplastia e Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Pré-Axilas e Face Interna das Coxas",
     category: "abdominoplasty",
     complexityA: p(36000, 31000, 5000),
     complexityB: p(39000, 34000, 5000),
@@ -1613,7 +1624,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoescultura-lipoaspiracao-de-abdome-flancos-e-dors-9",
-    name: "Abdominoplastia e Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Pré-Axilas, FI Coxas e Culotes",
+    name: "Abdominoplastia e Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Pré-Axilas, Face Interna das Coxas e Culotes",
     category: "abdominoplasty",
     complexityA: p(38000, 33000, 5000),
     complexityB: p(41000, 36000, 5000),
@@ -1623,7 +1634,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoescultura-lipoaspiracao-de-abdome-flancos-e-dors-10",
-    name: "Abdominoplastia e Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Pré-Axilas, FI Coxas e Braços",
+    name: "Abdominoplastia e Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Pré-Axilas, Face Interna das Coxas e Braços",
     category: "abdominoplasty",
     complexityA: p(39000, 34000, 5000),
     complexityB: p(42000, 37000, 5000),
@@ -1643,7 +1654,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoescultura-lipoaspiracao-de-abdome-flancos-e-dors-12",
-    name: "Abdominoplastia e Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Pré-Axilas, FI Coxas, Culotes e Braços",
+    name: "Abdominoplastia e Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Pré-Axilas, Face Interna das Coxas, Culotes e Braços",
     category: "abdominoplasty",
     complexityA: p(41000, 36000, 5000),
     complexityB: p(44000, 39000, 5000),
@@ -1653,7 +1664,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoescultura-lipoaspiracao-de-abdome-flancos-e-dors-13",
-    name: "Abdominoplastia e Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + FI Coxas e Culotes",
+    name: "Abdominoplastia e Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Face Interna das Coxas e Culotes",
     category: "abdominoplasty",
     complexityA: p(38000, 33000, 5000),
     complexityB: p(41000, 36000, 5000),
@@ -1663,7 +1674,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoescultura-lipoaspiracao-de-abdome-flancos-e-dors-14",
-    name: "Abdominoplastia e Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + FI Coxas e Braços",
+    name: "Abdominoplastia e Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Face Interna das Coxas e Braços",
     category: "abdominoplasty",
     complexityA: p(39000, 34000, 5000),
     complexityB: p(42000, 37000, 5000),
@@ -1683,7 +1694,7 @@ export const PROCEDURES: Procedure[] = [
   },
   {
     id: "abdominoplastia-e-lipoescultura-lipoaspiracao-de-abdome-flancos-e-dors-16",
-    name: "Abdominoplastia e Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + FI Coxas, Culotes e Braços",
+    name: "Abdominoplastia e Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea + Face Interna das Coxas, Culotes e Braços",
     category: "abdominoplasty",
     complexityA: p(41000, 36000, 5000),
     complexityB: p(44000, 39000, 5000),

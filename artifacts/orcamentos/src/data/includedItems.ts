@@ -44,6 +44,10 @@ function getProcedureLabel(entry: {
     return compactLipoLabel || 'procedimento';
   }
 
+  if (entry.category === 'lipo' && /lipoaspiraç[aã]o/i.test(normalizedName)) {
+    return 'lipoaspiração';
+  }
+
   if (entry.category === 'abdominoplasty' && /abdominoplastia/i.test(normalizedName) && /lipoaspiraç[aã]o/i.test(normalizedName)) {
     return 'abdominoplastia com lipoaspiração';
   }

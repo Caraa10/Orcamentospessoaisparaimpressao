@@ -308,7 +308,15 @@ function buildLipoGroupedTitle(names: string[]) {
   if (!hasAnyLipo) return null;
 
   const uniqueSegments = Array.from(new Set(segments.map(normalizeProcedureTitleBasic)));
+  const trailingSegments: string[] = [];
   const orderedAreas = LIPO_AREAS.filter((area) => areaKeys.has(area.key)).map((area) => area.label);
+
+  for (let i = uniqueSegments.length - 1; i >= 0; i -= 1) {
+    if (/retirada de fuso de pele do abdome/i.test(uniqueSegments[i])) {
+      trailingSegments.unshift(uniqueSegments[i]);
+      uniqueSegments.splice(i, 1);
+    }
+  }
 
   if (orderedAreas.length > 0) {
     let lipoTitle = `Lipoaspiração de ${joinPortuguese(orderedAreas)}`;
@@ -326,6 +334,8 @@ function buildLipoGroupedTitle(names: string[]) {
   } else if (hasGlutealFatGrafting) {
     uniqueSegments.push('Lipoenxertia Glútea');
   }
+
+  uniqueSegments.push(...trailingSegments);
 
   return joinPortuguese(uniqueSegments).replace(/\s-\s+e\s+(lipoaspiração)/i, ' - $1');
 }

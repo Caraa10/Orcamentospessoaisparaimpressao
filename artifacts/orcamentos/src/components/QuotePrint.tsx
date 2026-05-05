@@ -242,8 +242,33 @@ const LIPO_AREAS = [
   { key: 'dorso', label: 'Dorso', patterns: [/dorso/i] },
 ];
 
+const NORMALIZED_LIPO_AREA_LABELS = new Set(
+  LIPO_AREAS.map((area) =>
+    normalizeComparisonText(area.label).replace(/-/g, ' ').replace(/\s+/g, ' ').trim(),
+  ),
+);
+
 function getLipoAreas(title: string) {
   return LIPO_AREAS.filter((area) => area.patterns.some((pattern) => pattern.test(title)));
+}
+
+function isPureLipoAreaSegment(part: string) {
+  const normalized = normalizeComparisonText(part)
+    .replace(/-/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!normalized) return false;
+
+  const pieces = normalized
+    .split(/\s*,\s*|\s+e\s+/)
+    .map((piece) => piece.trim())
+    .filter(Boolean);
+
+  return (
+    pieces.length > 0 &&
+    pieces.every((piece) => NORMALIZED_LIPO_AREA_LABELS.has(piece))
+  );
 }
 
 function stripLipoSegments(title: string) {
@@ -271,7 +296,7 @@ function buildLipoGroupedTitle(names: string[]) {
         continue;
       }
       const areas = getLipoAreas(part);
-      if (/lipoaspiração/i.test(part) || areas.length > 0) {
+      if (/lipoaspiração/i.test(part) || isPureLipoAreaSegment(part)) {
         hasAnyLipo = true;
         for (const area of areas) areaKeys.add(area.key);
         continue;

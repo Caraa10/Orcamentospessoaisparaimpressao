@@ -52,6 +52,21 @@ function getProcedureLabel(entry: {
 }): string {
   const normalizedName = normalizeProcedureLabel(entry.name);
 
+  if (
+    entry.category === 'abdominoplasty' &&
+    /retirada de fuso de pele do abdome/i.test(normalizedName) &&
+    /lipoaspiraç[aã]o/i.test(normalizedName)
+  ) {
+    const lipoMatch = normalizedName.match(/(lipoaspiraç[aã]o[\s\S]*)/i);
+    if (lipoMatch) {
+      const lipoSegment = lipoMatch[1]
+        .replace(/\s+e\s+lipoenxertia gl[uú]tea$/i, '')
+        .trim()
+        .replace(/\s*-\s*$/g, '');
+      return `${lipoSegment} e retirada de fuso de pele do abdome`;
+    }
+  }
+
   if (/lipoescultura/i.test(normalizedName)) {
     if (entry.category === 'abdominoplasty' && /abdominoplastia/i.test(normalizedName)) {
       return 'abdominoplastia com lipoescultura';

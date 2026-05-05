@@ -81,6 +81,41 @@ function getProcedureLabel(entry: {
   return baseName || 'procedimento';
 }
 
+function isLipoesculturaOnly(entry: { category: ProcedureCategory; name: string }) {
+  const normalizedName = normalizeProcedureLabel(entry.name);
+  return entry.category === 'lipo' && /lipoescultura/i.test(normalizedName);
+}
+
+function isAbdominoplastyWithLipoescultura(entry: {
+  category: ProcedureCategory;
+  name: string;
+}) {
+  const normalizedName = normalizeProcedureLabel(entry.name);
+  return (
+    entry.category === 'abdominoplasty' &&
+    /abdominoplastia/i.test(normalizedName) &&
+    /lipoescultura/i.test(normalizedName)
+  );
+}
+
+function isLipoaspiracaoOnly(entry: { category: ProcedureCategory; name: string }) {
+  const normalizedName = normalizeProcedureLabel(entry.name);
+  return entry.category === 'lipo' && /lipoaspiraç[aã]o/i.test(normalizedName);
+}
+
+function isAbdominoplastyWithLipoaspiracao(entry: {
+  category: ProcedureCategory;
+  name: string;
+}) {
+  const normalizedName = normalizeProcedureLabel(entry.name);
+  return (
+    entry.category === 'abdominoplasty' &&
+    /abdominoplastia/i.test(normalizedName) &&
+    /lipoaspiraç[aã]o/i.test(normalizedName) &&
+    !/lipoescultura/i.test(normalizedName)
+  );
+}
+
 // ─── Category-specific items ───
 
 const LIPO_SPECIFIC_ITEMS: string[] = [
@@ -142,6 +177,14 @@ interface CategoryInfo {
   firstIntro: string;    // intro for first / single procedure
   subIntro: string;      // intro for second+ procedures in multi-proc
   items: string[];
+}
+
+interface IncludedGroup {
+  intro: string;
+  subIntro: string;
+  items: string[];
+  argoplasmaLabel?: string;
+  supportsArgoplasma: boolean;
 }
 
 function getCategoryInfo(category: ProcedureCategory, procedureName: string): CategoryInfo {
@@ -210,6 +253,139 @@ function getCategoryInfo(category: ProcedureCategory, procedureName: string): Ca
   };
 }
 
+function dedupeItems(items: string[]) {
+  return Array.from(new Set(items));
+}
+
+function buildIncludedGroups(
+  entries: Array<{ category: ProcedureCategory; name: string }>,
+): IncludedGroup[] {
+  const groups: IncludedGroup[] = [];
+  const consumed = new Set<number>();
+
+  for (let index = 0; index < entries.length; index += 1) {
+    if (consumed.has(index)) continue;
+
+    const entry = entries[index];
+
+    if (isLipoesculturaOnly(entry)) {
+      const matchIndex = entries.findIndex(
+        (candidate, candidateIndex) =>
+          candidateIndex !== index &&
+          !consumed.has(candidateIndex) &&
+          isAbdominoplastyWithLipoescultura(candidate),
+      );
+
+      if (matchIndex !== -1) {
+        const currentInfo = getCategoryInfo(entry.category, entry.name);
+        const matchInfo = getCategoryInfo(entries[matchIndex].category, entries[matchIndex].name);
+        consumed.add(index);
+        consumed.add(matchIndex);
+        groups.push({
+          intro:
+            'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de lipoescultura ou de abdominoplastia com lipoescultura**:',
+          subIntro:
+            'Estão **incluídos em seu procedimento de lipoescultura ou de abdominoplastia com lipoescultura**:',
+          items: dedupeItems([...currentInfo.items, ...matchInfo.items]),
+          argoplasmaLabel: 'lipoescultura ou de abdominoplastia com lipoescultura',
+          supportsArgoplasma: true,
+        });
+        continue;
+      }
+    }
+
+    if (isAbdominoplastyWithLipoescultura(entry)) {
+      const matchIndex = entries.findIndex(
+        (candidate, candidateIndex) =>
+          candidateIndex !== index &&
+          !consumed.has(candidateIndex) &&
+          isLipoesculturaOnly(candidate),
+      );
+
+      if (matchIndex !== -1) {
+        const currentInfo = getCategoryInfo(entry.category, entry.name);
+        const matchInfo = getCategoryInfo(entries[matchIndex].category, entries[matchIndex].name);
+        consumed.add(index);
+        consumed.add(matchIndex);
+        groups.push({
+          intro:
+            'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de lipoescultura ou de abdominoplastia com lipoescultura**:',
+          subIntro:
+            'Estão **incluídos em seu procedimento de lipoescultura ou de abdominoplastia com lipoescultura**:',
+          items: dedupeItems([...matchInfo.items, ...currentInfo.items]),
+          argoplasmaLabel: 'lipoescultura ou de abdominoplastia com lipoescultura',
+          supportsArgoplasma: true,
+        });
+        continue;
+      }
+    }
+
+    if (isLipoaspiracaoOnly(entry)) {
+      const matchIndex = entries.findIndex(
+        (candidate, candidateIndex) =>
+          candidateIndex !== index &&
+          !consumed.has(candidateIndex) &&
+          isAbdominoplastyWithLipoaspiracao(candidate),
+      );
+
+      if (matchIndex !== -1) {
+        const currentInfo = getCategoryInfo(entry.category, entry.name);
+        const matchInfo = getCategoryInfo(entries[matchIndex].category, entries[matchIndex].name);
+        consumed.add(index);
+        consumed.add(matchIndex);
+        groups.push({
+          intro:
+            'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de lipoaspiração ou de abdominoplastia com lipoaspiração**:',
+          subIntro:
+            'Estão **incluídos em seu procedimento de lipoaspiração ou de abdominoplastia com lipoaspiração**:',
+          items: dedupeItems([...currentInfo.items, ...matchInfo.items]),
+          argoplasmaLabel: 'lipoaspiração ou de abdominoplastia com lipoaspiração',
+          supportsArgoplasma: true,
+        });
+        continue;
+      }
+    }
+
+    if (isAbdominoplastyWithLipoaspiracao(entry)) {
+      const matchIndex = entries.findIndex(
+        (candidate, candidateIndex) =>
+          candidateIndex !== index &&
+          !consumed.has(candidateIndex) &&
+          isLipoaspiracaoOnly(candidate),
+      );
+
+      if (matchIndex !== -1) {
+        const currentInfo = getCategoryInfo(entry.category, entry.name);
+        const matchInfo = getCategoryInfo(entries[matchIndex].category, entries[matchIndex].name);
+        consumed.add(index);
+        consumed.add(matchIndex);
+        groups.push({
+          intro:
+            'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de lipoaspiração ou de abdominoplastia com lipoaspiração**:',
+          subIntro:
+            'Estão **incluídos em seu procedimento de lipoaspiração ou de abdominoplastia com lipoaspiração**:',
+          items: dedupeItems([...matchInfo.items, ...currentInfo.items]),
+          argoplasmaLabel: 'lipoaspiração ou de abdominoplastia com lipoaspiração',
+          supportsArgoplasma: true,
+        });
+        continue;
+      }
+    }
+
+    const info = getCategoryInfo(entry.category, entry.name);
+    consumed.add(index);
+    groups.push({
+      intro: info.firstIntro,
+      subIntro: info.subIntro,
+      items: info.items,
+      argoplasmaLabel: getProcedureLabel(entry),
+      supportsArgoplasma: entry.category === 'abdominoplasty' || entry.category === 'lipo',
+    });
+  }
+
+  return groups;
+}
+
 // ─── Public API ───
 
 export function getIncludedSections(
@@ -235,6 +411,8 @@ export function getIncludedSections(
       },
     ];
   }
+
+  const groups = buildIncludedGroups(entries);
 
   if (hasAlternativeProcedures) {
     const seen = new Set<string>();
@@ -268,26 +446,20 @@ export function getIncludedSections(
     }];
   }
 
-  const seen = new Set<string>();
   let intro = '';
   const items: string[] = [];
 
-  for (const entry of entries) {
-    const key = `${entry.category}:${entry.name.toLowerCase()}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-
-    const info = getCategoryInfo(entry.category, entry.name);
-    if (info.items.length === 0) continue;
+  for (const group of groups) {
+    if (group.items.length === 0) continue;
 
     if (!intro) {
-      intro = info.firstIntro;
-      items.push(...info.items);
+      intro = group.intro;
+      items.push(...group.items);
     } else {
-      items.push(`[[paragraph]]${info.subIntro}`, ...info.items);
+      items.push(`[[paragraph]]${group.subIntro}`, ...group.items);
     }
-    if (shouldIncludeArgoplasma && supportsArgoplasma(entry)) {
-      items.push(...getArgoplasmaIncludedItems(getProcedureLabel(entry)));
+    if (shouldIncludeArgoplasma && group.supportsArgoplasma && group.argoplasmaLabel) {
+      items.push(...getArgoplasmaIncludedItems(group.argoplasmaLabel));
     }
   }
 

@@ -171,6 +171,10 @@ const BREAST_AUGMENTATION_SPECIFIC_ITEMS: string[] = [
   '**Sutiã cirúrgico**: para suporte adequado e proteção das mamas',
 ];
 
+const BREAST_FAT_GRAFTING_AUGMENTATION_ITEMS: string[] = [
+  '**Sutiã cirúrgico**: para suporte adequado e proteção das mamas',
+];
+
 const BREAST_REDUCTION_SPECIFIC_ITEMS: string[] = [
   '**Técnicas** de sutiã interno, alça de sustentação e, caso necessário, enxertia de gordura nas mamas',
   '**Cola cirúrgica** (Prineo® Johnson&Johnson): funciona como curativo (você não precisa se preocupar em fazer curativos no pós-operatório) e não há pontos para retirar nas mamas',
@@ -245,6 +249,13 @@ function getCategoryInfo(category: ProcedureCategory, procedureName: string): Ca
         firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de mamoplastia redutora**:',
         subIntro: 'Estão **incluídos em seu procedimento de mamoplastia redutora**:',
         items: BREAST_REDUCTION_SPECIFIC_ITEMS,
+      };
+    }
+    if (lower.includes('lipoenxertia mamária de aumento')) {
+      return {
+        firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de lipoenxertia mamária de aumento**:',
+        subIntro: 'Estão **incluídos em seu procedimento de lipoenxertia mamária de aumento**:',
+        items: BREAST_FAT_GRAFTING_AUGMENTATION_ITEMS,
       };
     }
     if (lower.includes('mastopexia')) {

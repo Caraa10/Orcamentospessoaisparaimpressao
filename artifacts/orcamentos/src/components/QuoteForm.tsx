@@ -96,7 +96,30 @@ export default function QuoteForm({ onGenerate }: Props) {
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
     if (!q) return PROCEDURES.slice(0, 30);
-    return PROCEDURES.filter((p) => p.name.toLowerCase().includes(q)).slice(0, 40);
+
+    const matches = PROCEDURES.filter((p) => p.name.toLowerCase().includes(q));
+
+    if (/^abd/.test(q)) {
+      const rankAbdomenProcedure = (name: string) => {
+        const normalized = name.toLowerCase();
+        if (normalized.startsWith('abdominoplastia')) return 0;
+        if (normalized.includes('abdominoplastia')) return 1;
+        if (normalized.startsWith('miniabdominoplastia')) return 2;
+        if (normalized.includes('miniabdominoplastia')) return 3;
+        return 4;
+      };
+
+      return matches
+        .slice()
+        .sort((a, b) => {
+          const rankDiff = rankAbdomenProcedure(a.name) - rankAbdomenProcedure(b.name);
+          if (rankDiff !== 0) return rankDiff;
+          return a.name.localeCompare(b.name, 'pt-BR');
+        })
+        .slice(0, 40);
+    }
+
+    return matches.slice(0, 40);
   }, [search]);
 
   const pickerPrices = useMemo(() => {

@@ -265,6 +265,13 @@ function getCategoryInfo(category: ProcedureCategory, procedureName: string): Ca
         items: MASTOPEXY_SPECIFIC_ITEMS,
       };
     }
+    if (lower.includes('substituição de implantes')) {
+      return {
+        firstIntro: `Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de ${term}**:`,
+        subIntro: `Estão **incluídos em seu procedimento de ${term}**:`,
+        items: BREAST_AUGMENTATION_SPECIFIC_ITEMS,
+      };
+    }
     return {
       firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de mamoplastia de aumento**:',
       subIntro: 'Estão **incluídos em seu procedimento de mamoplastia de aumento**:',

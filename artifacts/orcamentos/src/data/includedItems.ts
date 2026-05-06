@@ -258,6 +258,13 @@ function getCategoryInfo(category: ProcedureCategory, procedureName: string): Ca
         items: BREAST_FAT_GRAFTING_AUGMENTATION_ITEMS,
       };
     }
+    if (lower.includes('retirada implantes e lipoenxertia mamária')) {
+      return {
+        firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de retirada de implantes e lipoenxertia mamária**:',
+        subIntro: 'Estão **incluídos em seu procedimento de retirada de implantes e lipoenxertia mamária**:',
+        items: BREAST_FAT_GRAFTING_AUGMENTATION_ITEMS,
+      };
+    }
     if (lower.includes('mastopexia')) {
       return {
         firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de mastopexia**:',

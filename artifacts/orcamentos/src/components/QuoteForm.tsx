@@ -50,10 +50,12 @@ export default function QuoteForm({ onGenerate }: Props) {
   const [hospitalName, setHospitalName] = useState(HOSPITAL_NAME);
   const [hospitalAuto, setHospitalAuto] = useState(true);
   const [combinedSurgery, setCombinedSurgery] = useState(true);
+  const hasAutoHospitalValues = procedureEntries.some((entry) => entry.procedure.hospitalMin !== null);
+  const effectiveHospitalAuto = hospitalAuto && hasAutoHospitalValues;
 
   // Auto-fill hospital values from selected procedures
   useEffect(() => {
-    if (!hospitalAuto) return;
+    if (!effectiveHospitalAuto) return;
     if (procedureEntries.length === 0) {
       setHospitalMin('');
       setHospitalMax('');
@@ -85,7 +87,7 @@ export default function QuoteForm({ onGenerate }: Props) {
     }
     setHospitalMin(String(Math.round(sumMin)));
     setHospitalMax(String(Math.round(sumMax)));
-  }, [procedureEntries, hospitalAuto, combinedSurgery]);
+  }, [procedureEntries, effectiveHospitalAuto, combinedSurgery]);
 
   const [includeArgoplasma, setIncludeArgoplasma] = useState(false);
   const [includeImplants, setIncludeImplants] = useState(false);
@@ -484,7 +486,7 @@ export default function QuoteForm({ onGenerate }: Props) {
               type="text"
               value={hospitalMin}
               onChange={(e) => setHospitalMin(e.target.value)}
-              disabled={hospitalAuto}
+            disabled={effectiveHospitalAuto}
               placeholder="Ex: 4700"
               className={inputClass + (hospitalAuto ? ' bg-slate-100 text-slate-500' : '')}
               style={inputFocusStyle}
@@ -500,7 +502,7 @@ export default function QuoteForm({ onGenerate }: Props) {
               type="text"
               value={hospitalMax}
               onChange={(e) => setHospitalMax(e.target.value)}
-              disabled={hospitalAuto}
+            disabled={effectiveHospitalAuto}
               placeholder="Ex: 5700"
               className={inputClass + (hospitalAuto ? ' bg-slate-100 text-slate-500' : '')}
               style={inputFocusStyle}

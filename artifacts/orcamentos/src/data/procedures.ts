@@ -162,7 +162,7 @@ export const PROCEDURES: Procedure[] = [
     complexityA: p(22000, 19000, 3000),
     complexityB: p(26000, 23000, 3000),
     complexityC: p(26000, 23000, 3000),
-    hospitalMin: null,
+    hospitalMin: 3700,
     hospitalMax: null,
   },
   {

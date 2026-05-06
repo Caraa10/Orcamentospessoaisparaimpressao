@@ -246,8 +246,8 @@ export const PROCEDURES: Procedure[] = [
     complexityA: p(31000, 28000, 3000),
     complexityB: p(34000, 31000, 3000),
     complexityC: p(37000, 34000, 3000),
-    hospitalMin: null,
-    hospitalMax: null,
+    hospitalMin: 4900,
+    hospitalMax: 5500,
   },
   {
     id: "mastopexia-com-implantes",

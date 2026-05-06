@@ -236,8 +236,8 @@ export const PROCEDURES: Procedure[] = [
     complexityA: p(31000, 28000, 3000),
     complexityB: p(34000, 31000, 3000),
     complexityC: p(37000, 34000, 3000),
-    hospitalMin: null,
-    hospitalMax: null,
+    hospitalMin: 4900,
+    hospitalMax: 5500,
   },
   {
     id: "mastopexia-retirada-de-implantes-lipoenxertia-mamaria",
@@ -323,8 +323,8 @@ export const PROCEDURES: Procedure[] = [
     complexityA: p(32000, 29000, 3000),
     complexityB: p(35000, 32000, 3000),
     complexityC: p(38000, 35000, 3000),
-    hospitalMin: null,
-    hospitalMax: null,
+    hospitalMin: 4900,
+    hospitalMax: 5400,
   },
   {
     id: "mastopexia-com-implantes-retirada-de-implantes-lipoenxertia-mamaria",

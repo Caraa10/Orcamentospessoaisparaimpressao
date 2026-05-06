@@ -173,7 +173,7 @@ const BREAST_AUGMENTATION_SPECIFIC_ITEMS: string[] = [
 
 const BREAST_REDUCTION_SPECIFIC_ITEMS: string[] = [
   '**Técnicas** de sutiã interno, alça de sustentação e, caso necessário, enxertia de gordura nas mamas',
-  '**Cola cirúrgica** (Prineo® Johnson&Johnson): funciona como curativo (você não precisa se preocupar em fazer curativos no pós-operatório) e não há pontos para retirar na mama',
+  '**Cola cirúrgica** (Prineo® Johnson&Johnson): funciona como curativo (você não precisa se preocupar em fazer curativos no pós-operatório) e não há pontos para retirar nas mamas',
   '**Sutiã cirúrgico**: para suporte adequado e proteção das mamas',
   '**Meia elástica** (meia de compressão cirúrgica): para redução de riscos',
 ];

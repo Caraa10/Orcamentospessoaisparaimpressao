@@ -183,6 +183,13 @@ const BREAST_REDUCTION_SPECIFIC_ITEMS: string[] = [
 ];
 
 const MASTOPEXY_SPECIFIC_ITEMS: string[] = [
+  '**Técnicas** de sutiã interno e, caso necessário, enxertia de gordura nas mamas',
+  '**Cola cirúrgica** (Prineo® Johnson&Johnson): funciona como curativo (você não precisa se preocupar em fazer curativos no pós-operatório) e não há pontos para retirar nas mamas',
+  '**Sutiã cirúrgico**: para suporte adequado e proteção das mamas',
+  '**Meia elástica** (meia de compressão cirúrgica): para redução de riscos',
+];
+
+const MASTOPEXY_WITH_IMPLANTS_SPECIFIC_ITEMS: string[] = [
   '**Técnicas** de sutiã interno, alça de sustentação e, caso necessário, enxertia de gordura nas mamas',
   '**Funil de inserção** (funil de Keller): dispositivo que permite a inserção suave dos implantes, reduzindo riscos relacionados à cirurgia, tempo cirúrgico e dor pós-operatória',
   '**Cola cirúrgica** (Prineo® Johnson&Johnson): funciona como curativo (você não precisa se preocupar em fazer curativos no pós-operatório) e não há pontos para retirar nas mamas',
@@ -263,6 +270,13 @@ function getCategoryInfo(category: ProcedureCategory, procedureName: string): Ca
         firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de retirada de implantes e lipoenxertia mamária**:',
         subIntro: 'Estão **incluídos em seu procedimento de retirada de implantes e lipoenxertia mamária**:',
         items: BREAST_FAT_GRAFTING_AUGMENTATION_ITEMS,
+      };
+    }
+    if (lower.includes('mastopexia com implantes')) {
+      return {
+        firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de mastopexia com implantes**:',
+        subIntro: 'Estão **incluídos em seu procedimento de mastopexia com implantes**:',
+        items: MASTOPEXY_WITH_IMPLANTS_SPECIFIC_ITEMS,
       };
     }
     if (lower.includes('mastopexia')) {

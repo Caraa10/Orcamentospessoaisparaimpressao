@@ -68,6 +68,10 @@ function getProcedureLabel(entry: {
   }
 
   if (/lipoescultura/i.test(normalizedName)) {
+    if (entry.category === 'abdominoplasty' && /miniabdominoplastia/i.test(normalizedName)) {
+      return 'miniabdominoplastia com lipoescultura';
+    }
+
     if (entry.category === 'abdominoplasty' && /abdominoplastia/i.test(normalizedName)) {
       return 'abdominoplastia com lipoescultura';
     }
@@ -85,6 +89,9 @@ function getProcedureLabel(entry: {
   }
 
   if (entry.category === 'abdominoplasty' && /abdominoplastia/i.test(normalizedName) && /lipoaspiraç[aã]o/i.test(normalizedName)) {
+    if (/miniabdominoplastia/i.test(normalizedName)) {
+      return 'miniabdominoplastia com lipoaspiração';
+    }
     return 'abdominoplastia com lipoaspiração';
   }
 

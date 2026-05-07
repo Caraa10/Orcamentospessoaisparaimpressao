@@ -378,6 +378,18 @@ function splitProcedureChunk(part: string) {
     }
   }
 
+  const specialRetiradaWithLipoescultura = before.match(
+    /^(retirada de fuso de pele do abdome)\s+e\s+(lipoescultura)$/i,
+  );
+  if (specialRetiradaWithLipoescultura) {
+    return [
+      specialRetiradaWithLipoescultura[1],
+      specialRetiradaWithLipoescultura[2],
+      afterLipo,
+      ...extracted,
+    ].filter(Boolean);
+  }
+
   return [before, afterLipo, ...extracted].filter(Boolean);
 }
 

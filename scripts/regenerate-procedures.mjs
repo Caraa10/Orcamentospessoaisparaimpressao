@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 
-const PRICES_CSV = 'attached_assets/Valores_Procedimentos-VALORES_PROCEDIMENTOS_(15.01.2024)_1776454094642.csv';
-const HOSPITAL_CSV = 'attached_assets/Valores_Accurata-VALORES_PROCEDIMENTOS_(15.01.2024)_1776454094642.csv';
+const PRICES_CSV = 'Valores Procedimentos e Accurata (07.05.2026)/04.05.2026-VALORES PROCEDIMENTOS (04.05.2026).csv';
+const HOSPITAL_CSV = 'Valores Procedimentos e Accurata (07.05.2026)/Valores Accurata 04:05:26.csv';
 
 function parseMoney(s) {
   s = s.trim();
@@ -16,14 +16,24 @@ function readCsvLines(path) {
 const pricesLines = readCsvLines(PRICES_CSV);
 const hospitalLines = readCsvLines(HOSPITAL_CSV);
 
-// Skip first 2 header lines on both
-const dataLines = [];
-for (let i = 2; i < pricesLines.length; i++) {
-  const pl = pricesLines[i];
-  const hl = hospitalLines[i] || '';
-  if (!pl.trim()) continue;
-  dataLines.push({ rowIndex: i, prices: pl, hospital: hl });
+const priceDataLines = pricesLines.filter(
+  (line) => line.trim() && !/^PROCEDIMENTO;A/.test(line) && !/^;Total;/.test(line),
+);
+const hospitalDataLines = hospitalLines.filter(
+  (line) => line.trim() && !/^PROCEDIMENTO;HOSPITAL ACCURATA/.test(line),
+);
+
+if (priceDataLines.length !== hospitalDataLines.length) {
+  throw new Error(
+    `CSV row mismatch: ${priceDataLines.length} procedure rows vs ${hospitalDataLines.length} hospital rows`,
+  );
 }
+
+const dataLines = priceDataLines.map((prices, rowIndex) => ({
+  rowIndex,
+  prices,
+  hospital: hospitalDataLines[rowIndex] || '',
+}));
 
 console.log(`Found ${dataLines.length} procedure rows`);
 

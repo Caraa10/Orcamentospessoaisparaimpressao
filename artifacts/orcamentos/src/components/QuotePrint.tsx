@@ -231,6 +231,12 @@ function joinPortuguese(parts: string[]) {
   ) {
     return `${cleanParts[0]}, ${cleanParts[1]}`;
   }
+  if (
+    cleanParts.length === 2 &&
+    /\se\s/i.test(cleanParts[1])
+  ) {
+    return `${cleanParts[0]}, ${cleanParts[1]}`;
+  }
   if (cleanParts.length === 2) return `${cleanParts[0]} e ${cleanParts[1]}`;
   return `${cleanParts.slice(0, -1).join(', ')} e ${cleanParts[cleanParts.length - 1]}`;
 }

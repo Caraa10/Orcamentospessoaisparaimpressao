@@ -138,6 +138,22 @@ function isAbdominoplastyWithLipoaspiracao(entry: {
   );
 }
 
+function shouldOmitIncludedSectionForExclusiveSingleProcedure(entry: {
+  category: ProcedureCategory;
+  name: string;
+}) {
+  const normalizedName = normalizeProcedureLabel(entry.name);
+  return [
+    'blefaroplastia superior com anestesia local',
+    'otoplastia',
+    'tratamento cirurgico de cicatriz',
+  ].includes(
+    normalizedName
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, ''),
+  );
+}
+
 // ─── Category-specific items ───
 
 const LIPO_SPECIFIC_ITEMS: string[] = [
@@ -460,6 +476,10 @@ export function getIncludedSections(
     entry.category === 'abdominoplasty' || entry.category === 'lipo';
 
   if (!isMulti) {
+    if (shouldOmitIncludedSectionForExclusiveSingleProcedure(entries[0])) {
+      return [];
+    }
+
     const info = getCategoryInfo(entries[0].category, entries[0].name);
     const argoplasmaItems =
       shouldIncludeArgoplasma && supportsArgoplasma(entries[0])

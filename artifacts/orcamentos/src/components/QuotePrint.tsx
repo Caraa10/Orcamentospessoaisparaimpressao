@@ -108,10 +108,12 @@ function joinProcedureTitles(names: string[]) {
     return 'Procedimentos Selecionados';
   }
 
-  const title = buildLipoGroupedTitle(names);
+  const normalizedNames = normalizeCombinedProcedureTitles(names);
+
+  const title = buildLipoGroupedTitle(normalizedNames);
   if (title) return title;
 
-  const cleanNames = names.map((name) => normalizeProcedureTitleBasic(name));
+  const cleanNames = normalizedNames.map((name) => normalizeProcedureTitleBasic(name));
   return joinPortuguese(cleanNames);
 }
 
@@ -135,6 +137,25 @@ function shouldUseNeutralCombinedTitle(names: string[]) {
   const hasMamoplastiaAumento = names.some(isMamoplastiaAumentoFamily);
   const hasMastopexia = names.some(isMastopexiaFamily);
   return hasMamoplastiaAumento && hasMastopexia;
+}
+
+function normalizeCombinedProcedureTitles(names: string[]) {
+  if (names.length <= 1) return names;
+
+  const hasLocalAnesthesiaProcedure = names.some((name) =>
+    /com anestesia local/i.test(name),
+  );
+  const hasNonLocalProcedure = names.some((name) =>
+    !/com anestesia local/i.test(name),
+  );
+
+  if (!hasLocalAnesthesiaProcedure || !hasNonLocalProcedure) {
+    return names;
+  }
+
+  return names.map((name) =>
+    name.replace(/\s+com anestesia local\b/i, '').replace(/\s+/g, ' ').trim(),
+  );
 }
 
 function calculateCombinedHospitalValues(

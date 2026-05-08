@@ -584,16 +584,20 @@ type SectionPart = {
 const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const isMulti = data.procedures.length > 1;
   const isCombinedSurgery = data.combinedSurgery ?? true;
+  const hasAnyAnesthesiaFee =
+    data.procedures.some((entry) => entry.prices.anesthesia > 0);
   const isLocalAnesthesiaOnly =
     data.procedures.length > 0 &&
     data.procedures.every((entry) =>
       /anestesia local/i.test(entry.procedure.name),
     );
 
-  const includedSections = getIncludedSections(
-    data.procedures.map((e) => ({ category: e.procedure.category, name: e.procedure.name })),
-    { includeArgoplasma: data.includeArgoplasma },
-  );
+  const includedSections = data.manualMode
+    ? []
+    : getIncludedSections(
+        data.procedures.map((e) => ({ category: e.procedure.category, name: e.procedure.name })),
+        { includeArgoplasma: data.includeArgoplasma },
+      );
 
   const initialParts: SectionPart[] = includedSections.map((s, idx) => ({
     sectionIdx: idx,
@@ -654,7 +658,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   parts.forEach((p, i) => lastPartIdxBySection.set(p.sectionIdx, i));
 
   const costComponents: string[] = ['equipe cirúrgica'];
-  if (!isLocalAnesthesiaOnly) costComponents.push('anestesista');
+  if (hasAnyAnesthesiaFee) costComponents.push('anestesista');
   costComponents.push('hospital');
   if (data.includeImplants) costComponents.push('implantes');
   if (data.includeArgoplasma) costComponents.push('argoplasma (opcional)');
@@ -1222,10 +1226,10 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           <p>O custo é calculado somando-se os valores de {costComponents.join(' + ')}.</p>
           <p>
             Os valores de equipe cirúrgica
-            {!isLocalAnesthesiaOnly ? ' e anestesista' : ''}
+            {hasAnyAnesthesiaFee ? ' e anestesista' : ''}
             {' '}são válidos para realização do procedimento em até 30 dias, considerando a data deste orçamento.
           </p>
-          {!isLocalAnesthesiaOnly && (
+          {hasAnyAnesthesiaFee && !isLocalAnesthesiaOnly && (
             <p>
               Caso opte por fazer a cirurgia, o primeiro passo é agendar a data do procedimento. Depois disso, marcaremos seu retorno com o {data.doctorName} e a consulta pré-anestésica com a {data.anesthesiologistName} (valor de R$ 200).
             </p>

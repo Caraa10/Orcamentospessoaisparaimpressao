@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 
-const PRICES_CSV = 'Valores Procedimentos e Accurata (07.05.2026)/04.05.2026-VALORES PROCEDIMENTOS (04.05.2026).csv';
-const HOSPITAL_CSV = 'Valores Procedimentos e Accurata (07.05.2026)/Valores Accurata 04:05:26.csv';
+const PRICES_CSV = 'Valores Procedimentos e Hospital (09.05.2026)/Valores Procedimentos 09 05-VALORES PROCEDIMENTOS (04.05.2026).csv';
+const HOSPITAL_CSV = 'Valores Procedimentos e Hospital (09.05.2026)/Valores Accurata 09 05 -VALORES PROCEDIMENTOS (04.05.2026).csv';
 
 function parseMoney(s) {
   s = s.trim();

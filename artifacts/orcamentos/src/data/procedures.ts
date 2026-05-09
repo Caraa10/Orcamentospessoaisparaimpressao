@@ -239,8 +239,8 @@ export const PROCEDURES: Procedure[] = [
     hospitalMax: 5400,
   },
   {
-    id: "substituicao-de-implantes-mamarios",
-    name: "Substituição de Implantes Mamários",
+    id: "mastopexia-com-substituicao-de-implantes",
+    name: "Mastopexia com Substituição de Implantes",
     category: "breast",
     hasImplants: true,
     complexityA: p(31000, 28000, 3000),
@@ -250,8 +250,8 @@ export const PROCEDURES: Procedure[] = [
     hospitalMax: 5400,
   },
   {
-    id: "substituicao-de-implantes-mamarios-lipoaspiracao-de-pre-axilas",
-    name: "Substituição de Implantes Mamários + Lipoaspiração de Pré-Axilas",
+    id: "mastopexia-com-substituicao-de-implantes-lipoaspiracao-de-pre-axilas",
+    name: "Mastopexia com Substituição de Implantes + Lipoaspiração de Pré-Axilas",
     category: "breast",
     hasImplants: true,
     complexityA: p(32000, 29000, 3000),
@@ -261,8 +261,8 @@ export const PROCEDURES: Procedure[] = [
     hospitalMax: 5400,
   },
   {
-    id: "substituicao-de-implantes-mamarios-lipoaspiracao-de-contorno-mamario",
-    name: "Substituição de Implantes Mamários + Lipoaspiração de Contorno Mamário",
+    id: "mastopexia-com-substituicao-de-implantes-lipoaspiracao-de-contorno-mam",
+    name: "Mastopexia com Substituição de Implantes + Lipoaspiração de Contorno Mamário",
     category: "breast",
     hasImplants: true,
     complexityA: p(33000, 30000, 3000),
@@ -272,8 +272,8 @@ export const PROCEDURES: Procedure[] = [
     hospitalMax: 5400,
   },
   {
-    id: "substituicao-de-implantes-mamarios-tratamento-cirurgico-de-contratura-",
-    name: "Substituição de Implantes Mamários + Tratamento Cirúrgico de Contratura Capsular",
+    id: "mastopexia-com-substituicao-de-implantes-tratamento-cirurgico-de-contr",
+    name: "Mastopexia com Substituição de Implantes + Tratamento Cirúrgico de Contratura Capsular",
     category: "breast",
     hasImplants: true,
     complexityA: p(32000, 29000, 3000),

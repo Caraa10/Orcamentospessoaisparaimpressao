@@ -220,6 +220,10 @@ const MASTOPEXY_WITH_IMPLANTS_SPECIFIC_ITEMS: string[] = [
   '**Meia elástica** (meia de compressão cirúrgica): para redução de riscos',
 ];
 
+const ACCESSORY_BREAST_REMOVAL_SPECIFIC_ITEMS: string[] = [
+  '**Cola cirúrgica** (Dermabond® Johnson&Johnson): funciona como curativo (você não precisa se preocupar em fazer curativos no pós-operatório) e não há pontos para retirar',
+];
+
 // ─── Helper ───
 
 interface CategoryInfo {
@@ -274,6 +278,13 @@ function getCategoryInfo(category: ProcedureCategory, procedureName: string): Ca
 
   if (category === 'breast') {
     const lower = procedureName.toLowerCase();
+    if (/retirada de mama acess[óo]ria (unilateral|bilateral)/i.test(lower)) {
+      return {
+        firstIntro: `Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de ${term}**:`,
+        subIntro: `Estão **incluídos em seu procedimento de ${term}**:`,
+        items: ACCESSORY_BREAST_REMOVAL_SPECIFIC_ITEMS,
+      };
+    }
     if (lower.includes('redutora')) {
       return {
         firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de mamoplastia redutora**:',

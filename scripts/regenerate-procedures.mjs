@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 
-const PRICES_CSV = 'Valores Procedimentos e Hospital (09.05.2026)/Valores Procedimentos 09 05-VALORES PROCEDIMENTOS (04.05.2026).csv';
-const HOSPITAL_CSV = 'Valores Procedimentos e Hospital (09.05.2026)/Valores Accurata 09 05 -VALORES PROCEDIMENTOS (04.05.2026).csv';
+const PRICES_CSV = 'Valores Procedimentos e Accurata 09:05:2026/Valores Procedimentos 09 05-VALORES PROCEDIMENTOS (04.05.2026).csv';
+const HOSPITAL_CSV = 'Valores Procedimentos e Accurata 09:05:2026/Valores Accurata 09 05 -VALORES PROCEDIMENTOS (04.05.2026).csv';
 
 function parseMoney(s) {
   s = s.trim();
@@ -20,7 +20,7 @@ const priceDataLines = pricesLines.filter(
   (line) => line.trim() && !/^PROCEDIMENTO;A/.test(line) && !/^;Total;/.test(line),
 );
 const hospitalDataLines = hospitalLines.filter(
-  (line) => line.trim() && !/^PROCEDIMENTO;HOSPITAL ACCURATA/.test(line),
+  (line) => line.trim() && !/^PROCEDIMENTO;HOSPITAL ACCURATA/.test(line) && !/^\s*;+\s*;*\s*$/.test(line),
 );
 
 if (priceDataLines.length !== hospitalDataLines.length) {

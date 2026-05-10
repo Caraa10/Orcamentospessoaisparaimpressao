@@ -58,9 +58,12 @@ function categoryOf(name) {
 function hasImplantsFor(name) {
   const n = name.toLowerCase();
   if (n.includes('mamoplastia de aumento')) return true;
-  if (n.includes('mastopexia com implantes')) return true;
+  if (n.includes('implantes')) return true;
+  if (n.includes('implante')) return true;
   if (n.includes('substituição de implantes')) return true;
   if (n.includes('substituição de implante')) return true;
+  if (n.includes('troca de implantes')) return true;
+  if (n.includes('troca de implante')) return true;
   return false;
 }
 

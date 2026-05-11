@@ -199,6 +199,13 @@ const BREAST_FAT_GRAFTING_AUGMENTATION_ITEMS: string[] = [
 ];
 
 const BREAST_REDUCTION_SPECIFIC_ITEMS: string[] = [
+  '**Técnicas** de sutiã interno e, caso necessário, enxertia de gordura nas mamas',
+  '**Cola cirúrgica** (Prineo® Johnson&Johnson): funciona como curativo (você não precisa se preocupar em fazer curativos no pós-operatório) e não há pontos para retirar nas mamas',
+  '**Sutiã cirúrgico**: para suporte adequado e proteção das mamas',
+  '**Meia elástica** (meia de compressão cirúrgica): para redução de riscos',
+];
+
+const BREAST_REDUCTION_WITH_IMPLANTS_SPECIFIC_ITEMS: string[] = [
   '**Técnicas** de sutiã interno, alça de sustentação e, caso necessário, enxertia de gordura nas mamas',
   '**Cola cirúrgica** (Prineo® Johnson&Johnson): funciona como curativo (você não precisa se preocupar em fazer curativos no pós-operatório) e não há pontos para retirar nas mamas',
   '**Sutiã cirúrgico**: para suporte adequado e proteção das mamas',
@@ -286,10 +293,11 @@ function getCategoryInfo(category: ProcedureCategory, procedureName: string): Ca
       };
     }
     if (lower.includes('redutora')) {
+      const hasImplants = /com implantes|substituiç[aã]o de implantes|troca de implantes/.test(lower);
       return {
         firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de mamoplastia redutora**:',
         subIntro: 'Estão **incluídos em seu procedimento de mamoplastia redutora**:',
-        items: BREAST_REDUCTION_SPECIFIC_ITEMS,
+        items: hasImplants ? BREAST_REDUCTION_WITH_IMPLANTS_SPECIFIC_ITEMS : BREAST_REDUCTION_SPECIFIC_ITEMS,
       };
     }
     if (lower.includes('lipoenxertia mamária de aumento')) {

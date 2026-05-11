@@ -254,7 +254,7 @@ function joinPortuguese(parts: string[]) {
   }
   if (
     cleanParts.length === 2 &&
-    /^(miniabdominoplastia|abdominoplastia|mamoplastia de aumento)\b/i.test(cleanParts[0]) &&
+    /^(miniabdominoplastia|abdominoplastia|mamoplastia de aumento|mamoplastia redutora(?: com implantes)?|mastopexia(?: com implantes)?)\b/i.test(cleanParts[0]) &&
     /^lipoaspiração\b/i.test(cleanParts[1])
   ) {
     return `${cleanParts[0]} e ${cleanParts[1]}`;

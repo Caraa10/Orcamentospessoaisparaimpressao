@@ -248,9 +248,16 @@ function joinPortuguese(parts: string[]) {
   }
   if (
     cleanParts.length === 2 &&
-    /^retirada de implantes\b/i.test(cleanParts[1])
+    /^retirada de implantes/i.test(cleanParts[1])
   ) {
     return `${cleanParts[0]}, ${cleanParts[1]}`;
+  }
+  if (
+    cleanParts.length === 2 &&
+    /^(miniabdominoplastia|abdominoplastia)/i.test(cleanParts[0]) &&
+    /^lipoaspiração/i.test(cleanParts[1])
+  ) {
+    return `${cleanParts[0]} e ${cleanParts[1]}`;
   }
   if (
     cleanParts.length === 2 &&

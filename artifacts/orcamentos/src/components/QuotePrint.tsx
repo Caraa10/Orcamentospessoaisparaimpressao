@@ -128,8 +128,47 @@ function isMamoplastiaAumentoFamily(title: string) {
   return normalizeComparisonText(title).includes('mamoplastia de aumento');
 }
 
+function isMastopexiaWithImplantsFamily(title: string) {
+  return normalizeComparisonText(title).includes('mastopexia com implantes');
+}
+
+function isMastopexiaWithoutImplantsFamily(title: string) {
+  const normalized = normalizeComparisonText(title);
+  return normalized.includes('mastopexia') && !normalized.includes('mastopexia com implantes');
+}
+
 function isMastopexiaFamily(title: string) {
-  return normalizeComparisonText(title).includes('mastopexia');
+  return isMastopexiaWithImplantsFamily(title) || isMastopexiaWithoutImplantsFamily(title);
+}
+
+function isMiniabdominoplastiaFamily(title: string) {
+  return normalizeComparisonText(title).includes('miniabdominoplastia');
+}
+
+function isAbdominoplastiaFamily(title: string) {
+  const normalized = normalizeComparisonText(title);
+  return normalized.includes('abdominoplastia') && !normalized.includes('miniabdominoplastia');
+}
+
+function isRetiradaFusoFamily(title: string) {
+  return normalizeComparisonText(title).includes('retirada de fuso de pele');
+}
+
+function getExclusiveGroupKey(title: string) {
+  if (isMamoplastiaAumentoFamily(title)) return 'breast-augmentation';
+  if (isMastopexiaWithImplantsFamily(title)) return 'breast-mastopexy-with-implants';
+  if (isMastopexiaWithoutImplantsFamily(title)) return 'breast-mastopexy';
+  if (isMiniabdominoplastiaFamily(title)) return 'abdomen-miniabdominoplasty';
+  if (isAbdominoplastiaFamily(title)) return 'abdomen-abdominoplasty';
+  if (isRetiradaFusoFamily(title)) return 'abdomen-fuso';
+  return null;
+}
+
+function getExclusiveConflictBucket(groupKey: string | null) {
+  if (!groupKey) return null;
+  if (groupKey.startsWith('breast-')) return 'breast';
+  if (groupKey.startsWith('abdomen-')) return 'abdomen';
+  return null;
 }
 
 function shouldUseNeutralCombinedTitle(names: string[]) {
@@ -197,31 +236,53 @@ function calculateCombinedHospitalValues(
 }
 
 function getCombinedSummarySets(procedures: QuoteData['procedures']) {
-  const mamoplastiaEntries = procedures.filter((entry) =>
-    isMamoplastiaAumentoFamily(entry.procedure.name),
-  );
-  const mastopexiaEntries = procedures.filter((entry) =>
-    isMastopexiaFamily(entry.procedure.name),
-  );
+  const grouped = new Map<string, QuoteData['procedures']>();
+  const sharedEntries: QuoteData['procedures'] = [];
 
-  if (mamoplastiaEntries.length === 0 || mastopexiaEntries.length === 0) {
+  procedures.forEach((entry) => {
+    const groupKey = getExclusiveGroupKey(entry.procedure.name);
+    const conflictBucket = getExclusiveConflictBucket(groupKey);
+
+    if (!groupKey || !conflictBucket) {
+      sharedEntries.push(entry);
+      return;
+    }
+
+    const existing = grouped.get(conflictBucket) ?? [];
+    existing.push(entry);
+    grouped.set(conflictBucket, existing);
+  });
+
+  const groupEntries = Array.from(grouped.values());
+  const hasConflicts = groupEntries.some((entries) => entries.length > 1);
+  if (!hasConflicts) {
     return [procedures];
   }
 
-  const sharedEntries = procedures.filter(
-    (entry) =>
-      !isMamoplastiaAumentoFamily(entry.procedure.name) &&
-      !isMastopexiaFamily(entry.procedure.name),
-  );
+  const sets: QuoteData['procedures'][] = [];
 
-  if (sharedEntries.length === 0) {
-    return [];
-  }
+  const buildSets = (index: number, current: QuoteData['procedures']) => {
+    if (index >= groupEntries.length) {
+      if (current.length > 0 || sharedEntries.length > 0) {
+        sets.push([...current, ...sharedEntries]);
+      }
+      return;
+    }
 
-  return [
-    ...mamoplastiaEntries.map((entry) => [entry, ...sharedEntries]),
-    ...mastopexiaEntries.map((entry) => [entry, ...sharedEntries]),
-  ];
+    groupEntries[index].forEach((entry) => {
+      buildSets(index + 1, [...current, entry]);
+    });
+  };
+
+  buildSets(0, []);
+
+  const seen = new Set<string>();
+  return sets.filter((set) => {
+    const key = set.map((entry) => entry.procedure.name).sort().join('||');
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 function normalizeProcedureTitleBasic(title: string) {

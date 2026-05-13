@@ -35,19 +35,6 @@ function parseCurrencyInput(value: string) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function normalizeProcedureName(value: string) {
-  return value
-    .toLocaleLowerCase('pt-BR')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function getMastopexySelectionGroup(name: string) {
-  return normalizeProcedureName(name).includes('mastopexia') ? 'mastopexia' : null;
-}
-
 export default function QuoteForm({ onGenerate }: Props) {
   const [patientName, setPatientName] = useState('');
   const [date, setDate] = useState(() => {
@@ -211,16 +198,8 @@ export default function QuoteForm({ onGenerate }: Props) {
       complexity: pickerComplexity,
       prices: pickerPrices,
     };
-    const mastopexyGroup = getMastopexySelectionGroup(entry.procedure.name);
-    const entriesToKeep = mastopexyGroup
-      ? procedureEntries.filter(
-          (current) => getMastopexySelectionGroup(current.procedure.name) !== mastopexyGroup,
-        )
-      : procedureEntries;
-    const nextEntries = [...entriesToKeep, entry];
-
-    setProcedureEntries(nextEntries);
-    setIncludeImplants(nextEntries.some((current) => current.procedure.hasImplants));
+    setProcedureEntries((prev) => [...prev, entry]);
+    if (pickerProcedure.hasImplants) setIncludeImplants(true);
     setPickerProcedure(null);
     setSearch('');
     setPickerComplexity('A');

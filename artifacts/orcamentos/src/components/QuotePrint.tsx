@@ -278,49 +278,12 @@ function getCombinedSummarySets(procedures: QuoteData['procedures']) {
 
   const seen = new Set<string>();
   return sets.filter((set) => {
+    if (set.length <= 1) return false;
     const key = set.map((entry) => entry.procedure.name).sort().join('||');
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
   });
-}
-
-function getMastopexyDedupScore(name: string) {
-  const normalized = normalizeComparisonText(name);
-  if (!normalized.includes('mastopexia')) return 0;
-
-  let score = normalized.length;
-  if (normalized.includes('com implantes')) score += 1000;
-  if (normalized.includes('substituicao de implantes')) score += 900;
-  if (normalized.includes('lipoaspiracao')) score += 100;
-  if (normalized.includes('retirada')) score += 80;
-  return score;
-}
-
-function dedupeMastopexyProcedureEntries(procedures: QuoteData['procedures']) {
-  const next: QuoteData['procedures'] = [];
-  let mastopexyIndex = -1;
-
-  for (const entry of procedures) {
-    const normalized = normalizeComparisonText(entry.procedure.name);
-    if (!normalized.includes('mastopexia')) {
-      next.push(entry);
-      continue;
-    }
-
-    if (mastopexyIndex < 0) {
-      mastopexyIndex = next.length;
-      next.push(entry);
-      continue;
-    }
-
-    const current = next[mastopexyIndex];
-    if (getMastopexyDedupScore(entry.procedure.name) >= getMastopexyDedupScore(current.procedure.name)) {
-      next[mastopexyIndex] = entry;
-    }
-  }
-
-  return next;
 }
 
 function normalizeProcedureTitleBasic(title: string) {
@@ -688,23 +651,20 @@ type SectionPart = {
 };
 
 const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
-  const displayProcedures = data.manualMode
-    ? data.procedures
-    : dedupeMastopexyProcedureEntries(data.procedures);
-  const isMulti = displayProcedures.length > 1;
+  const isMulti = data.procedures.length > 1;
   const isCombinedSurgery = data.combinedSurgery ?? true;
   const hasAnyAnesthesiaFee =
-    displayProcedures.some((entry) => entry.prices.anesthesia > 0);
+    data.procedures.some((entry) => entry.prices.anesthesia > 0);
   const isLocalAnesthesiaOnly =
-    displayProcedures.length > 0 &&
-    displayProcedures.every((entry) =>
+    data.procedures.length > 0 &&
+    data.procedures.every((entry) =>
       /anestesia local/i.test(entry.procedure.name),
     );
 
   const includedSections = data.manualMode
     ? []
     : getIncludedSections(
-        displayProcedures.map((e) => ({ category: e.procedure.category, name: e.procedure.name })),
+        data.procedures.map((e) => ({ category: e.procedure.category, name: e.procedure.name })),
         { includeArgoplasma: data.includeArgoplasma },
       );
 
@@ -773,7 +733,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   if (data.includeArgoplasma) costComponents.push('argoplasma (opcional)');
 
   const combinedSummarySets = isCombinedSurgery && isMulti
-    ? getCombinedSummarySets(displayProcedures)
+    ? getCombinedSummarySets(data.procedures)
     : [];
 
   return (
@@ -1195,7 +1155,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           - If multiple procedures: show one page per procedure (equipe + anestesista)
           - If single procedure: show one page (equipe + anestesista + hospital + argoplasma)
       ════════════════════════════════════════════════ */}
-      {displayProcedures.map((entry, idx) => {
+      {data.procedures.map((entry, idx) => {
         const procHospitalMin = entry.procedure.hospitalMin;
         const procHospitalMax = entry.procedure.hospitalMax ?? procHospitalMin;
         const procName = entry.procedure.name.toLowerCase();

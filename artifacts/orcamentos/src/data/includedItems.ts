@@ -5,13 +5,18 @@ export interface IncludedSection {
   items: string[];
 }
 
-// ─── Common items (always shown) ───
+// ─── Common items ───
+
+const WARMING_ITEM = '**Sistema de aquecimento** (Bair Hugger, Warm Touch): para lhe manter aquecida durante todo o procedimento';
+const VENOUS_COMPRESSION_ITEM = '**Sistema de compressão venosa de membros inferiores**: para reduzir o risco de trombose durante e após a cirurgia';
+const GENERAL_ANESTHESIA_ITEM = '**Anestesia geral venosa total**: o que há de mais avançado em termos de anestesia — maior segurança e conforto para o seu procedimento';
+const FOLLOW_UP_ITEM = 'Após a cirurgia, **você será cuidada pelo Dr. Thiago**: o acompanhamento não é delegado para a equipe — ele lhe vê em todas as consultas e você tem o telefone pessoal dele para o que precisar';
 
 export const COMMON_ITEMS: string[] = [
-  '**Sistema de aquecimento** (Bair Hugger, Warm Touch): para lhe manter aquecida durante todo o procedimento',
-  '**Sistema de compressão venosa de membros inferiores**: para reduzir o risco de trombose durante e após a cirurgia',
-  '**Anestesia geral venosa total**: o que há de mais avançado em termos de anestesia — maior segurança e conforto para o seu procedimento',
-  'Após a cirurgia, **você será cuidada pelo Dr. Thiago**: o acompanhamento não é delegado para a equipe — ele lhe vê em todas as consultas e você tem o telefone pessoal dele para o que precisar',
+  WARMING_ITEM,
+  VENOUS_COMPRESSION_ITEM,
+  GENERAL_ANESTHESIA_ITEM,
+  FOLLOW_UP_ITEM,
 ];
 
 export function getArgoplasmaIncludedItems(procedureLabel: string): string[] {
@@ -27,6 +32,36 @@ function normalizeProcedureLabel(name: string) {
     .replace(/\s+/g, ' ')
     .trim()
     .toLowerCase();
+}
+
+function normalizeProcedureKey(name: string) {
+  return normalizeProcedureLabel(name)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+function isLocalAnesthesiaProcedure(name: string) {
+  return normalizeProcedureKey(name).includes('anestesia local');
+}
+
+function isSedationProcedure(name: string) {
+  return normalizeProcedureKey(name).includes('sedacao');
+}
+
+function hasGeneralAnesthesiaProcedure(entries: Array<{ name: string }>) {
+  return entries.some(
+    (entry) => !isLocalAnesthesiaProcedure(entry.name) && !isSedationProcedure(entry.name),
+  );
+}
+
+function getSharedIncludedItems(entries: Array<{ name: string }>) {
+  const hasGeneral = hasGeneralAnesthesiaProcedure(entries);
+  const hasSedation = entries.some((entry) => isSedationProcedure(entry.name));
+  const hasLocal = entries.some((entry) => isLocalAnesthesiaProcedure(entry.name));
+
+  if (hasGeneral) return COMMON_ITEMS;
+  if (hasSedation && !hasLocal) return [WARMING_ITEM, VENOUS_COMPRESSION_ITEM, FOLLOW_UP_ITEM];
+  return [FOLLOW_UP_ITEM];
 }
 
 function isMamoplastiaAumentoFamily(name: string) {
@@ -514,7 +549,7 @@ export function getIncludedSections(
     return [
       {
         intro: info.firstIntro,
-        items: [...info.items, ...COMMON_ITEMS, ...argoplasmaItems],
+        items: [...info.items, ...getSharedIncludedItems([entries[0]]), ...argoplasmaItems],
       },
     ];
   }
@@ -549,7 +584,7 @@ export function getIncludedSections(
 
     return [{
       intro,
-      items: [...items, '[[paragraph]]Todos os **procedimentos incluem**:', ...COMMON_ITEMS],
+      items: [...items, '[[paragraph]]Todos os **procedimentos incluem**:', ...getSharedIncludedItems(entries)],
     }];
   }
 
@@ -570,11 +605,13 @@ export function getIncludedSections(
     }
   }
 
-  const sharedItems = ['[[paragraph]]Todos os **procedimentos incluem**:', ...COMMON_ITEMS];
+  const sharedIncludedItems = getSharedIncludedItems(entries);
+  const sharedItems = ['[[paragraph]]Todos os **procedimentos incluem**:', ...sharedIncludedItems];
   if (!intro) {
+    if (sharedIncludedItems.length === 0) return [];
     return [{
       intro: 'Todos os **procedimentos incluem**:',
-      items: COMMON_ITEMS,
+      items: sharedIncludedItems,
     }];
   }
 

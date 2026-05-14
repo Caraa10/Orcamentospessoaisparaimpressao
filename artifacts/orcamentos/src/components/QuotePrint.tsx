@@ -238,6 +238,42 @@ function getProcedureEntriesForIncludedSections(procedures: QuoteData['procedure
   }));
 }
 
+function hasUpperBlepharoplastySedation(procedures: QuoteData['procedures']) {
+  return procedures.some((entry) => isUpperBlepharoplastySedationFamily(entry.procedure.name));
+}
+
+function getCombinedSummaryTitleKey(procedureSet: QuoteData['procedures']) {
+  const procedureNames = procedureSet.map((entry) =>
+    getProcedureNameForCombinedSummary(entry, procedureSet),
+  );
+
+  return joinProcedureTitles(procedureNames)
+    .toLocaleLowerCase('pt-BR')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function dedupeCombinedSummarySetsByDisplayedTitle(sets: QuoteData['procedures'][]) {
+  const byTitle = new Map<string, QuoteData['procedures']>();
+
+  for (const set of sets) {
+    const key = getCombinedSummaryTitleKey(set);
+    const existing = byTitle.get(key);
+    if (!existing) {
+      byTitle.set(key, set);
+      continue;
+    }
+
+    if (hasUpperBlepharoplastySedation(set) && !hasUpperBlepharoplastySedation(existing)) {
+      byTitle.set(key, set);
+    }
+  }
+
+  return Array.from(byTitle.values());
+}
+
 function normalizeCombinedProcedureTitles(names: string[]) {
   if (names.length <= 1) return names;
 
@@ -793,7 +829,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   if (data.includeArgoplasma) costComponents.push('argoplasma (opcional)');
 
   const combinedSummarySets = isCombinedSurgery && isMulti
-    ? getCombinedSummarySets(data.procedures)
+    ? dedupeCombinedSummarySetsByDisplayedTitle(getCombinedSummarySets(data.procedures))
     : [];
 
   return (

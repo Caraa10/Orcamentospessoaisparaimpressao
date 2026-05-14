@@ -128,11 +128,16 @@ export default function QuoteForm({ onGenerate }: Props) {
     if (/^abd/.test(q)) {
       const rankAbdomenProcedure = (name: string) => {
         const normalized = name.toLowerCase();
-        if (normalized.startsWith('abdominoplastia')) return 0;
-        if (normalized.includes('abdominoplastia')) return 1;
-        if (normalized.startsWith('miniabdominoplastia')) return 2;
-        if (normalized.includes('miniabdominoplastia')) return 3;
-        return 4;
+        const isAbdominoplasty = normalized.startsWith('abdominoplastia');
+        const hasAbdomenFlanksLipo = /lipoaspiração de abdome,? flancos/.test(normalized);
+
+        if (normalized === 'abdominoplastia') return 0;
+        if (isAbdominoplasty && hasAbdomenFlanksLipo) return 1;
+        if (isAbdominoplasty) return 2;
+        if (normalized.startsWith('miniabdominoplastia')) return 3;
+        if (normalized.includes('miniabdominoplastia')) return 4;
+        if (normalized.includes('abdominoplastia')) return 5;
+        return 6;
       };
 
       return matches

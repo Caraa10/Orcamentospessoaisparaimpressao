@@ -191,6 +191,53 @@ function shouldUseNeutralCombinedTitle(names: string[]) {
   return hasMamoplastiaAumento && hasMastopexia;
 }
 
+function isSedationProcedureName(name: string) {
+  return /sedação|sedacao/i.test(name);
+}
+
+function isLocalAnesthesiaProcedureName(name: string) {
+  return /anestesia local/i.test(name);
+}
+
+function isGeneralAnesthesiaEntry(entry: QuoteData['procedures'][number]) {
+  return (
+    entry.prices.anesthesia > 0 &&
+    !isSedationProcedureName(entry.procedure.name) &&
+    !isLocalAnesthesiaProcedureName(entry.procedure.name)
+  );
+}
+
+function shouldUseGeneralAnesthesiaForBlepharoplastySedation(
+  entry: QuoteData['procedures'][number],
+  procedureSet: QuoteData['procedures'],
+) {
+  return (
+    isUpperBlepharoplastySedationFamily(entry.procedure.name) &&
+    procedureSet.some(isGeneralAnesthesiaEntry)
+  );
+}
+
+function getProcedureNameForCombinedSummary(
+  entry: QuoteData['procedures'][number],
+  procedureSet: QuoteData['procedures'],
+) {
+  if (shouldUseGeneralAnesthesiaForBlepharoplastySedation(entry, procedureSet)) {
+    return entry.procedure.name
+      .replace(/\s+com sedação\b/i, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  return entry.procedure.name;
+}
+
+function getProcedureEntriesForIncludedSections(procedures: QuoteData['procedures']) {
+  return procedures.map((entry) => ({
+    category: entry.procedure.category,
+    name: getProcedureNameForCombinedSummary(entry, procedures),
+  }));
+}
+
 function normalizeCombinedProcedureTitles(names: string[]) {
   if (names.length <= 1) return names;
 
@@ -677,7 +724,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const includedSections = data.manualMode
     ? []
     : getIncludedSections(
-        data.procedures.map((e) => ({ category: e.procedure.category, name: e.procedure.name })),
+        getProcedureEntriesForIncludedSections(data.procedures),
         { includeArgoplasma: data.includeArgoplasma },
       );
 
@@ -1224,7 +1271,9 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           Shows total equipe + total anestesista + hospital + argoplasma
       ════════════════════════════════════════════════ */}
       {combinedSummarySets.map((procedureSet, idx) => {
-        const procedureNames = procedureSet.map((entry) => entry.procedure.name);
+        const procedureNames = procedureSet.map((entry) =>
+          getProcedureNameForCombinedSummary(entry, procedureSet),
+        );
         const totalSurgery = procedureSet.reduce((sum, entry) => sum + entry.prices.surgery, 0);
         const totalAnesthesia = procedureSet.reduce((sum, entry) => sum + entry.prices.anesthesia, 0);
         const totalHospital = calculateCombinedHospitalValues(procedureSet);

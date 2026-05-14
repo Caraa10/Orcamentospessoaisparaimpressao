@@ -64,6 +64,24 @@ function getSharedIncludedItems(entries: Array<{ name: string }>) {
   return [FOLLOW_UP_ITEM];
 }
 
+function doAllProceduresUseGeneralAnesthesia(entries: Array<{ name: string }>) {
+  return entries.every(
+    (entry) => !isLocalAnesthesiaProcedure(entry.name) && !isSedationProcedure(entry.name),
+  );
+}
+
+function getSharedIncludedIntro(entries: Array<{ name: string }>) {
+  if (doAllProceduresUseGeneralAnesthesia(entries)) {
+    return '[[paragraph]]Todos os **procedimentos incluem**:';
+  }
+
+  if (hasGeneralAnesthesiaProcedure(entries)) {
+    return '[[paragraph]]Os **procedimentos realizados sob anestesia geral incluem**:';
+  }
+
+  return '[[paragraph]]Também está **incluído**:';
+}
+
 function isMamoplastiaAumentoFamily(name: string) {
   return normalizeProcedureLabel(name).includes('mamoplastia de aumento');
 }
@@ -584,7 +602,7 @@ export function getIncludedSections(
 
     return [{
       intro,
-      items: [...items, '[[paragraph]]Todos os **procedimentos incluem**:', ...getSharedIncludedItems(entries)],
+      items: [...items, getSharedIncludedIntro(entries), ...getSharedIncludedItems(entries)],
     }];
   }
 
@@ -606,7 +624,7 @@ export function getIncludedSections(
   }
 
   const sharedIncludedItems = getSharedIncludedItems(entries);
-  const sharedItems = ['[[paragraph]]Todos os **procedimentos incluem**:', ...sharedIncludedItems];
+  const sharedItems = [getSharedIncludedIntro(entries), ...sharedIncludedItems];
   if (!intro) {
     if (sharedIncludedItems.length === 0) return [];
     return [{

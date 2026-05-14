@@ -154,6 +154,16 @@ function isRetiradaFusoFamily(title: string) {
   return normalizeComparisonText(title).includes('retirada de fuso de pele');
 }
 
+function isUpperBlepharoplastyLocalFamily(title: string) {
+  const normalized = normalizeComparisonText(title);
+  return normalized.includes('blefaroplastia superior') && normalized.includes('anestesia local');
+}
+
+function isUpperBlepharoplastySedationFamily(title: string) {
+  const normalized = normalizeComparisonText(title);
+  return normalized.includes('blefaroplastia superior') && normalized.includes('sedacao');
+}
+
 function getExclusiveGroupKey(title: string) {
   if (isMamoplastiaAumentoFamily(title)) return 'breast-augmentation';
   if (isMastopexiaWithImplantsFamily(title)) return 'breast-mastopexy-with-implants';
@@ -161,6 +171,8 @@ function getExclusiveGroupKey(title: string) {
   if (isMiniabdominoplastiaFamily(title)) return 'abdomen-miniabdominoplasty';
   if (isAbdominoplastiaFamily(title)) return 'abdomen-abdominoplasty';
   if (isRetiradaFusoFamily(title)) return 'abdomen-fuso';
+  if (isUpperBlepharoplastyLocalFamily(title)) return 'face-upper-blepharoplasty-local';
+  if (isUpperBlepharoplastySedationFamily(title)) return 'face-upper-blepharoplasty-sedation';
   return null;
 }
 
@@ -168,6 +180,7 @@ function getExclusiveConflictBucket(groupKey: string | null) {
   if (!groupKey) return null;
   if (groupKey.startsWith('breast-')) return 'breast';
   if (groupKey.startsWith('abdomen-')) return 'abdomen';
+  if (groupKey.startsWith('face-upper-blepharoplasty-')) return 'face-upper-blepharoplasty';
   return null;
 }
 

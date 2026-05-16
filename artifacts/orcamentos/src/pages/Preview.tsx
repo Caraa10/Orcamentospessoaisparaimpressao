@@ -174,7 +174,7 @@ export default function Preview() {
   if (!data) return null;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#d8d1bd' }}>
+    <div style={{ minHeight: '100vh', background: '#f3f4f6' }}>
       {/* Toolbar */}
       <div className="sticky top-0 z-50 bg-white border-b border-stone-200 shadow-sm">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">

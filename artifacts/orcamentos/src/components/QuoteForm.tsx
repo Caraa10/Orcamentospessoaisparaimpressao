@@ -18,12 +18,12 @@ const HOSPITAL_NAME = 'Hospital Accurata';
 
 const BRAND = '#1d2e3f';
 const BRAND_HOVER = '#152433';
-const BRAND_SOFT = '#f6f0d8';
-const BRAND_BORDER = '#d7c884';
-const SURFACE = '#fbfaf6';
-const SURFACE_BORDER = '#e6dfca';
+const BRAND_SOFT = '#f8f5ea';
+const BRAND_BORDER = '#d4c079';
+const SURFACE = '#f9fafb';
+const SURFACE_BORDER = '#e5e7eb';
 const TEXT = '#152236';
-const TEXT_MUTED = '#7b7466';
+const TEXT_MUTED = '#6f7480';
 
 function parseCurrencyInput(value: string) {
   const normalized = value
@@ -476,7 +476,7 @@ export default function QuoteForm({ onGenerate }: Props) {
   const inputClass =
     'w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 text-slate-800 placeholder-slate-400 transition-colors';
   const inputFocusStyle = {
-    '--tw-ring-color': '#f1e6b8',
+    '--tw-ring-color': '#efe2ad',
     borderColor: SURFACE_BORDER,
   } as React.CSSProperties;
 

@@ -13,18 +13,18 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: '#f8f6ef' }}>
+    <div className="min-h-screen bg-white">
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="text-center mb-8">
+        <div className="text-center mb-9">
           <img
             src={logoSrc}
             alt="Thiago Ferri Cirurgia Plástica"
-            className="mx-auto mb-5 h-auto w-full max-w-[280px]"
+            className="mx-auto mb-5 h-auto w-full max-w-[340px]"
           />
           <h1 className="text-2xl font-semibold mb-1" style={{ color: '#1d2e3f' }}>
             Planejamento Cirúrgico
           </h1>
-          <p className="text-sm" style={{ color: '#7b7466' }}>
+          <p className="text-sm" style={{ color: '#6f7480' }}>
             Gere orçamentos personalizados em PDF
           </p>
         </div>

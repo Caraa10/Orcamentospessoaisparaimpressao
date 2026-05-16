@@ -88,6 +88,7 @@ export default function Preview() {
             procedureEntryIds: ['demo-lipoescultura', 'demo-mamoplastia-redutora'],
           },
         ],
+        procedureExclusions: [],
         combinedSurgery: true,
         hospitalName: 'Hospital Accurata',
         hospitalMin: 9300,
@@ -109,6 +110,7 @@ export default function Preview() {
     setData({
       ...parsed,
       procedureCombinations: parsed.procedureCombinations ?? [],
+      procedureExclusions: parsed.procedureExclusions ?? [],
       combinedSurgery: parsed.combinedSurgery ?? true,
     });
   }, [setLocation]);

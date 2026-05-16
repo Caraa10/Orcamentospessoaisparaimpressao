@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Search, FileText, Plus, Trash2, ChevronDown } from 'lucide-react';
 import { PROCEDURES, Procedure, Complexity, getPriceForComplexity, ARGOPLASMA_PRICE } from '@/data/procedures';
 import { formatBRL } from '@/utils/calculations';
-import type { QuoteData, ProcedureCombination, ProcedureEntry } from '@/types/quote';
+import type { QuoteData, ProcedureCombination, ProcedureEntry, ProcedureExclusion } from '@/types/quote';
 
 interface Props {
   onGenerate: (data: QuoteData) => void;
@@ -41,6 +41,28 @@ function createLocalId(prefix: string) {
 
 function getProcedureEntryId(entry: ProcedureEntry, index: number) {
   return entry.entryId ?? `${entry.procedure.id}-${index}`;
+}
+
+function makePairKey(firstId: string, secondId: string) {
+  return [firstId, secondId].sort().join('||');
+}
+
+function getExclusionKeys(exclusions: ProcedureExclusion[]) {
+  return new Set(
+    exclusions
+      .filter((exclusion) => exclusion.procedureEntryIds.length >= 2)
+      .map((exclusion) => makePairKey(exclusion.procedureEntryIds[0], exclusion.procedureEntryIds[1])),
+  );
+}
+
+function hasBlockedPair(procedureEntryIds: string[], exclusions: ProcedureExclusion[]) {
+  const exclusionKeys = getExclusionKeys(exclusions);
+  for (let i = 0; i < procedureEntryIds.length; i++) {
+    for (let j = i + 1; j < procedureEntryIds.length; j++) {
+      if (exclusionKeys.has(makePairKey(procedureEntryIds[i], procedureEntryIds[j]))) return true;
+    }
+  }
+  return false;
 }
 
 function calculateCombinedHospitalValues(entries: ProcedureEntry[]) {
@@ -94,6 +116,7 @@ export default function QuoteForm({ onGenerate }: Props) {
 
   const [procedureEntries, setProcedureEntries] = useState<ProcedureEntry[]>([]);
   const [procedureCombinations, setProcedureCombinations] = useState<ProcedureCombination[]>([]);
+  const [procedureExclusions, setProcedureExclusions] = useState<ProcedureExclusion[]>([]);
   const [manualMode, setManualMode] = useState(false);
   const [manualProcedureName, setManualProcedureName] = useState('');
   const [manualSurgeryValue, setManualSurgeryValue] = useState('');
@@ -237,6 +260,14 @@ export default function QuoteForm({ onGenerate }: Props) {
         }))
         .filter((combination) => combination.procedureEntryIds.length > 0),
     );
+    setProcedureExclusions((prev) =>
+      prev
+        .map((exclusion) => ({
+          ...exclusion,
+          procedureEntryIds: exclusion.procedureEntryIds.filter((id) => validIds.has(id)).slice(0, 2),
+        }))
+        .filter((exclusion) => exclusion.procedureEntryIds.length > 0),
+    );
   }, [procedureEntries]);
 
   const handleSelectProcedure = (proc: Procedure) => {
@@ -309,6 +340,39 @@ export default function QuoteForm({ onGenerate }: Props) {
     );
   };
 
+  const handleAddExclusion = () => {
+    const defaultIds = procedureEntries
+      .slice(0, 2)
+      .map((entry, idx) => getProcedureEntryId(entry, idx));
+    if (defaultIds.length < 2) return;
+
+    setProcedureExclusions((prev) => [
+      ...prev,
+      {
+        id: createLocalId('block'),
+        procedureEntryIds: defaultIds,
+      },
+    ]);
+  };
+
+  const handleUpdateExclusion = (exclusionId: string, position: number, procedureEntryId: string) => {
+    setProcedureExclusions((prev) =>
+      prev.map((exclusion) => {
+        if (exclusion.id !== exclusionId) return exclusion;
+        const nextIds = [...exclusion.procedureEntryIds];
+        nextIds[position] = procedureEntryId;
+        return {
+          ...exclusion,
+          procedureEntryIds: nextIds.slice(0, 2),
+        };
+      }),
+    );
+  };
+
+  const handleRemoveExclusion = (exclusionId: string) => {
+    setProcedureExclusions((prev) => prev.filter((exclusion) => exclusion.id !== exclusionId));
+  };
+
   const canAdd = pickerProcedure !== null && pickerPrices !== null;
   const hasManualProcedureData =
     manualProcedureName.trim() &&
@@ -361,13 +425,28 @@ export default function QuoteForm({ onGenerate }: Props) {
             ...combination,
             procedureEntryIds: combination.procedureEntryIds.filter((id) => validProcedureEntryIds.has(id)),
           }))
-          .filter((combination) => combination.procedureEntryIds.length >= 2);
+          .filter((combination) =>
+            combination.procedureEntryIds.length >= 2 &&
+            !hasBlockedPair(combination.procedureEntryIds, procedureExclusions),
+          );
+    const validProcedureExclusions = manualMode
+      ? []
+      : procedureExclusions
+          .map((exclusion) => ({
+            ...exclusion,
+            procedureEntryIds: exclusion.procedureEntryIds.filter((id) => validProcedureEntryIds.has(id)).slice(0, 2),
+          }))
+          .filter((exclusion) =>
+            exclusion.procedureEntryIds.length === 2 &&
+            exclusion.procedureEntryIds[0] !== exclusion.procedureEntryIds[1],
+          );
 
     onGenerate({
       patientName: patientName.trim(),
       date,
       procedures,
       procedureCombinations: validProcedureCombinations,
+      procedureExclusions: validProcedureExclusions,
       manualMode,
       combinedSurgery: manualMode ? false : combinedSurgery,
       hospitalName: hospitalName.trim() || HOSPITAL_NAME,
@@ -703,13 +782,15 @@ export default function QuoteForm({ onGenerate }: Props) {
           ) : (
             <div className="space-y-3">
               {procedureCombinations.map((combination, comboIdx) => {
+                const selectedIds = combination.procedureEntryIds;
                 const selectedEntries = procedureEntries.filter((entry, idx) =>
-                  combination.procedureEntryIds.includes(getProcedureEntryId(entry, idx)),
+                  selectedIds.includes(getProcedureEntryId(entry, idx)),
                 );
                 const totalSurgery = selectedEntries.reduce((sum, entry) => sum + entry.prices.surgery, 0);
                 const totalAnesthesia = selectedEntries.reduce((sum, entry) => sum + entry.prices.anesthesia, 0);
                 const totalHospital = calculateCombinedHospitalValues(selectedEntries);
-                const isValid = selectedEntries.length >= 2;
+                const hasBlockedProcedures = hasBlockedPair(selectedIds, procedureExclusions);
+                const isValid = selectedEntries.length >= 2 && !hasBlockedProcedures;
 
                 return (
                   <div key={combination.id} className="rounded-xl border p-4" style={{ borderColor: SURFACE_BORDER, background: SURFACE }}>
@@ -720,7 +801,9 @@ export default function QuoteForm({ onGenerate }: Props) {
                         </div>
                         {!isValid && (
                           <div className="text-xs text-amber-700 mt-0.5">
-                            Selecione ao menos 2 procedimentos para imprimir esta combinação.
+                            {selectedEntries.length < 2
+                              ? 'Selecione ao menos 2 procedimentos para imprimir esta combinação.'
+                              : 'Esta combinação contém procedimentos marcados como incompatíveis e não será impressa.'}
                           </div>
                         )}
                       </div>
@@ -786,6 +869,91 @@ export default function QuoteForm({ onGenerate }: Props) {
               })}
             </div>
           )}
+
+          <div className="mt-5 pt-5 border-t" style={{ borderColor: SURFACE_BORDER }}>
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <div>
+                <div className="text-sm font-semibold text-slate-800">
+                  Procedimentos que não podem ser combinados
+                </div>
+                <p className="text-xs text-slate-500 mt-1">
+                  Marque pares incompatíveis. O documento não vai imprimir combinações que contenham esses dois procedimentos juntos.
+                </p>
+              </div>
+              <button
+                onClick={handleAddExclusion}
+                className="px-3 py-2 rounded-xl font-medium text-sm flex items-center gap-2 transition-colors border"
+                style={{ background: 'white', color: BRAND, borderColor: BRAND_BORDER }}
+              >
+                <Plus className="w-4 h-4" />
+                Restrição
+              </button>
+            </div>
+
+            {procedureExclusions.length === 0 ? (
+              <div className="rounded-xl border border-dashed px-4 py-3 text-sm text-slate-500" style={{ borderColor: SURFACE_BORDER, background: 'white' }}>
+                Nenhuma restrição adicionada. Todos os procedimentos selecionados serão considerados combináveis.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {procedureExclusions.map((exclusion) => {
+                  const firstId = exclusion.procedureEntryIds[0] ?? '';
+                  const secondId = exclusion.procedureEntryIds[1] ?? '';
+                  const invalidPair = !firstId || !secondId || firstId === secondId;
+
+                  return (
+                    <div key={exclusion.id} className="rounded-xl border bg-white p-3" style={{ borderColor: SURFACE_BORDER }}>
+                      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr_auto] gap-2 md:items-center">
+                        <select
+                          value={firstId}
+                          onChange={(e) => handleUpdateExclusion(exclusion.id, 0, e.target.value)}
+                          className={inputClass}
+                          style={inputFocusStyle}
+                        >
+                          {procedureEntries.map((entry, idx) => {
+                            const entryId = getProcedureEntryId(entry, idx);
+                            return (
+                              <option key={entryId} value={entryId}>
+                                {entry.procedure.name}
+                              </option>
+                            );
+                          })}
+                        </select>
+                        <span className="text-xs font-semibold text-slate-400 text-center">não combina com</span>
+                        <select
+                          value={secondId}
+                          onChange={(e) => handleUpdateExclusion(exclusion.id, 1, e.target.value)}
+                          className={inputClass}
+                          style={inputFocusStyle}
+                        >
+                          {procedureEntries.map((entry, idx) => {
+                            const entryId = getProcedureEntryId(entry, idx);
+                            return (
+                              <option key={entryId} value={entryId}>
+                                {entry.procedure.name}
+                              </option>
+                            );
+                          })}
+                        </select>
+                        <button
+                          onClick={() => handleRemoveExclusion(exclusion.id)}
+                          className="text-slate-400 hover:text-slate-600 transition-colors justify-self-end"
+                          title="Remover restrição"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      {invalidPair && (
+                        <div className="text-xs text-amber-700 mt-2">
+                          Escolha dois procedimentos diferentes para ativar esta restrição.
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       )}
 

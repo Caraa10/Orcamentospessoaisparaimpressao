@@ -335,6 +335,18 @@ function getProcedureEntryId(entry: QuoteData['procedures'][number], index: numb
   return entry.entryId ?? `${entry.procedure.id}-${index}`;
 }
 
+function makePairKey(firstId: string, secondId: string) {
+  return [firstId, secondId].sort().join('||');
+}
+
+function getExclusionKeys(exclusions: QuoteData['procedureExclusions']) {
+  return new Set(
+    (exclusions ?? [])
+      .filter((exclusion) => exclusion.procedureEntryIds.length >= 2)
+      .map((exclusion) => makePairKey(exclusion.procedureEntryIds[0], exclusion.procedureEntryIds[1])),
+  );
+}
+
 function getCombinedSummarySets(procedures: QuoteData['procedures']) {
   const grouped = new Map<string, QuoteData['procedures']>();
   const sharedEntries: QuoteData['procedures'] = [];
@@ -384,6 +396,55 @@ function getCombinedSummarySets(procedures: QuoteData['procedures']) {
     seen.add(key);
     return true;
   });
+}
+
+function expandCompatibleProcedureSets(
+  procedureSets: QuoteData['procedures'][],
+  getEntryId: (entry: QuoteData['procedures'][number]) => string,
+  exclusionKeys: Set<string>,
+) {
+  if (exclusionKeys.size === 0) return procedureSets;
+
+  const isCompatible = (procedureSet: QuoteData['procedures']) => {
+    for (let i = 0; i < procedureSet.length; i++) {
+      for (let j = i + 1; j < procedureSet.length; j++) {
+        if (exclusionKeys.has(makePairKey(getEntryId(procedureSet[i]), getEntryId(procedureSet[j])))) {
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+
+  const compatibleSets: QuoteData['procedures'][] = [];
+
+  procedureSets.forEach((procedureSet) => {
+    if (isCompatible(procedureSet)) {
+      compatibleSets.push(procedureSet);
+      return;
+    }
+
+    const subsetCount = 2 ** procedureSet.length;
+    const compatibleSubsets: QuoteData['procedures'][] = [];
+    for (let mask = 1; mask < subsetCount; mask++) {
+      const subset = procedureSet.filter((_, index) => (mask & (1 << index)) !== 0);
+      if (subset.length >= 2 && isCompatible(subset)) {
+        compatibleSubsets.push(subset);
+      }
+    }
+
+    compatibleSubsets.forEach((subset) => {
+      const subsetIds = new Set(subset.map(getEntryId));
+      const isContainedInLargerSet = compatibleSubsets.some((candidate) => {
+        if (candidate.length <= subset.length) return false;
+        const candidateIds = new Set(candidate.map(getEntryId));
+        return Array.from(subsetIds).every((id) => candidateIds.has(id));
+      });
+      if (!isContainedInLargerSet) compatibleSets.push(subset);
+    });
+  });
+
+  return compatibleSets;
 }
 
 function normalizeProcedureTitleBasic(title: string) {
@@ -835,6 +896,12 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const proceduresByEntryId = new Map(
     data.procedures.map((entry, index) => [getProcedureEntryId(entry, index), entry]),
   );
+  const entryIdsByEntry = new Map(
+    data.procedures.map((entry, index) => [entry, getProcedureEntryId(entry, index)]),
+  );
+  const exclusionKeys = getExclusionKeys(data.procedureExclusions);
+  const getEntryId = (entry: QuoteData['procedures'][number]) =>
+    entryIdsByEntry.get(entry) ?? entry.entryId ?? entry.procedure.id;
   const selectedCombinedSummarySets = (data.procedureCombinations ?? [])
     .map((combination) =>
       combination.procedureEntryIds
@@ -845,9 +912,13 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const hasSpecificCombinationSelection = (data.procedureCombinations ?? []).length > 0;
   const combinedSummarySets = isMulti
     ? dedupeCombinedSummarySetsByDisplayedTitle(
-        hasSpecificCombinationSelection
-          ? selectedCombinedSummarySets
-          : getCombinedSummarySets(data.procedures),
+        expandCompatibleProcedureSets(
+          hasSpecificCombinationSelection
+            ? selectedCombinedSummarySets
+            : getCombinedSummarySets(data.procedures),
+          getEntryId,
+          exclusionKeys,
+        ),
       )
     : [];
 

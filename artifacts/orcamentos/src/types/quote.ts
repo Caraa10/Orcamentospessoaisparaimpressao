@@ -12,11 +12,17 @@ export interface ProcedureCombination {
   procedureEntryIds: string[];
 }
 
+export interface ProcedureExclusion {
+  id: string;
+  procedureEntryIds: string[];
+}
+
 export interface QuoteData {
   patientName: string;
   date: string;
   procedures: ProcedureEntry[];
   procedureCombinations?: ProcedureCombination[];
+  procedureExclusions?: ProcedureExclusion[];
   manualMode?: boolean;
   combinedSurgery: boolean;
   hospitalName: string;

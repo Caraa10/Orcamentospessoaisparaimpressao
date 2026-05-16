@@ -681,7 +681,7 @@ export default function QuoteForm({ onGenerate }: Props) {
                 Combinações possíveis
               </h2>
               <p className="text-xs text-slate-500 mt-1">
-                Selecione quais procedimentos podem ser realizados juntos. Cada combinação será impressa em uma página própria.
+                Sem seleção específica, o documento considera os procedimentos como combináveis. Adicione combinações para imprimir somente as opções escolhidas.
               </p>
             </div>
             <button
@@ -698,7 +698,7 @@ export default function QuoteForm({ onGenerate }: Props) {
 
           {procedureCombinations.length === 0 ? (
             <div className="rounded-xl border border-dashed px-4 py-4 text-sm text-slate-500" style={{ borderColor: SURFACE_BORDER, background: SURFACE }}>
-              Nenhuma combinação adicionada. Os procedimentos continuarão aparecendo apenas individualmente.
+              Nenhuma combinação específica adicionada. O documento vai apresentar a combinação geral dos procedimentos selecionados.
             </div>
           ) : (
             <div className="space-y-3">

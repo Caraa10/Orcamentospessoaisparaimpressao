@@ -842,8 +842,13 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         .filter((entry): entry is QuoteData['procedures'][number] => Boolean(entry)),
     )
     .filter((procedureSet) => procedureSet.length >= 2);
+  const hasSpecificCombinationSelection = (data.procedureCombinations ?? []).length > 0;
   const combinedSummarySets = isMulti
-    ? dedupeCombinedSummarySetsByDisplayedTitle(selectedCombinedSummarySets)
+    ? dedupeCombinedSummarySetsByDisplayedTitle(
+        hasSpecificCombinationSelection
+          ? selectedCombinedSummarySets
+          : getCombinedSummarySets(data.procedures),
+      )
     : [];
 
   return (

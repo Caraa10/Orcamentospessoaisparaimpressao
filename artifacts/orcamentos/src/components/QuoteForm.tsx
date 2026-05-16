@@ -18,8 +18,8 @@ const HOSPITAL_NAME = 'Hospital Accurata';
 
 const BRAND = '#1d2e3f';
 const BRAND_HOVER = '#152433';
-const BRAND_SOFT = '#f8f5ea';
-const BRAND_BORDER = '#d4c079';
+const BRAND_SOFT = '#eef4f8';
+const BRAND_BORDER = '#b8c9d6';
 const SURFACE = '#f9fafb';
 const SURFACE_BORDER = '#e5e7eb';
 const TEXT = '#152236';
@@ -476,7 +476,7 @@ export default function QuoteForm({ onGenerate }: Props) {
   const inputClass =
     'w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 text-slate-800 placeholder-slate-400 transition-colors';
   const inputFocusStyle = {
-    '--tw-ring-color': '#efe2ad',
+    '--tw-ring-color': '#d8e6ef',
     borderColor: SURFACE_BORDER,
   } as React.CSSProperties;
 
@@ -815,7 +815,7 @@ export default function QuoteForm({ onGenerate }: Props) {
                           Combinação {comboIdx + 1}
                         </div>
                         {!isValid && (
-                          <div className="text-xs text-amber-700 mt-0.5">
+                          <div className="text-xs text-sky-800 mt-0.5">
                             {selectedEntries.length < 2
                               ? 'Selecione ao menos 2 procedimentos para imprimir esta combinação.'
                               : 'Esta combinação contém procedimentos marcados como incompatíveis e não será impressa.'}
@@ -959,7 +959,7 @@ export default function QuoteForm({ onGenerate }: Props) {
                         </button>
                       </div>
                       {invalidPair && (
-                        <div className="text-xs text-amber-700 mt-2">
+                        <div className="text-xs text-sky-800 mt-2">
                           Escolha dois procedimentos diferentes para ativar esta restrição.
                         </div>
                       )}

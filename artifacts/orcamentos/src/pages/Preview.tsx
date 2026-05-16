@@ -213,7 +213,7 @@ export default function Preview() {
 
       {/* Info note */}
       <div className="max-w-5xl mx-auto px-4 pt-4 pb-2">
-        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-700 flex gap-2">
+        <div className="bg-sky-50 border border-sky-100 rounded-xl px-4 py-3 text-sm text-sky-900 flex gap-2">
           <Download className="w-4 h-4 mt-0.5 flex-shrink-0" />
           <span>
             Clique em <strong>Baixar PDF</strong> para gerar o arquivo em A4 com o layout fiel — funciona em qualquer navegador (Safari, Chrome, Firefox), sem precisar configurar a janela de impressão.

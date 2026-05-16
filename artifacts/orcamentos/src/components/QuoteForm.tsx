@@ -218,6 +218,20 @@ export default function QuoteForm({ onGenerate }: Props) {
         .slice(0, 40);
     }
 
+    if (/^lipo?/.test(q)) {
+      return matches
+        .slice()
+        .sort((a, b) => {
+          const aStartsWithLipoaspiracao = a.name.toLowerCase().startsWith('lipoaspiração');
+          const bStartsWithLipoaspiracao = b.name.toLowerCase().startsWith('lipoaspiração');
+          if (aStartsWithLipoaspiracao !== bStartsWithLipoaspiracao) {
+            return aStartsWithLipoaspiracao ? -1 : 1;
+          }
+          return a.name.localeCompare(b.name, 'pt-BR');
+        })
+        .slice(0, 40);
+    }
+
     return matches.slice(0, 40);
   }, [search]);
 

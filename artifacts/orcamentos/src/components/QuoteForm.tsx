@@ -16,14 +16,14 @@ const COMPLEXITY_LABELS: Record<Complexity, string> = {
 
 const HOSPITAL_NAME = 'Hospital Accurata';
 
-const BRAND = '#0f766e';
-const BRAND_HOVER = '#115e59';
-const BRAND_SOFT = '#dff7f3';
-const BRAND_BORDER = '#99f6e4';
-const SURFACE = '#f8fafc';
-const SURFACE_BORDER = '#e2e8f0';
-const TEXT = '#0f172a';
-const TEXT_MUTED = '#64748b';
+const BRAND = '#1d2e3f';
+const BRAND_HOVER = '#152433';
+const BRAND_SOFT = '#f6f0d8';
+const BRAND_BORDER = '#d7c884';
+const SURFACE = '#fbfaf6';
+const SURFACE_BORDER = '#e6dfca';
+const TEXT = '#152236';
+const TEXT_MUTED = '#7b7466';
 
 function parseCurrencyInput(value: string) {
   const normalized = value
@@ -476,7 +476,8 @@ export default function QuoteForm({ onGenerate }: Props) {
   const inputClass =
     'w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 text-slate-800 placeholder-slate-400 transition-colors';
   const inputFocusStyle = {
-    '--tw-ring-color': '#ccfbf1',
+    '--tw-ring-color': '#f1e6b8',
+    borderColor: SURFACE_BORDER,
   } as React.CSSProperties;
 
   return (

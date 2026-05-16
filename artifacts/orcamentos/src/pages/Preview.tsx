@@ -174,7 +174,7 @@ export default function Preview() {
   if (!data) return null;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#d6d3cd' }}>
+    <div style={{ minHeight: '100vh', background: '#d8d1bd' }}>
       {/* Toolbar */}
       <div className="sticky top-0 z-50 bg-white border-b border-stone-200 shadow-sm">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -193,7 +193,7 @@ export default function Preview() {
               onClick={handleDownloadPDF}
               disabled={generating}
               className="flex items-center gap-2 px-4 py-2 text-white rounded-xl text-sm font-medium transition-colors shadow-sm disabled:opacity-60"
-              style={{ background: '#1e2446' }}
+              style={{ background: '#1d2e3f' }}
             >
               {generating ? (
                 <>

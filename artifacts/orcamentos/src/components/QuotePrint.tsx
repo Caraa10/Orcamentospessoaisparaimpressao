@@ -310,17 +310,17 @@ function calculateCombinedHospitalValues(
   }
 
   const applyDiscount = items.length >= 2;
-  let lowestIdx = 0;
+  let highestIdx = 0;
   if (applyDiscount) {
     for (let i = 1; i < items.length; i++) {
-      if (items[i].min < items[lowestIdx].min) lowestIdx = i;
+      if (items[i].min > items[highestIdx].min) highestIdx = i;
     }
   }
 
   let min = 0;
   let max = 0;
   for (let i = 0; i < items.length; i++) {
-    const factor = applyDiscount && i === lowestIdx ? 0.5 : 1;
+    const factor = applyDiscount && i !== highestIdx ? 0.5 : 1;
     min += items[i].min * factor;
     max += items[i].max * factor;
   }
@@ -329,6 +329,10 @@ function calculateCombinedHospitalValues(
     min: Math.round(min),
     max: Math.round(max),
   };
+}
+
+function getProcedureEntryId(entry: QuoteData['procedures'][number], index: number) {
+  return entry.entryId ?? `${entry.procedure.id}-${index}`;
 }
 
 function getCombinedSummarySets(procedures: QuoteData['procedures']) {
@@ -828,8 +832,18 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   if (data.includeImplants) costComponents.push('implantes');
   if (data.includeArgoplasma) costComponents.push('argoplasma (opcional)');
 
-  const combinedSummarySets = isCombinedSurgery && isMulti
-    ? dedupeCombinedSummarySetsByDisplayedTitle(getCombinedSummarySets(data.procedures))
+  const proceduresByEntryId = new Map(
+    data.procedures.map((entry, index) => [getProcedureEntryId(entry, index), entry]),
+  );
+  const selectedCombinedSummarySets = (data.procedureCombinations ?? [])
+    .map((combination) =>
+      combination.procedureEntryIds
+        .map((entryId) => proceduresByEntryId.get(entryId))
+        .filter((entry): entry is QuoteData['procedures'][number] => Boolean(entry)),
+    )
+    .filter((procedureSet) => procedureSet.length >= 2);
+  const combinedSummarySets = isMulti
+    ? dedupeCombinedSummarySetsByDisplayedTitle(selectedCombinedSummarySets)
     : [];
 
   return (

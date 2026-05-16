@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Search, FileText, Plus, Trash2, ChevronDown } from 'lucide-react';
 import { PROCEDURES, Procedure, Complexity, getPriceForComplexity, ARGOPLASMA_PRICE } from '@/data/procedures';
 import { formatBRL } from '@/utils/calculations';
-import type { QuoteData, ProcedureEntry } from '@/types/quote';
+import type { QuoteData, ProcedureCombination, ProcedureEntry } from '@/types/quote';
 
 interface Props {
   onGenerate: (data: QuoteData) => void;
@@ -35,6 +35,50 @@ function parseCurrencyInput(value: string) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function createLocalId(prefix: string) {
+  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function getProcedureEntryId(entry: ProcedureEntry, index: number) {
+  return entry.entryId ?? `${entry.procedure.id}-${index}`;
+}
+
+function calculateCombinedHospitalValues(entries: ProcedureEntry[]) {
+  const items = entries
+    .map((entry) => {
+      const min = entry.procedure.hospitalMin;
+      if (min === null) return null;
+      const max = entry.procedure.hospitalMax ?? min;
+      return { min, max };
+    })
+    .filter((item): item is { min: number; max: number } => item !== null);
+
+  if (items.length === 0) {
+    return { min: 0, max: 0 };
+  }
+
+  const applyDiscount = items.length >= 2;
+  let highestIdx = 0;
+  if (applyDiscount) {
+    for (let i = 1; i < items.length; i++) {
+      if (items[i].min > items[highestIdx].min) highestIdx = i;
+    }
+  }
+
+  let min = 0;
+  let max = 0;
+  for (let i = 0; i < items.length; i++) {
+    const factor = applyDiscount && i !== highestIdx ? 0.5 : 1;
+    min += items[i].min * factor;
+    max += items[i].max * factor;
+  }
+
+  return {
+    min: Math.round(min),
+    max: Math.round(max),
+  };
+}
+
 export default function QuoteForm({ onGenerate }: Props) {
   const [patientName, setPatientName] = useState('');
   const [date, setDate] = useState(() => {
@@ -49,6 +93,7 @@ export default function QuoteForm({ onGenerate }: Props) {
   });
 
   const [procedureEntries, setProcedureEntries] = useState<ProcedureEntry[]>([]);
+  const [procedureCombinations, setProcedureCombinations] = useState<ProcedureCombination[]>([]);
   const [manualMode, setManualMode] = useState(false);
   const [manualProcedureName, setManualProcedureName] = useState('');
   const [manualSurgeryValue, setManualSurgeryValue] = useState('');
@@ -84,18 +129,18 @@ export default function QuoteForm({ onGenerate }: Props) {
     }
     if (items.length === 0) return;
 
-    // When 2+ procedures combined in same surgery, apply 50% discount on the lowest-value procedure
+    // When 2+ procedures are combined, keep the highest hospital value full and apply 50% to the others.
     const applyDiscount = items.length >= 2 && combinedSurgery;
-    let lowestIdx = 0;
+    let highestIdx = 0;
     if (applyDiscount) {
       for (let i = 1; i < items.length; i++) {
-        if (items[i].min < items[lowestIdx].min) lowestIdx = i;
+        if (items[i].min > items[highestIdx].min) highestIdx = i;
       }
     }
     let sumMin = 0;
     let sumMax = 0;
     for (let i = 0; i < items.length; i++) {
-      const factor = applyDiscount && i === lowestIdx ? 0.5 : 1;
+      const factor = applyDiscount && i !== highestIdx ? 0.5 : 1;
       sumMin += items[i].min * factor;
       sumMax += items[i].max * factor;
     }
@@ -182,6 +227,18 @@ export default function QuoteForm({ onGenerate }: Props) {
     }
   }, [anyProcedureSupportsArgoplasma, manualMode]);
 
+  useEffect(() => {
+    const validIds = new Set(procedureEntries.map(getProcedureEntryId));
+    setProcedureCombinations((prev) =>
+      prev
+        .map((combination) => ({
+          ...combination,
+          procedureEntryIds: combination.procedureEntryIds.filter((id) => validIds.has(id)),
+        }))
+        .filter((combination) => combination.procedureEntryIds.length > 0),
+    );
+  }, [procedureEntries]);
+
   const handleSelectProcedure = (proc: Procedure) => {
     setPickerProcedure(proc);
     setSearch(proc.name);
@@ -199,6 +256,7 @@ export default function QuoteForm({ onGenerate }: Props) {
   const handleAddProcedure = () => {
     if (!pickerProcedure || !pickerPrices) return;
     const entry: ProcedureEntry = {
+      entryId: createLocalId('proc'),
       procedure: pickerProcedure,
       complexity: pickerComplexity,
       prices: pickerPrices,
@@ -216,6 +274,39 @@ export default function QuoteForm({ onGenerate }: Props) {
       if (!next.some((e) => e.procedure.hasImplants)) setIncludeImplants(false);
       return next;
     });
+  };
+
+  const handleAddCombination = () => {
+    const defaultIds = procedureEntries
+      .slice(0, 2)
+      .map((entry, idx) => getProcedureEntryId(entry, idx));
+
+    setProcedureCombinations((prev) => [
+      ...prev,
+      {
+        id: createLocalId('combo'),
+        procedureEntryIds: defaultIds,
+      },
+    ]);
+  };
+
+  const handleRemoveCombination = (combinationId: string) => {
+    setProcedureCombinations((prev) => prev.filter((combination) => combination.id !== combinationId));
+  };
+
+  const handleToggleCombinationProcedure = (combinationId: string, procedureEntryId: string) => {
+    setProcedureCombinations((prev) =>
+      prev.map((combination) => {
+        if (combination.id !== combinationId) return combination;
+        const selected = combination.procedureEntryIds.includes(procedureEntryId);
+        return {
+          ...combination,
+          procedureEntryIds: selected
+            ? combination.procedureEntryIds.filter((id) => id !== procedureEntryId)
+            : [...combination.procedureEntryIds, procedureEntryId],
+        };
+      }),
+    );
   };
 
   const canAdd = pickerProcedure !== null && pickerPrices !== null;
@@ -262,11 +353,21 @@ export default function QuoteForm({ onGenerate }: Props) {
           },
         ]
       : procedureEntries;
+    const validProcedureEntryIds = new Set(procedures.map(getProcedureEntryId));
+    const validProcedureCombinations = manualMode
+      ? []
+      : procedureCombinations
+          .map((combination) => ({
+            ...combination,
+            procedureEntryIds: combination.procedureEntryIds.filter((id) => validProcedureEntryIds.has(id)),
+          }))
+          .filter((combination) => combination.procedureEntryIds.length >= 2);
 
     onGenerate({
       patientName: patientName.trim(),
       date,
       procedures,
+      procedureCombinations: validProcedureCombinations,
       manualMode,
       combinedSurgery: manualMode ? false : combinedSurgery,
       hospitalName: hospitalName.trim() || HOSPITAL_NAME,
@@ -572,6 +673,122 @@ export default function QuoteForm({ onGenerate }: Props) {
         )}
       </div>
 
+      {!manualMode && procedureEntries.length >= 2 && (
+        <div className="bg-white rounded-2xl border shadow-sm p-6" style={{ borderColor: SURFACE_BORDER }}>
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <div>
+              <h2 className="text-sm font-semibold uppercase tracking-wider" style={{ color: TEXT_MUTED }}>
+                Combinações possíveis
+              </h2>
+              <p className="text-xs text-slate-500 mt-1">
+                Selecione quais procedimentos podem ser realizados juntos. Cada combinação será impressa em uma página própria.
+              </p>
+            </div>
+            <button
+              onClick={handleAddCombination}
+              className="px-3 py-2 rounded-xl font-medium text-sm flex items-center gap-2 transition-colors"
+              style={{ background: BRAND, color: 'white' }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = BRAND_HOVER; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = BRAND; }}
+            >
+              <Plus className="w-4 h-4" />
+              Adicionar
+            </button>
+          </div>
+
+          {procedureCombinations.length === 0 ? (
+            <div className="rounded-xl border border-dashed px-4 py-4 text-sm text-slate-500" style={{ borderColor: SURFACE_BORDER, background: SURFACE }}>
+              Nenhuma combinação adicionada. Os procedimentos continuarão aparecendo apenas individualmente.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {procedureCombinations.map((combination, comboIdx) => {
+                const selectedEntries = procedureEntries.filter((entry, idx) =>
+                  combination.procedureEntryIds.includes(getProcedureEntryId(entry, idx)),
+                );
+                const totalSurgery = selectedEntries.reduce((sum, entry) => sum + entry.prices.surgery, 0);
+                const totalAnesthesia = selectedEntries.reduce((sum, entry) => sum + entry.prices.anesthesia, 0);
+                const totalHospital = calculateCombinedHospitalValues(selectedEntries);
+                const isValid = selectedEntries.length >= 2;
+
+                return (
+                  <div key={combination.id} className="rounded-xl border p-4" style={{ borderColor: SURFACE_BORDER, background: SURFACE }}>
+                    <div className="flex items-center justify-between gap-3 mb-3">
+                      <div>
+                        <div className="text-sm font-semibold text-slate-800">
+                          Combinação {comboIdx + 1}
+                        </div>
+                        {!isValid && (
+                          <div className="text-xs text-amber-700 mt-0.5">
+                            Selecione ao menos 2 procedimentos para imprimir esta combinação.
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleRemoveCombination(combination.id)}
+                        className="text-slate-400 hover:text-slate-600 transition-colors"
+                        title="Remover combinação"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div className="space-y-2 mb-3">
+                      {procedureEntries.map((entry, idx) => {
+                        const entryId = getProcedureEntryId(entry, idx);
+                        const checked = combination.procedureEntryIds.includes(entryId);
+
+                        return (
+                          <label key={entryId} className="flex items-start gap-2 text-sm text-slate-700 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={() => handleToggleCombinationProcedure(combination.id, entryId)}
+                              className="w-4 h-4 rounded mt-0.5"
+                            />
+                            <span>
+                              <span className="font-medium">{entry.procedure.name}</span>
+                              <span className="block text-xs text-slate-500">
+                                {COMPLEXITY_LABELS[entry.complexity]}
+                              </span>
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+
+                    {selectedEntries.length > 0 && (
+                      <div className="bg-white rounded-xl px-3 py-2.5 text-sm text-slate-700 border border-slate-200 space-y-0.5">
+                        <div className="flex justify-between gap-4">
+                          <span className="text-slate-500">Equipe cirúrgica:</span>
+                          <span className="font-semibold">{formatBRL(totalSurgery)}</span>
+                        </div>
+                        {totalAnesthesia > 0 && (
+                          <div className="flex justify-between gap-4">
+                            <span className="text-slate-500">Anestesista:</span>
+                            <span className="font-semibold">{formatBRL(totalAnesthesia)}</span>
+                          </div>
+                        )}
+                        {totalHospital.min > 0 && (
+                          <div className="flex justify-between gap-4">
+                            <span className="text-slate-500">Hospital:</span>
+                            <span className="font-semibold">
+                              {totalHospital.min === totalHospital.max
+                                ? formatBRL(totalHospital.min)
+                                : `${formatBRL(totalHospital.min)} - ${formatBRL(totalHospital.max)}`}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Hospital */}
       <div className="bg-white rounded-2xl border shadow-sm p-6" style={{ borderColor: SURFACE_BORDER }}>
         <div className="flex items-center justify-between mb-4">
@@ -589,29 +806,11 @@ export default function QuoteForm({ onGenerate }: Props) {
             Calcular automaticamente
           </label>
         </div>
-        {hospitalAuto && procedureEntries.length >= 2 && (
-          <label className="flex items-start gap-2 text-xs text-slate-700 cursor-pointer mb-3 rounded-lg px-3 py-2" style={{ background: SURFACE }}>
-            <input
-              type="checkbox"
-              checked={combinedSurgery}
-              onChange={(e) => setCombinedSurgery(e.target.checked)}
-              className="w-4 h-4 rounded mt-0.5"
-            />
-            <span>
-              Procedimentos realizados na mesma cirurgia (combinados)
-              <span className="block text-slate-500 mt-0.5">
-                Quando combinados, aplica 50% de desconto no procedimento de menor valor do hospital.
-              </span>
-            </span>
-          </label>
-        )}
         {hospitalAuto && procedureEntries.length > 0 && (
           <div className="mb-3 text-xs text-slate-500 rounded-lg px-3 py-2" style={{ background: SURFACE }}>
             {procedureEntries.length === 1
               ? 'Valor do hospital do procedimento selecionado. Desmarque para editar manualmente.'
-              : combinedSurgery
-                ? 'Soma com 50% de desconto no procedimento de menor valor. Desmarque para editar manualmente.'
-                : 'Soma integral dos valores (sem desconto, pois cirurgias separadas). Desmarque para editar manualmente.'}
+              : 'Estimativa automática geral: maior valor hospitalar integral e 50% nos demais. As combinações escolhidas serão calculadas em suas próprias páginas.'}
           </div>
         )}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

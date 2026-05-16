@@ -51,6 +51,7 @@ export default function Preview() {
         date: '2026-04-12',
         procedures: [
           {
+            entryId: 'demo-lipoescultura',
             procedure: {
               id: 'lipoescultura-demo',
               name: 'Lipoescultura - Lipoaspiração de Abdome, Flancos e Dorso e Lipoenxertia Glútea',
@@ -65,6 +66,7 @@ export default function Preview() {
             prices: { total: 30000, surgery: 27000, anesthesia: 3000 },
           },
           {
+            entryId: 'demo-mamoplastia-redutora',
             procedure: {
               id: 'mamoplastia-redutora-demo',
               name: 'Mamoplastia Redutora',
@@ -78,6 +80,12 @@ export default function Preview() {
             },
             complexity: 'B',
             prices: { total: 32000, surgery: 29000, anesthesia: 3000 },
+          },
+        ],
+        procedureCombinations: [
+          {
+            id: 'demo-combinacao-1',
+            procedureEntryIds: ['demo-lipoescultura', 'demo-mamoplastia-redutora'],
           },
         ],
         combinedSurgery: true,
@@ -100,6 +108,7 @@ export default function Preview() {
     const parsed = JSON.parse(stored);
     setData({
       ...parsed,
+      procedureCombinations: parsed.procedureCombinations ?? [],
       combinedSurgery: parsed.combinedSurgery ?? true,
     });
   }, [setLocation]);

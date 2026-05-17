@@ -118,9 +118,12 @@ export default function QuoteForm({ onGenerate }: Props) {
   const [procedureCombinations, setProcedureCombinations] = useState<ProcedureCombination[]>([]);
   const [procedureExclusions, setProcedureExclusions] = useState<ProcedureExclusion[]>([]);
   const [manualMode, setManualMode] = useState(false);
+  const [showManualProcedureForm, setShowManualProcedureForm] = useState(false);
   const [manualProcedureName, setManualProcedureName] = useState('');
   const [manualSurgeryValue, setManualSurgeryValue] = useState('');
   const [manualAnesthesiaValue, setManualAnesthesiaValue] = useState('0');
+  const [manualHospitalMin, setManualHospitalMin] = useState('');
+  const [manualHospitalMax, setManualHospitalMax] = useState('');
 
   const [search, setSearch] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
@@ -321,6 +324,46 @@ export default function QuoteForm({ onGenerate }: Props) {
     });
   };
 
+  const handleAddManualProcedure = () => {
+    if (!manualProcedureName.trim() || !manualSurgeryValue.trim() || !manualHospitalMin.trim() || !manualHospitalMax.trim()) {
+      return;
+    }
+
+    const parsedSurgery = parseCurrencyInput(manualSurgeryValue);
+    const parsedAnesthesia = parseCurrencyInput(manualAnesthesiaValue);
+    const parsedHospitalMin = parseCurrencyInput(manualHospitalMin);
+    const parsedHospitalMax = parseCurrencyInput(manualHospitalMax);
+    const manualId = createLocalId('manual-proc');
+
+    const entry: ProcedureEntry = {
+      entryId: manualId,
+      procedure: {
+        id: manualId,
+        name: manualProcedureName.trim(),
+        category: 'other',
+        complexityA: null,
+        complexityB: null,
+        complexityC: null,
+        hospitalMin: parsedHospitalMin,
+        hospitalMax: parsedHospitalMax,
+      },
+      complexity: 'A',
+      prices: {
+        total: parsedSurgery + parsedAnesthesia,
+        surgery: parsedSurgery,
+        anesthesia: parsedAnesthesia,
+      },
+    };
+
+    setProcedureEntries((prev) => [...prev, entry]);
+    setManualProcedureName('');
+    setManualSurgeryValue('');
+    setManualAnesthesiaValue('0');
+    setManualHospitalMin('');
+    setManualHospitalMax('');
+    setShowManualProcedureForm(false);
+  };
+
   const handleAddCombination = () => {
     const defaultIds = procedureEntries
       .slice(0, 2)
@@ -388,53 +431,26 @@ export default function QuoteForm({ onGenerate }: Props) {
   };
 
   const canAdd = pickerProcedure !== null && pickerPrices !== null;
-  const hasManualProcedureData =
+  const canAddManualProcedure =
     manualProcedureName.trim() &&
     manualSurgeryValue.trim() &&
-    hospitalMin.trim() &&
-    hospitalMax.trim();
+    manualHospitalMin.trim() &&
+    manualHospitalMax.trim();
   const hasStructuredProcedureData =
     procedureEntries.length > 0 &&
     hospitalMin.trim() &&
     hospitalMax.trim();
   const canGenerate =
     patientName.trim() &&
-    (manualMode ? hasManualProcedureData : hasStructuredProcedureData);
+    hasStructuredProcedureData;
 
   const handleGenerate = () => {
     if (!canGenerate) return;
     const parsedHospitalMin = parseCurrencyInput(hospitalMin);
     const parsedHospitalMax = parseCurrencyInput(hospitalMax);
-    const parsedManualSurgery = parseCurrencyInput(manualSurgeryValue);
-    const parsedManualAnesthesia = parseCurrencyInput(manualAnesthesiaValue);
-
-    const procedures = manualMode
-      ? [
-          {
-            procedure: {
-              id: 'manual-procedure',
-              name: manualProcedureName.trim(),
-              category: 'other' as const,
-              complexityA: null,
-              complexityB: null,
-              complexityC: null,
-              hasImplants: includeImplants,
-              hospitalMin: parsedHospitalMin,
-              hospitalMax: parsedHospitalMax,
-            },
-            complexity: 'A' as const,
-            prices: {
-              total: parsedManualSurgery + parsedManualAnesthesia,
-              surgery: parsedManualSurgery,
-              anesthesia: parsedManualAnesthesia,
-            },
-          },
-        ]
-      : procedureEntries;
+    const procedures = procedureEntries;
     const validProcedureEntryIds = new Set(procedures.map(getProcedureEntryId));
-    const validProcedureCombinations = manualMode
-      ? []
-      : procedureCombinations
+    const validProcedureCombinations = procedureCombinations
           .map((combination) => ({
             ...combination,
             procedureEntryIds: combination.procedureEntryIds.filter((id) => validProcedureEntryIds.has(id)),
@@ -443,9 +459,7 @@ export default function QuoteForm({ onGenerate }: Props) {
             combination.procedureEntryIds.length >= 2 &&
             !hasBlockedPair(combination.procedureEntryIds, procedureExclusions),
           );
-    const validProcedureExclusions = manualMode
-      ? []
-      : procedureExclusions
+    const validProcedureExclusions = procedureExclusions
           .map((exclusion) => ({
             ...exclusion,
             procedureEntryIds: exclusion.procedureEntryIds.filter((id) => validProcedureEntryIds.has(id)).slice(0, 2),
@@ -461,8 +475,8 @@ export default function QuoteForm({ onGenerate }: Props) {
       procedures,
       procedureCombinations: validProcedureCombinations,
       procedureExclusions: validProcedureExclusions,
-      manualMode,
-      combinedSurgery: manualMode ? false : combinedSurgery,
+      manualMode: false,
+      combinedSurgery,
       hospitalName: hospitalName.trim() || HOSPITAL_NAME,
       hospitalMin: parsedHospitalMin,
       hospitalMax: parsedHospitalMax,
@@ -526,19 +540,18 @@ export default function QuoteForm({ onGenerate }: Props) {
           <h2 className="text-sm font-semibold uppercase tracking-wider" style={{ color: TEXT_MUTED }}>
             Procedimentos
           </h2>
-          <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={manualMode}
-              onChange={(e) => setManualMode(e.target.checked)}
-              className="w-4 h-4 rounded"
-            />
-            Preencher manualmente
-          </label>
+          <button
+            onClick={() => setShowManualProcedureForm((prev) => !prev)}
+            className="px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-2 transition-colors border"
+            style={{ color: BRAND, borderColor: BRAND_BORDER, background: showManualProcedureForm ? BRAND_SOFT : 'white' }}
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Adicionar manualmente
+          </button>
         </div>
 
         {/* Added procedures list */}
-        {!manualMode && procedureEntries.length > 0 && (
+        {procedureEntries.length > 0 && (
           <div className="mb-5 space-y-2">
             {procedureEntries.map((entry, idx) => (
               <div
@@ -551,7 +564,7 @@ export default function QuoteForm({ onGenerate }: Props) {
                     {entry.procedure.name}
                   </div>
                   <div className="text-xs mt-0.5" style={{ color: TEXT_MUTED }}>
-                    {COMPLEXITY_LABELS[entry.complexity]} ·{' '}
+                    {entry.procedure.id.startsWith('manual-proc') ? 'Manual' : COMPLEXITY_LABELS[entry.complexity]} ·{' '}
                     <span className="font-semibold" style={{ color: BRAND }}>
                       Equipe: {formatBRL(entry.prices.surgery)}
                     </span>
@@ -572,75 +585,7 @@ export default function QuoteForm({ onGenerate }: Props) {
           </div>
         )}
 
-        {manualMode ? (
-          <div className="border rounded-xl p-4 space-y-4" style={{ borderColor: SURFACE_BORDER, background: SURFACE }}>
-            <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#94a3b8' }}>
-              Preenchimento manual do procedimento
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5" style={{ color: '#334155' }}>
-                Nome do procedimento *
-              </label>
-              <input
-                type="text"
-                value={manualProcedureName}
-                onChange={(e) => setManualProcedureName(e.target.value)}
-                placeholder="Ex: Abdominoplastia com lipoescultura"
-                className={inputClass}
-                style={inputFocusStyle}
-                onFocus={(e) => (e.target.style.borderColor = BRAND)}
-                onBlur={(e) => (e.target.style.borderColor = '')}
-              />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1.5" style={{ color: '#334155' }}>
-                  Equipe cirúrgica (R$) *
-                </label>
-                <input
-                  type="text"
-                  value={manualSurgeryValue}
-                  onChange={(e) => setManualSurgeryValue(e.target.value)}
-                  placeholder="Ex: 25000"
-                  className={inputClass}
-                  style={inputFocusStyle}
-                  onFocus={(e) => (e.target.style.borderColor = BRAND)}
-                  onBlur={(e) => (e.target.style.borderColor = '')}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1.5" style={{ color: '#334155' }}>
-                  Anestesista (R$)
-                </label>
-                <input
-                  type="text"
-                  value={manualAnesthesiaValue}
-                  onChange={(e) => setManualAnesthesiaValue(e.target.value)}
-                  placeholder="Ex: 3000 ou 0"
-                  className={inputClass}
-                  style={inputFocusStyle}
-                  onFocus={(e) => (e.target.style.borderColor = BRAND)}
-                  onBlur={(e) => (e.target.style.borderColor = '')}
-                />
-              </div>
-            </div>
-            {manualSurgeryValue.trim() && (
-              <div className="bg-white rounded-xl px-3 py-2.5 text-sm text-slate-700 border border-slate-200 space-y-0.5">
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Equipe cirúrgica:</span>
-                  <span className="font-semibold">{formatBRL(parseCurrencyInput(manualSurgeryValue))}</span>
-                </div>
-                {parseCurrencyInput(manualAnesthesiaValue) > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Anestesista:</span>
-                    <span className="font-semibold">{formatBRL(parseCurrencyInput(manualAnesthesiaValue))}</span>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="border rounded-xl p-4" style={{ borderColor: SURFACE_BORDER, background: SURFACE }}>
+        <div className="border rounded-xl p-4" style={{ borderColor: SURFACE_BORDER, background: SURFACE }}>
             <div className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: '#94a3b8' }}>
               {procedureEntries.length === 0 ? 'Selecionar procedimento *' : 'Adicionar outro procedimento'}
             </div>
@@ -762,6 +707,129 @@ export default function QuoteForm({ onGenerate }: Props) {
             >
               <Plus className="w-4 h-4" />
               {procedureEntries.length === 0 ? 'Adicionar procedimento' : 'Adicionar mais um procedimento'}
+            </button>
+        </div>
+
+        {showManualProcedureForm && (
+          <div className="border rounded-xl p-4 mt-4 space-y-4" style={{ borderColor: BRAND_BORDER, background: BRAND_SOFT }}>
+            <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: TEXT_MUTED }}>
+              Procedimento não cadastrado
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1.5" style={{ color: '#334155' }}>
+                Nome do procedimento *
+              </label>
+              <input
+                type="text"
+                value={manualProcedureName}
+                onChange={(e) => setManualProcedureName(e.target.value)}
+                placeholder="Ex: Procedimento complementar"
+                className={inputClass}
+                style={inputFocusStyle}
+                onFocus={(e) => (e.target.style.borderColor = BRAND)}
+                onBlur={(e) => (e.target.style.borderColor = '')}
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: '#334155' }}>
+                  Equipe cirúrgica (R$) *
+                </label>
+                <input
+                  type="text"
+                  value={manualSurgeryValue}
+                  onChange={(e) => setManualSurgeryValue(e.target.value)}
+                  placeholder="Ex: 25000"
+                  className={inputClass}
+                  style={inputFocusStyle}
+                  onFocus={(e) => (e.target.style.borderColor = BRAND)}
+                  onBlur={(e) => (e.target.style.borderColor = '')}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: '#334155' }}>
+                  Anestesista (R$)
+                </label>
+                <input
+                  type="text"
+                  value={manualAnesthesiaValue}
+                  onChange={(e) => setManualAnesthesiaValue(e.target.value)}
+                  placeholder="Ex: 3000 ou 0"
+                  className={inputClass}
+                  style={inputFocusStyle}
+                  onFocus={(e) => (e.target.style.borderColor = BRAND)}
+                  onBlur={(e) => (e.target.style.borderColor = '')}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: '#334155' }}>
+                  Hospital mínimo (R$) *
+                </label>
+                <input
+                  type="text"
+                  value={manualHospitalMin}
+                  onChange={(e) => setManualHospitalMin(e.target.value)}
+                  placeholder="Ex: 4700"
+                  className={inputClass}
+                  style={inputFocusStyle}
+                  onFocus={(e) => (e.target.style.borderColor = BRAND)}
+                  onBlur={(e) => (e.target.style.borderColor = '')}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1.5" style={{ color: '#334155' }}>
+                  Hospital máximo (R$) *
+                </label>
+                <input
+                  type="text"
+                  value={manualHospitalMax}
+                  onChange={(e) => setManualHospitalMax(e.target.value)}
+                  placeholder="Ex: 5700"
+                  className={inputClass}
+                  style={inputFocusStyle}
+                  onFocus={(e) => (e.target.style.borderColor = BRAND)}
+                  onBlur={(e) => (e.target.style.borderColor = '')}
+                />
+              </div>
+            </div>
+            {(manualSurgeryValue.trim() || manualHospitalMin.trim()) && (
+              <div className="bg-white rounded-xl px-3 py-2.5 text-sm text-slate-700 border border-slate-200 space-y-0.5">
+                {manualSurgeryValue.trim() && (
+                  <div className="flex justify-between gap-4">
+                    <span className="text-slate-500">Equipe cirúrgica:</span>
+                    <span className="font-semibold">{formatBRL(parseCurrencyInput(manualSurgeryValue))}</span>
+                  </div>
+                )}
+                {parseCurrencyInput(manualAnesthesiaValue) > 0 && (
+                  <div className="flex justify-between gap-4">
+                    <span className="text-slate-500">Anestesista:</span>
+                    <span className="font-semibold">{formatBRL(parseCurrencyInput(manualAnesthesiaValue))}</span>
+                  </div>
+                )}
+                {manualHospitalMin.trim() && manualHospitalMax.trim() && (
+                  <div className="flex justify-between gap-4">
+                    <span className="text-slate-500">Hospital:</span>
+                    <span className="font-semibold">
+                      {formatBRL(parseCurrencyInput(manualHospitalMin))} - {formatBRL(parseCurrencyInput(manualHospitalMax))}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+            <button
+              onClick={handleAddManualProcedure}
+              disabled={!canAddManualProcedure}
+              className="w-full py-2.5 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-all"
+              style={
+                canAddManualProcedure
+                  ? { background: BRAND, color: 'white' }
+                  : { background: '#e2e8f0', color: '#94a3b8', cursor: 'not-allowed' }
+              }
+              onMouseEnter={(e) => { if (canAddManualProcedure) (e.currentTarget as HTMLButtonElement).style.background = BRAND_HOVER; }}
+              onMouseLeave={(e) => { if (canAddManualProcedure) (e.currentTarget as HTMLButtonElement).style.background = BRAND; }}
+            >
+              <Plus className="w-4 h-4" />
+              Adicionar procedimento manual
             </button>
           </div>
         )}

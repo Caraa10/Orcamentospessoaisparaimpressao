@@ -1073,7 +1073,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
            CONTENT — TEXT
         ══════════════════════════════════════ */
         .p-intro {
-          font-size: 11pt;
+          font-size: 10pt;
           margin-bottom: 4mm;
           text-align: justify;
           line-height: 1.58;
@@ -1082,7 +1082,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           margin-bottom: 10pt;
         }
         .p-section-intro {
-          font-size: 11pt;
+          font-size: 10pt;
           margin-top: 2mm;
           margin-bottom: 6pt;
           text-align: justify;
@@ -1116,12 +1116,12 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           flex-shrink: 0;
           margin-right: 3mm;
           margin-top: 0.05em;
-          font-size: 11pt;
+          font-size: 10pt;
           line-height: 1.58;
         }
         .p-list-text {
           flex: 1;
-          font-size: 11pt;
+          font-size: 10pt;
           text-align: justify;
           line-height: 1.58;
         }
@@ -1228,7 +1228,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         .p-closing p {
           margin-bottom: 4mm;
           text-align: justify;
-          font-size: 11pt;
+          font-size: 10pt;
           line-height: 1.58;
         }
         .p-closing p:last-child { margin-bottom: 0; }

@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 
-const PRICES_CSV = 'Valores Procedimentos e Accurata 09:05:2026/Valores Procedimentos 09 05-VALORES PROCEDIMENTOS (04.05.2026).csv';
-const HOSPITAL_CSV = 'Valores Procedimentos e Accurata 09:05:2026/Valores Accurata 09 05 -VALORES PROCEDIMENTOS (04.05.2026).csv';
+const PRICES_CSV = 'Valores Procedimentos e Accurata (30.05.2026)/Valores Procedimentos 09 05-VALORES PROCEDIMENTOS (30.05.2026).csv';
+const HOSPITAL_CSV = 'Valores Procedimentos e Accurata (30.05.2026)/Valores Accurata 09 05 -VALORES PROCEDIMENTOS (30.05.2026).csv';
 
 function parseMoney(s) {
   s = s.trim();
@@ -57,6 +57,7 @@ function categoryOf(name) {
 
 function hasImplantsFor(name) {
   const n = name.toLowerCase();
+  if (n.includes('retirada') && n.includes('implantes') && n.includes('lipoenxertia mamária')) return false;
   if (n.includes('mamoplastia de aumento')) return true;
   if (n.includes('implantes')) return true;
   if (n.includes('implante')) return true;
@@ -194,9 +195,9 @@ out.push('export const ARGOPLASMA_PRICE_12X = 6250;');
 out.push('');
 out.push('export const IMPLANT_PRICES = {');
 out.push('  eurosilicone: {');
-out.push('    avista: 3630,');
-out.push('    ate6x: 3880,');
-out.push('    de7a10x: 4180,');
+out.push('    avista: 3750,');
+out.push('    ate6x: 3900,');
+out.push('    de7a10x: 4200,');
 out.push('  },');
 out.push('  silimed: {');
 out.push('    avista: 4603,');

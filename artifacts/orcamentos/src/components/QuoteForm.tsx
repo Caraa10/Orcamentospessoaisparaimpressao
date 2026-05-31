@@ -201,16 +201,21 @@ export default function QuoteForm({ onGenerate }: Props) {
         const normalized = name.toLowerCase();
         const isAbdominoplasty = normalized.startsWith('abdominoplastia');
         const isCircumferentialAbdominoplasty = normalized.startsWith('abdominoplastia circunferencial');
+        const baseAbdomenFlanks = 'abdominoplastia e lipoaspiração de abdome e flancos';
+        const isBaseAbdomenFlanks = normalized === baseAbdomenFlanks;
+        const isBaseAbdomenFlanksVariant = normalized.startsWith(`${baseAbdomenFlanks} +`);
         const hasAbdomenFlanksLipo = /lipoaspiração de abdome,? flancos/.test(normalized);
 
-        if (normalized === 'abdominoplastia') return 0;
-        if (isAbdominoplasty && !isCircumferentialAbdominoplasty && hasAbdomenFlanksLipo) return 1;
-        if (isAbdominoplasty && !isCircumferentialAbdominoplasty) return 2;
-        if (normalized.startsWith('miniabdominoplastia')) return 3;
-        if (normalized.includes('miniabdominoplastia')) return 4;
-        if (isCircumferentialAbdominoplasty) return 5;
-        if (normalized.includes('abdominoplastia')) return 6;
-        return 7;
+        if (isBaseAbdomenFlanks) return 0;
+        if (isBaseAbdomenFlanksVariant) return 1;
+        if (normalized === 'abdominoplastia') return 2;
+        if (isAbdominoplasty && !isCircumferentialAbdominoplasty && hasAbdomenFlanksLipo) return 3;
+        if (isAbdominoplasty && !isCircumferentialAbdominoplasty) return 4;
+        if (normalized.startsWith('miniabdominoplastia')) return 5;
+        if (normalized.includes('miniabdominoplastia')) return 6;
+        if (isCircumferentialAbdominoplasty) return 7;
+        if (normalized.includes('abdominoplastia')) return 8;
+        return 9;
       };
 
       return matches

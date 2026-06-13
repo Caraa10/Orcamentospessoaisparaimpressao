@@ -16,12 +16,29 @@ function includesMastopexy(entry: ProcedureEntry) {
   return normalizeProcedureName(entry.procedure.name).includes('mastopexia');
 }
 
+function isImplantReplacementWithPreAxillaryLiposuction(entry: ProcedureEntry) {
+  const name = normalizeProcedureName(entry.procedure.name);
+  return (
+    name.includes('substituicao de implantes') &&
+    name.includes('lipoaspiracao de pre-axilas') &&
+    !name.includes('contratura capsular') &&
+    !name.includes('mamoplastia redutora')
+  );
+}
+
 export function areProceduresBuiltInIncompatible(first: ProcedureEntry, second: ProcedureEntry) {
-  if (!isImplantRemovalWithBreastFatGrafting(first) || !isImplantRemovalWithBreastFatGrafting(second)) {
-    return false;
+  const isRemovalAlternative =
+    isImplantRemovalWithBreastFatGrafting(first) &&
+    isImplantRemovalWithBreastFatGrafting(second);
+  const isReplacementAlternative =
+    isImplantReplacementWithPreAxillaryLiposuction(first) &&
+    isImplantReplacementWithPreAxillaryLiposuction(second);
+
+  if (isRemovalAlternative || isReplacementAlternative) {
+    return includesMastopexy(first) !== includesMastopexy(second);
   }
 
-  return includesMastopexy(first) !== includesMastopexy(second);
+  return false;
 }
 
 export function hasBuiltInProcedureConflict(entries: ProcedureEntry[]) {

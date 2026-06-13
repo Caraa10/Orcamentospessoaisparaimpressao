@@ -463,31 +463,6 @@ function formatProcedureDisplayTitle(title: string) {
 function joinPortuguese(parts: string[]) {
   const cleanParts = parts.map((part) => part.trim()).filter(Boolean);
   if (cleanParts.length <= 1) return cleanParts[0] ?? '';
-  if (
-    cleanParts.length === 2 &&
-    /\be lipoescultura\b/i.test(cleanParts[1])
-  ) {
-    return `${cleanParts[0]}, ${cleanParts[1]}`;
-  }
-  if (
-    cleanParts.length === 2 &&
-    /^retirada de implantes\b/i.test(cleanParts[1])
-  ) {
-    return `${cleanParts[0]}, ${cleanParts[1]}`;
-  }
-  if (
-    cleanParts.length === 2 &&
-    /^(miniabdominoplastia|abdominoplastia|mamoplastia de aumento|mamoplastia redutora(?: com implantes)?|mastopexia(?: com implantes)?)\b/i.test(cleanParts[0]) &&
-    /^lipoaspiração\b/i.test(cleanParts[1])
-  ) {
-    return `${cleanParts[0]} e ${cleanParts[1]}`;
-  }
-  if (
-    cleanParts.length === 2 &&
-    /\se\s/i.test(cleanParts[1])
-  ) {
-    return `${cleanParts[0]}, ${cleanParts[1]}`;
-  }
   if (cleanParts.length === 2) return `${cleanParts[0]} e ${cleanParts[1]}`;
   return `${cleanParts.slice(0, -1).join(', ')} e ${cleanParts[cleanParts.length - 1]}`;
 }

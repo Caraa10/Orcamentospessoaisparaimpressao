@@ -251,6 +251,11 @@ const BREAST_FAT_GRAFTING_AUGMENTATION_ITEMS: string[] = [
   '**Sutiã cirúrgico**: para suporte adequado e proteção das mamas',
 ];
 
+const BREAST_IMPLANT_REMOVAL_WITH_FAT_GRAFTING_ITEMS: string[] = [
+  '**Sutiã cirúrgico**: para suporte adequado e proteção das mamas',
+  '**Meia elástica** (meia de compressão cirúrgica): para redução de riscos',
+];
+
 const BREAST_REDUCTION_SPECIFIC_ITEMS: string[] = [
   '**Técnicas** de sutiã interno e, caso necessário, enxertia de gordura nas mamas',
   '**Cola cirúrgica** (Prineo® Johnson&Johnson): funciona como curativo (você não precisa se preocupar em fazer curativos no pós-operatório) e não há pontos para retirar nas mamas',
@@ -371,7 +376,7 @@ function getCategoryInfo(category: ProcedureCategory, procedureName: string): Ca
       return {
         firstIntro: 'Dessa forma, tendo como objetivo oferecer o melhor para você, já **incluímos em seu procedimento de retirada de implantes e lipoenxertia mamária**:',
         subIntro: 'Estão **incluídos em seu procedimento de retirada de implantes e lipoenxertia mamária**:',
-        items: BREAST_FAT_GRAFTING_AUGMENTATION_ITEMS,
+        items: BREAST_IMPLANT_REMOVAL_WITH_FAT_GRAFTING_ITEMS,
       };
     }
     if (lower.includes('mastopexia com implantes')) {

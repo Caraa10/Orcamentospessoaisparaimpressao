@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Search, FileText, Plus, Trash2, ChevronDown } from 'lucide-react';
 import { PROCEDURES, Procedure, Complexity, getPriceForComplexity, ARGOPLASMA_PRICE } from '@/data/procedures';
 import { formatBRL } from '@/utils/calculations';
+import { hasBuiltInProcedureConflict } from '@/utils/procedureCompatibility';
 import type { QuoteData, ProcedureCombination, ProcedureEntry, ProcedureExclusion } from '@/types/quote';
 
 interface Props {
@@ -393,9 +394,15 @@ export default function QuoteForm({ onGenerate }: Props) {
   };
 
   const handleAddCombination = () => {
-    const defaultIds = procedureEntries
-      .slice(0, 2)
-      .map((entry, idx) => getProcedureEntryId(entry, idx));
+    let defaultIds: string[] = [];
+    for (let i = 0; i < procedureEntries.length && defaultIds.length === 0; i++) {
+      for (let j = i + 1; j < procedureEntries.length; j++) {
+        if (!hasBuiltInProcedureConflict([procedureEntries[i], procedureEntries[j]])) {
+          defaultIds = [getProcedureEntryId(procedureEntries[i], i), getProcedureEntryId(procedureEntries[j], j)];
+          break;
+        }
+      }
+    }
 
     setProcedureCombinations((prev) => [
       ...prev,
@@ -411,15 +418,23 @@ export default function QuoteForm({ onGenerate }: Props) {
   };
 
   const handleToggleCombinationProcedure = (combinationId: string, procedureEntryId: string) => {
+    const entriesById = new Map(
+      procedureEntries.map((entry, index) => [getProcedureEntryId(entry, index), entry]),
+    );
     setProcedureCombinations((prev) =>
       prev.map((combination) => {
         if (combination.id !== combinationId) return combination;
         const selected = combination.procedureEntryIds.includes(procedureEntryId);
+        const nextIds = selected
+          ? combination.procedureEntryIds.filter((id) => id !== procedureEntryId)
+          : [...combination.procedureEntryIds, procedureEntryId];
+        const nextEntries = nextIds
+          .map((entryId) => entriesById.get(entryId))
+          .filter((entry): entry is ProcedureEntry => Boolean(entry));
+        if (hasBuiltInProcedureConflict(nextEntries)) return combination;
         return {
           ...combination,
-          procedureEntryIds: selected
-            ? combination.procedureEntryIds.filter((id) => id !== procedureEntryId)
-            : [...combination.procedureEntryIds, procedureEntryId],
+          procedureEntryIds: nextIds,
         };
       }),
     );
@@ -478,15 +493,24 @@ export default function QuoteForm({ onGenerate }: Props) {
     const parsedHospitalMax = parseCurrencyInput(hospitalMax);
     const procedures = procedureEntries;
     const validProcedureEntryIds = new Set(procedures.map(getProcedureEntryId));
+    const proceduresByEntryId = new Map(
+      procedures.map((entry, index) => [getProcedureEntryId(entry, index), entry]),
+    );
     const validProcedureCombinations = procedureCombinations
           .map((combination) => ({
             ...combination,
             procedureEntryIds: combination.procedureEntryIds.filter((id) => validProcedureEntryIds.has(id)),
           }))
-          .filter((combination) =>
-            combination.procedureEntryIds.length >= 2 &&
-            !hasBlockedPair(combination.procedureEntryIds, procedureExclusions),
-          );
+          .filter((combination) => {
+            const selectedEntries = combination.procedureEntryIds
+              .map((entryId) => proceduresByEntryId.get(entryId))
+              .filter((entry): entry is ProcedureEntry => Boolean(entry));
+            return (
+              selectedEntries.length >= 2 &&
+              !hasBlockedPair(combination.procedureEntryIds, procedureExclusions) &&
+              !hasBuiltInProcedureConflict(selectedEntries)
+            );
+          });
     const validProcedureExclusions = procedureExclusions
           .map((exclusion) => ({
             ...exclusion,
@@ -900,7 +924,9 @@ export default function QuoteForm({ onGenerate }: Props) {
                 const totalSurgery = selectedEntries.reduce((sum, entry) => sum + entry.prices.surgery, 0);
                 const totalAnesthesia = selectedEntries.reduce((sum, entry) => sum + entry.prices.anesthesia, 0);
                 const totalHospital = calculateCombinedHospitalValues(selectedEntries);
-                const hasBlockedProcedures = hasBlockedPair(selectedIds, procedureExclusions);
+                const hasBlockedProcedures =
+                  hasBlockedPair(selectedIds, procedureExclusions) ||
+                  hasBuiltInProcedureConflict(selectedEntries);
                 const isValid = selectedEntries.length >= 2 && !hasBlockedProcedures;
 
                 return (

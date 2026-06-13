@@ -3,6 +3,7 @@ import type { QuoteData } from '@/types/quote';
 import { calcPaymentOptions, formatBRLNoSymbol, calcInstallmentValue } from '@/utils/calculations';
 import { getIncludedSections } from '@/data/includedItems';
 import { ARGOPLASMA_PRICE, ARGOPLASMA_PRICE_6X, ARGOPLASMA_PRICE_12X, IMPLANT_PRICES } from '@/data/procedures';
+import { areProceduresBuiltInIncompatible } from '@/utils/procedureCompatibility';
 
 interface Props {
   data: QuoteData;
@@ -405,21 +406,10 @@ function expandCompatibleProcedureSets(
 ) {
   if (exclusionKeys.size === 0) return procedureSets;
 
-  const isCompatible = (procedureSet: QuoteData['procedures']) => {
-    for (let i = 0; i < procedureSet.length; i++) {
-      for (let j = i + 1; j < procedureSet.length; j++) {
-        if (exclusionKeys.has(makePairKey(getEntryId(procedureSet[i]), getEntryId(procedureSet[j])))) {
-          return false;
-        }
-      }
-    }
-    return true;
-  };
-
   const compatibleSets: QuoteData['procedures'][] = [];
 
   procedureSets.forEach((procedureSet) => {
-    if (isCompatible(procedureSet)) {
+    if (isProcedureSetCompatible(procedureSet, getEntryId, exclusionKeys)) {
       compatibleSets.push(procedureSet);
       return;
     }
@@ -428,7 +418,7 @@ function expandCompatibleProcedureSets(
     const compatibleSubsets: QuoteData['procedures'][] = [];
     for (let mask = 1; mask < subsetCount; mask++) {
       const subset = procedureSet.filter((_, index) => (mask & (1 << index)) !== 0);
-      if (subset.length >= 2 && isCompatible(subset)) {
+      if (subset.length >= 2 && isProcedureSetCompatible(subset, getEntryId, exclusionKeys)) {
         compatibleSubsets.push(subset);
       }
     }
@@ -445,6 +435,21 @@ function expandCompatibleProcedureSets(
   });
 
   return compatibleSets;
+}
+
+function isProcedureSetCompatible(
+  procedureSet: QuoteData['procedures'],
+  getEntryId: (entry: QuoteData['procedures'][number]) => string,
+  exclusionKeys: Set<string>,
+) {
+  for (let i = 0; i < procedureSet.length; i++) {
+    for (let j = i + 1; j < procedureSet.length; j++) {
+      if (exclusionKeys.has(makePairKey(getEntryId(procedureSet[i]), getEntryId(procedureSet[j])))) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 function normalizeProcedureTitleBasic(title: string) {
@@ -877,6 +882,13 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const exclusionKeys = getExclusionKeys(data.procedureExclusions);
   const getEntryId = (entry: QuoteData['procedures'][number]) =>
     entryIdsByEntry.get(entry) ?? entry.entryId ?? entry.procedure.id;
+  for (let i = 0; i < data.procedures.length; i++) {
+    for (let j = i + 1; j < data.procedures.length; j++) {
+      if (areProceduresBuiltInIncompatible(data.procedures[i], data.procedures[j])) {
+        exclusionKeys.add(makePairKey(getEntryId(data.procedures[i]), getEntryId(data.procedures[j])));
+      }
+    }
+  }
   const selectedCombinedSummarySets = (data.procedureCombinations ?? [])
     .map((combination) =>
       combination.procedureEntryIds
@@ -885,15 +897,18 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
     )
     .filter((procedureSet) => procedureSet.length >= 2);
   const hasSpecificCombinationSelection = (data.procedureCombinations ?? []).length > 0;
+  const candidateCombinedSummarySets = hasSpecificCombinationSelection
+    ? selectedCombinedSummarySets.filter((procedureSet) =>
+        isProcedureSetCompatible(procedureSet, getEntryId, exclusionKeys),
+      )
+    : expandCompatibleProcedureSets(
+        getCombinedSummarySets(data.procedures),
+        getEntryId,
+        exclusionKeys,
+      );
   const combinedSummarySets = isMulti
     ? dedupeCombinedSummarySetsByDisplayedTitle(
-        expandCompatibleProcedureSets(
-          hasSpecificCombinationSelection
-            ? selectedCombinedSummarySets
-            : getCombinedSummarySets(data.procedures),
-          getEntryId,
-          exclusionKeys,
-        ),
+        candidateCombinedSummarySets,
       )
     : [];
 

@@ -228,6 +228,27 @@ export default function QuoteForm({ onGenerate }: Props) {
         .slice(0, 40);
     }
 
+    if (/^lipoe/.test(q)) {
+      const rankLipoProcedure = (name: string) => {
+        const normalized = name.toLowerCase();
+        if (normalized.startsWith('lipoescultura')) return 0;
+        if (normalized.includes(q)) return 1;
+        if (normalized.includes('lipoescultura')) return 2;
+        if (normalized.includes('lipoenxertia')) return 3;
+        if (normalized.includes('lipoaspiração')) return 4;
+        return 5;
+      };
+
+      return PROCEDURES
+        .filter((procedure) => rankLipoProcedure(procedure.name) < 5)
+        .slice()
+        .sort((a, b) => {
+          const rankDiff = rankLipoProcedure(a.name) - rankLipoProcedure(b.name);
+          if (rankDiff !== 0) return rankDiff;
+          return a.name.localeCompare(b.name, 'pt-BR');
+        });
+    }
+
     if (/^lipo?/.test(q)) {
       return matches
         .slice()

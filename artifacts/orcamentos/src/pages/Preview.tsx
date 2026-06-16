@@ -21,7 +21,7 @@ function formatPatientFileName(patientName: string) {
     .filter(Boolean)
     .map(toTitleCasePart);
 
-  const safeName = nameParts.length > 0 ? nameParts.join('_') : 'Orcamento';
+  const safeName = nameParts.length > 0 ? nameParts.join(' ') : 'Orcamento';
   const dateParts = new Intl.DateTimeFormat('pt-BR', {
     timeZone: SAO_PAULO_TIME_ZONE,
     year: 'numeric',
@@ -33,9 +33,9 @@ function formatPatientFileName(patientName: string) {
       parts[part.type] = part.value;
       return parts;
     }, {});
-  const generatedDate = [dateParts.day, dateParts.month, dateParts.year].join('_');
+  const generatedDate = [dateParts.day, dateParts.month, dateParts.year].join('.');
 
-  return `${safeName}_${generatedDate}.pdf`;
+  return `${safeName} (${generatedDate}).pdf`;
 }
 
 export default function Preview() {

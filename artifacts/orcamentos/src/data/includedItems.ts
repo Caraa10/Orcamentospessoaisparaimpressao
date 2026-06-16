@@ -198,6 +198,7 @@ function shouldOmitIncludedSectionForExclusiveSingleProcedure(entry: {
   const normalizedName = normalizeProcedureLabel(entry.name);
   return [
     'blefaroplastia superior com anestesia local',
+    'ninfoplastia',
     'otoplastia',
     'tratamento cirurgico de cicatriz',
   ].includes(

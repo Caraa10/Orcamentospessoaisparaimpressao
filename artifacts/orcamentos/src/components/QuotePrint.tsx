@@ -168,6 +168,25 @@ function isUpperBlepharoplastySedationFamily(title: string) {
   return normalized.includes('blefaroplastia superior') && normalized.includes('sedacao');
 }
 
+function getLipoBodyContourGroupKey(title: string) {
+  const normalized = normalizeComparisonText(title);
+  const isLipoProcedure =
+    normalized.startsWith('lipoaspiracao') ||
+    normalized.includes('lipoescultura');
+  const isBreastProcedure =
+    normalized.includes('mamoplastia') ||
+    normalized.includes('mastopexia') ||
+    normalized.includes('implante') ||
+    normalized.includes('mama');
+
+  if (!isLipoProcedure || isBreastProcedure) return null;
+
+  const areaKeys = getLipoAreas(title).map((area) => area.key).sort();
+  if (areaKeys.length === 0) return null;
+
+  return `lipo-body-${areaKeys.join('-')}`;
+}
+
 function getExclusiveGroupKey(title: string) {
   if (isMamoplastiaAumentoFamily(title)) return 'breast-augmentation';
   if (isMastopexiaWithImplantsFamily(title)) return 'breast-mastopexy-with-implants';
@@ -177,6 +196,8 @@ function getExclusiveGroupKey(title: string) {
   if (isRetiradaFusoFamily(title)) return 'abdomen-fuso';
   if (isUpperBlepharoplastyLocalFamily(title)) return 'face-upper-blepharoplasty-local';
   if (isUpperBlepharoplastySedationFamily(title)) return 'face-upper-blepharoplasty-sedation';
+  const lipoBodyContourGroupKey = getLipoBodyContourGroupKey(title);
+  if (lipoBodyContourGroupKey) return lipoBodyContourGroupKey;
   return null;
 }
 
@@ -185,6 +206,7 @@ function getExclusiveConflictBucket(groupKey: string | null) {
   if (groupKey.startsWith('breast-')) return 'breast';
   if (groupKey.startsWith('abdomen-')) return 'abdomen';
   if (groupKey.startsWith('face-upper-blepharoplasty-')) return 'face-upper-blepharoplasty';
+  if (groupKey.startsWith('lipo-body-')) return groupKey;
   return null;
 }
 

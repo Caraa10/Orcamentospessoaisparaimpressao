@@ -27,7 +27,10 @@ function isImplantReplacementWithPreAxillaryLiposuction(entry: ProcedureEntry) {
 }
 
 function isStandalonePreAxillaryLiposuction(entry: ProcedureEntry) {
-  return normalizeProcedureName(entry.procedure.name) === 'lipoaspiracao de pre-axilas';
+  return (
+    entry.procedure.category === 'lipo' &&
+    normalizeProcedureName(entry.procedure.name) === 'lipoaspiracao de pre-axilas'
+  );
 }
 
 function includesPreAxillaryLiposuction(entry: ProcedureEntry) {
@@ -56,12 +59,12 @@ function getLiposuctionAreas(entry: ProcedureEntry) {
 }
 
 function isLipoescultura(entry: ProcedureEntry) {
-  return normalizeProcedureName(entry.procedure.name).includes('lipoescultura');
+  return entry.procedure.category === 'lipo' && normalizeProcedureName(entry.procedure.name).includes('lipoescultura');
 }
 
 function isStandaloneLiposuction(entry: ProcedureEntry) {
   const name = normalizeProcedureName(entry.procedure.name);
-  return name.includes('lipoaspiracao') && !name.includes('lipoescultura');
+  return entry.procedure.category === 'lipo' && name.includes('lipoaspiracao') && !name.includes('lipoescultura');
 }
 
 function isRedundantWithLipoescultura(entry: ProcedureEntry, lipoesculturaAreas: Set<string>) {

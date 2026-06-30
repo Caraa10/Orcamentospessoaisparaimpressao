@@ -3,6 +3,7 @@ import { Search, FileText, Plus, Trash2, ChevronDown } from 'lucide-react';
 import { PROCEDURES, Procedure, Complexity, getPriceForComplexity, ARGOPLASMA_PRICE } from '@/data/procedures';
 import { formatBRL } from '@/utils/calculations';
 import {
+  doesProcedureUseBillableImplants,
   hasBuiltInProcedureConflict,
   normalizeProcedureSetForCombinedPricing,
 } from '@/utils/procedureCompatibility';
@@ -275,7 +276,7 @@ export default function QuoteForm({ onGenerate }: Props) {
     return getPriceForComplexity(pickerProcedure, pickerComplexity);
   }, [pickerProcedure, pickerComplexity]);
 
-  const anyProcedureHasImplants = procedureEntries.some((e) => e.procedure.hasImplants);
+  const anyProcedureHasImplants = procedureEntries.some(doesProcedureUseBillableImplants);
   const anyProcedureSupportsArgoplasma = procedureEntries.some((entry) => {
     const procName = entry.procedure.name.toLowerCase();
     return (
@@ -342,7 +343,7 @@ export default function QuoteForm({ onGenerate }: Props) {
       prices: pickerPrices,
     };
     setProcedureEntries((prev) => [...prev, entry]);
-    if (pickerProcedure.hasImplants) setIncludeImplants(true);
+    if (doesProcedureUseBillableImplants(entry)) setIncludeImplants(true);
     setPickerProcedure(null);
     setSearch('');
     setPickerComplexity('A');
@@ -351,7 +352,7 @@ export default function QuoteForm({ onGenerate }: Props) {
   const handleRemoveProcedure = (idx: number) => {
     setProcedureEntries((prev) => {
       const next = prev.filter((_, i) => i !== idx);
-      if (!next.some((e) => e.procedure.hasImplants)) setIncludeImplants(false);
+      if (!next.some(doesProcedureUseBillableImplants)) setIncludeImplants(false);
       return next;
     });
   };

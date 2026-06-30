@@ -5,6 +5,7 @@ import { getIncludedSections } from '@/data/includedItems';
 import { ARGOPLASMA_PRICE, ARGOPLASMA_PRICE_6X, ARGOPLASMA_PRICE_12X, IMPLANT_PRICES } from '@/data/procedures';
 import {
   areProceduresBuiltInIncompatible,
+  doesProcedureUseBillableImplants,
   normalizeProcedureSetForCombinedPricing,
 } from '@/utils/procedureCompatibility';
 
@@ -836,6 +837,8 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
     data.procedures.every((entry) =>
       /anestesia local/i.test(entry.procedure.name),
     );
+  const shouldShowImplantPrices =
+    data.includeImplants && data.procedures.some(doesProcedureUseBillableImplants);
 
   const includedSections = data.manualMode
     ? []
@@ -905,7 +908,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const costComponents: string[] = ['equipe cirúrgica'];
   if (hasAnyAnesthesiaFee) costComponents.push('anestesista');
   costComponents.push('hospital');
-  if (data.includeImplants) costComponents.push('implantes');
+  if (shouldShowImplantPrices) costComponents.push('implantes');
   if (data.includeArgoplasma) costComponents.push('argoplasma (opcional)');
 
   const proceduresByEntryId = new Map(
@@ -1471,7 +1474,7 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
       {/* ════════════════════════════════════════════════
           IMPLANTS PAGE
       ════════════════════════════════════════════════ */}
-      {data.includeImplants && (
+      {shouldShowImplantPrices && (
         <div className="page page-content">
           <div className="page-body">
           <div className="p-implant-section-title">

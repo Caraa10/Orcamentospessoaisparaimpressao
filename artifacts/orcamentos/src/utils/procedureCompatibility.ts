@@ -7,6 +7,23 @@ function normalizeProcedureName(name: string) {
     .replace(/[\u0300-\u036f]/g, '');
 }
 
+export function doesProcedureUseBillableImplants(entry: ProcedureEntry) {
+  if (!entry.procedure.hasImplants) return false;
+
+  const name = normalizeProcedureName(entry.procedure.name);
+  const removesImplants =
+    name.includes('retirada de implantes') ||
+    name.includes('retirada dos implantes') ||
+    name.includes('explante');
+  const placesImplants =
+    name.includes('substituicao de implantes') ||
+    name.includes('troca de implantes') ||
+    name.includes('com implantes') ||
+    name.includes('mamoplastia de aumento');
+
+  return placesImplants || !removesImplants;
+}
+
 function isImplantRemovalWithBreastFatGrafting(entry: ProcedureEntry) {
   const name = normalizeProcedureName(entry.procedure.name);
   return name.includes('retirada de implantes') && name.includes('lipoenxertia mamaria');

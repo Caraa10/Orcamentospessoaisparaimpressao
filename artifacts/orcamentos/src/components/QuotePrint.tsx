@@ -145,6 +145,15 @@ function isMastopexiaFamily(title: string) {
   return isMastopexiaWithImplantsFamily(title) || isMastopexiaWithoutImplantsFamily(title);
 }
 
+function isBreastImplantReplacementWithoutMastopexyFamily(title: string) {
+  const normalized = normalizeComparisonText(title);
+  return (
+    normalized.includes('substituicao de implantes') &&
+    !normalized.includes('mastopexia') &&
+    !normalized.includes('mamoplastia redutora')
+  );
+}
+
 function isMiniabdominoplastiaFamily(title: string) {
   return normalizeComparisonText(title).includes('miniabdominoplastia');
 }
@@ -191,6 +200,7 @@ function getExclusiveGroupKey(title: string) {
   if (isMamoplastiaAumentoFamily(title)) return 'breast-augmentation';
   if (isMastopexiaWithImplantsFamily(title)) return 'breast-mastopexy-with-implants';
   if (isMastopexiaWithoutImplantsFamily(title)) return 'breast-mastopexy';
+  if (isBreastImplantReplacementWithoutMastopexyFamily(title)) return 'breast-implant-replacement';
   if (isMiniabdominoplastiaFamily(title)) return 'abdomen-miniabdominoplasty';
   if (isAbdominoplastiaFamily(title)) return 'abdomen-abdominoplasty';
   if (isRetiradaFusoFamily(title)) return 'abdomen-fuso';

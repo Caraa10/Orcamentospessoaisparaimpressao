@@ -3,7 +3,10 @@ import type { QuoteData } from '@/types/quote';
 import { calcPaymentOptions, formatBRLNoSymbol, calcInstallmentValue } from '@/utils/calculations';
 import { getIncludedSections } from '@/data/includedItems';
 import { ARGOPLASMA_PRICE, ARGOPLASMA_PRICE_6X, ARGOPLASMA_PRICE_12X, IMPLANT_PRICES } from '@/data/procedures';
-import { areProceduresBuiltInIncompatible } from '@/utils/procedureCompatibility';
+import {
+  areProceduresBuiltInIncompatible,
+  normalizeProcedureSetForCombinedPricing,
+} from '@/utils/procedureCompatibility';
 
 interface Props {
   data: QuoteData;
@@ -906,9 +909,12 @@ const QuotePrint = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         getEntryId,
         exclusionKeys,
       );
+  const normalizedCombinedSummarySets = candidateCombinedSummarySets
+    .map(normalizeProcedureSetForCombinedPricing)
+    .filter((procedureSet) => procedureSet.length >= 2);
   const combinedSummarySets = isMulti
     ? dedupeCombinedSummarySetsByDisplayedTitle(
-        candidateCombinedSummarySets,
+        normalizedCombinedSummarySets,
       )
     : [];
 

@@ -2,7 +2,10 @@ import { useState, useMemo, useEffect } from 'react';
 import { Search, FileText, Plus, Trash2, ChevronDown } from 'lucide-react';
 import { PROCEDURES, Procedure, Complexity, getPriceForComplexity, ARGOPLASMA_PRICE } from '@/data/procedures';
 import { formatBRL } from '@/utils/calculations';
-import { hasBuiltInProcedureConflict } from '@/utils/procedureCompatibility';
+import {
+  hasBuiltInProcedureConflict,
+  normalizeProcedureSetForCombinedPricing,
+} from '@/utils/procedureCompatibility';
 import type { QuoteData, ProcedureCombination, ProcedureEntry, ProcedureExclusion } from '@/types/quote';
 
 interface Props {
@@ -921,9 +924,10 @@ export default function QuoteForm({ onGenerate }: Props) {
                 const selectedEntries = procedureEntries.filter((entry, idx) =>
                   selectedIds.includes(getProcedureEntryId(entry, idx)),
                 );
-                const totalSurgery = selectedEntries.reduce((sum, entry) => sum + entry.prices.surgery, 0);
-                const totalAnesthesia = selectedEntries.reduce((sum, entry) => sum + entry.prices.anesthesia, 0);
-                const totalHospital = calculateCombinedHospitalValues(selectedEntries);
+                const pricedEntries = normalizeProcedureSetForCombinedPricing(selectedEntries);
+                const totalSurgery = pricedEntries.reduce((sum, entry) => sum + entry.prices.surgery, 0);
+                const totalAnesthesia = pricedEntries.reduce((sum, entry) => sum + entry.prices.anesthesia, 0);
+                const totalHospital = calculateCombinedHospitalValues(pricedEntries);
                 const hasBlockedProcedures =
                   hasBlockedPair(selectedIds, procedureExclusions) ||
                   hasBuiltInProcedureConflict(selectedEntries);

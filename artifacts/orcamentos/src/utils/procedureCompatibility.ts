@@ -26,6 +26,24 @@ function isImplantReplacementWithPreAxillaryLiposuction(entry: ProcedureEntry) {
   );
 }
 
+function isStandalonePreAxillaryLiposuction(entry: ProcedureEntry) {
+  return normalizeProcedureName(entry.procedure.name) === 'lipoaspiracao de pre-axilas';
+}
+
+function includesPreAxillaryLiposuction(entry: ProcedureEntry) {
+  return normalizeProcedureName(entry.procedure.name).includes('lipoaspiracao de pre-axilas');
+}
+
+export function normalizeProcedureSetForCombinedPricing(entries: ProcedureEntry[]) {
+  const hasBundledPreAxillaryLiposuction = entries.some(
+    (entry) => includesPreAxillaryLiposuction(entry) && !isStandalonePreAxillaryLiposuction(entry),
+  );
+
+  if (!hasBundledPreAxillaryLiposuction) return entries;
+
+  return entries.filter((entry) => !isStandalonePreAxillaryLiposuction(entry));
+}
+
 export function areProceduresBuiltInIncompatible(first: ProcedureEntry, second: ProcedureEntry) {
   const isRemovalAlternative =
     isImplantRemovalWithBreastFatGrafting(first) &&

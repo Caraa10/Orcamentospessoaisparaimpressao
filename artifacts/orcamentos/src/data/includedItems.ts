@@ -103,7 +103,15 @@ function getProcedureLabel(entry: {
   category: ProcedureCategory;
   name: string;
 }): string {
-  const normalizedName = normalizeProcedureLabel(entry.name);
+  let normalizedName = normalizeProcedureLabel(entry.name);
+
+  if (entry.category === 'breast') {
+    normalizedName = normalizedName
+      .replace(/\s+e\s+lipoaspiraç[aã]o de pr[ée]-axilas\b/gi, '')
+      .replace(/\s+e\s+lipoaspiraç[aã]o de contorno mam[aá]rio\b/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
 
   if (
     entry.category === 'abdominoplasty' &&

@@ -4,7 +4,7 @@ App local em HTML/CSS/JS para montar orçamentos de cirurgia plástica e salvar 
 
 ## Como usar
 
-1. Abra [`app/index.html`](/Users/thiagoferri/Documents/New project/app/index.html) no navegador.
+1. Abra [`app/index.html`](app/index.html) no navegador.
 2. Escolha o procedimento, a variação e a complexidade.
 3. Revise os honorários, preencha hospital e itens extras quando necessário.
 4. Complete os textos do orçamento.
